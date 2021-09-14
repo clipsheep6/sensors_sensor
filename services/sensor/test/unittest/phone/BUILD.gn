@@ -1,0 +1,123 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+SUBSYSTEM_DIR = "//base/sensors"
+module_output_path = "sensors/sensor/services/sensor"
+
+###########################SensorDataProcesserTest###########################
+ohos_unittest("SensorDataProcesserTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./sensor_data_processer_test.cpp" ]
+
+  include_dirs = [
+    "//utils/native/base/include",
+    "$SUBSYSTEM_DIR/sensor/utils/include",
+    "$SUBSYSTEM_DIR/sensor/services/sensor/include",
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor/include",
+    "//drivers/peripheral/sensor/interfaces/include",
+    "$SUBSYSTEM_DIR/sensor/interfaces/native/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor:libsensor_native",
+    "$SUBSYSTEM_DIR/sensor/services/sensor:libsensor_service",
+    "$SUBSYSTEM_DIR/sensor/utils:libsensor_utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr_L2:samgr_proxy",
+  ]
+}
+
+###########################SensorProxyTest###########################
+ohos_unittest("SensorProxyTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./sensor_proxy_test.cpp" ]
+
+  include_dirs = [
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "$SUBSYSTEM_DIR/sensor/utils/include",
+    "$SUBSYSTEM_DIR/sensor/services/sensor/include",
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor/include",
+    "$SUBSYSTEM_DIR/sensor/interfaces/native/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor:libsensor_native",
+    "$SUBSYSTEM_DIR/sensor/services/sensor:libsensor_service",
+    "$SUBSYSTEM_DIR/sensor/utils:libsensor_utils",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_L2:samgr_proxy",
+  ]
+}
+
+###########################SensorServiceImplTest###########################
+ohos_unittest("SensorServiceImplTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./sensor_service_impl_test.cpp" ]
+
+  include_dirs = [
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "$SUBSYSTEM_DIR/sensor/utils/include",
+    "$SUBSYSTEM_DIR/sensor/services/sensor/include",
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor/include",
+    "//drivers/peripheral/sensor/interfaces/include",
+    "$SUBSYSTEM_DIR/sensor/interfaces/native/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor:libsensor_native",
+    "$SUBSYSTEM_DIR/sensor/services/sensor:libsensor_service",
+    "$SUBSYSTEM_DIR/sensor/utils:libsensor_utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//utils/native/base:utils",
+  ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_L2:samgr_proxy",
+  ]
+}
+
+###########################end###########################
+group("unittest") {
+  testonly = true
+  deps = [
+    ":SensorDataProcesserTest",
+    ":SensorProxyTest",
+    ":SensorServiceImplTest",
+  ]
+}
