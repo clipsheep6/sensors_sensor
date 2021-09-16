@@ -57,32 +57,6 @@ SensorDataChannel::SensorDataChannel()
     }
 }
 
-int32_t SensorDataChannel::HandleEvent(int32_t fd, int32_t events, void *data)
-{
-    HiLog::Debug(LABEL, "%{public}s fd : %{public}d", __func__, fd);
-    constexpr int32_t allowSkip = 1;
-    if (data == nullptr) {
-        HiLog::Error(LABEL, "%{public}s data cannot be null", __func__);
-        return allowSkip;
-    }
-    SensorDataChannel *channel = reinterpret_cast<SensorDataChannel *>(data);
-    if (channel->receiveDataBuff_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s channel receiveDataBuff_ cannot be null", __func__);
-        return allowSkip;
-    }
-    int32_t len = channel->ReceiveData(channel->receiveDataBuff_, SENSOR_READ_DATA_SIZE);
-    while (len > 0) {
-        int32_t eventSize = sizeof(SensorEvent);
-        if (eventSize > 0) {
-            int32_t num = len / eventSize;
-            HiLog::Debug(LABEL, "%{public}s num : %{public}d", __func__, num);
-            channel->dataCB_(channel->receiveDataBuff_, num, channel->privateData_);
-            len = channel->ReceiveData(channel->receiveDataBuff_, SENSOR_READ_DATA_SIZE);
-        }
-    }
-    return allowSkip;
-}
-
 int32_t SensorDataChannel::CreateSensorDataChannel(DataChannelCB callBack, void *data)
 {
     if (callBack == nullptr) {

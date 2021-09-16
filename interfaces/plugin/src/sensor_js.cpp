@@ -125,7 +125,7 @@ static int32_t SubscribeSensor(int32_t sensorTypeId, int64_t interval, RecordSen
 static napi_value Once(napi_env env, napi_callback_info info)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
-    size_t argc;
+    size_t argc = 2;
     napi_value args[2];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
@@ -168,7 +168,7 @@ static napi_value Once(napi_env env, napi_callback_info info)
 static napi_value On(napi_env env, napi_callback_info info)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
-    size_t argc;
+    size_t argc = 3;
     napi_value args[3];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
@@ -219,7 +219,7 @@ static napi_value On(napi_env env, napi_callback_info info)
 static napi_value Off(napi_env env, napi_callback_info info)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
-    size_t argc;
+    size_t argc = 2;
     napi_value args[2];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
