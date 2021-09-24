@@ -9,9 +9,6 @@
 
 -   [相关仓](#section96071132185310)
 
->![](public_sys-resources/icon-note.gif) **说明：** 
->从API Version 7 开始支持。
-
 ## 简介<a name="section11660541593"></a>
 
 传感器是指用于侦测环境中所发生事件或变化，并将此消息发送至其他电子设备（如中央处理器）的设备，通常由敏感组件和转换组件组成。传感器是实现物联网智能化的重要基石，为实现全场景智慧化战略，支撑“1+8+N”产品需求，需要构筑统一的传感器管理框架，达到为各产品/业务提供低时延、低功耗的感知数据的目的。根据用途可分为以下六大类：
@@ -192,9 +189,7 @@ export default {
 
 泛Sensor服务子系统
 
-sensors\_start
-
 **sensors\_sensor**
 
-sensors\_miscdevice
+[sensors\_miscdevice](https://gitee.com/openharmony/sensors_miscdevice)
 

@@ -9,9 +9,6 @@
 
 -   [Repositories Involved](#section96071132185310)
 
->![](public_sys-resources/icon-note.gif) **NOTE:** 
->The APIs of this module are supported since API version 7.
-
 ## Introduction<a name="section11660541593"></a>
 
 A sensor is a device to detect events or changes in an environment and send messages about the events or changes to another device \(for example, a CPU\). Generally, a sensor is composed of sensitive components and conversion components. Sensors are the cornerstone of the IoT. A unified sensor management framework is required to achieve data sensing at a low latency and low power consumption, thereby keeping up with requirements of "1+8+N" products or business in the Seamless AI Life Strategy. Based on the usage, sensors are divided into the following categories:
@@ -192,9 +189,7 @@ export default {
 
 Pan-sensor subsystem
 
-sensors\_start
-
 **sensors\_sensor**
 
-sensors\_miscdevice
+[sensors\_miscdevice](https://gitee.com/openharmony/sensors_miscdevice)
 
