@@ -46,7 +46,7 @@ ohos_shared_library("sensor_interface_native") {
     "//utils/native/base:utils",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  part_name = "sensors_sensor"
+  part_name = "sensor"
   subsystem_name = "sensors"
 }
 

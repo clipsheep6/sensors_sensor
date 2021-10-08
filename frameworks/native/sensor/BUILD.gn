@@ -56,7 +56,7 @@ ohos_shared_library("libsensor_native") {
     "samgr_L2:samgr_proxy",
   ]
 
-  part_name = "sensors_sensor"
+  part_name = "sensor"
   subsystem_name = "sensors"
 }
 

@@ -49,7 +49,7 @@ ohos_unittest("SensorJsTest") {
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   relative_install_dir = "module"
-  part_name = "sensors_sensor"
+  part_name = "sensor"
   subsystem_name = "sensors"
 }
 group("unittest") {
