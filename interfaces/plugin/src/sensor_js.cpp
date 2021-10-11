@@ -207,8 +207,6 @@ static napi_value On(napi_env env, napi_callback_info info)
         HiLog::Error(LABEL, "%{public}s subscribeSensor  failed", __func__);
         asyncCallbackInfo->status = -1;
         EmitAsyncCallbackWork(asyncCallbackInfo);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
         g_onCallbackInfos.erase(sensorTypeId);
         return nullptr;
     }
