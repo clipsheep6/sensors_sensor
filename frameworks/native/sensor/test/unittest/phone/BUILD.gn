@@ -48,7 +48,7 @@ ohos_unittest("SensorNativeTest") {
     #"communication_L2:ipc_core",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 }
 
