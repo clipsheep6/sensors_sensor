@@ -45,12 +45,6 @@ describe("SensorJsTest", function () {
          console.info('afterEach caled')
     })
 
-    // function timeout(done) {
-    //     expect().assertFail();
-    //     console.debug('SensorJsTest=========timeout========');
-    //     done();
-    // }
-
     /*
      * @tc.name:SensorJsTest001
      * @tc.desc:verify app info is not null
