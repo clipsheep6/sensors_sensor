@@ -148,7 +148,6 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
     if (sensorDataThread_.joinable()) {
         sensorDataThread_.join();
     }
-    // destroy sensor basic channel
     return DestroySensorBasicChannel();
 }
 bool SensorDataChannel::IsThreadExit()

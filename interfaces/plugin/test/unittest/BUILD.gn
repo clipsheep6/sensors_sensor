@@ -14,24 +14,10 @@
 import("//build/test.gni")
 
 module_output_path = "sensor/interfaces"
-
 ohos_js_unittest("SensorJsTest") {
   module_out_path = module_output_path
-  hap_profile = "./src/main/config.json"
-  deps = [
-    ":SensorJsTest_js_assets",
-    ":SensorJsTest_resources",
-  ]
-
+  hap_profile = "./config.json"
   certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
-  hap_name = "SensorJsTest"
-}
-ohos_js_assets("SensorJsTest_js_assets") {
-  source_dir = "./src/main/js/default"
-}
-ohos_resources("SensorJsTest_resources") {
-  sources = [ "./src/main/resources" ]
-  hap_profile = "./src/main/config.json"
 }
 
 group("unittest") {
