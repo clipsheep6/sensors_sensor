@@ -87,14 +87,14 @@ static const SensorUser user = {
 static int32_t UnsubscribeSensor(int32_t sensorTypeId)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
-    int32_t ret = UnsubscribeSensor(sensorTypeId, &user);
-    if (ret < 0) {
-        HiLog::Error(LABEL, "%{public}s  UnsubscribeSensor failed", __func__);
-        return ret;
-    }
-    ret = DeactivateSensor(sensorTypeId, &user);
+    int32_t ret = DeactivateSensor(sensorTypeId, &user);
     if (ret < 0) {
         HiLog::Error(LABEL, "%{public}s  DeactivateSensor failed", __func__);
+        return ret;
+    }
+    ret = UnsubscribeSensor(sensorTypeId, &user);
+    if (ret < 0) {
+        HiLog::Error(LABEL, "%{public}s  UnsubscribeSensor failed", __func__);
         return ret;
     }
     HiLog::Info(LABEL, "%{public}s left", __func__);

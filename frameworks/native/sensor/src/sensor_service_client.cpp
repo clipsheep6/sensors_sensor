@@ -75,9 +75,27 @@ int32_t SensorServiceClient::InitServiceClient()
     return SENSOR_NATIVE_GET_SERVICE_ERR;
 }
 
+bool SensorServiceClient::IsValidSensorId(uint32_t sensorId)
+{
+    if (sensorList_.empty()) {
+        HiLog::Error(LABEL, "%{public}s sensorList_ cannot be empty", __func__);
+        return false;
+    }
+    for (auto &sensor : sensorList_) {
+        if (sensor.GetSensorId() == sensorId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t SensorServiceClient::EnableSensor(uint32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    if (!IsValidSensorId(sensorId)) {
+        HiLog::Error(LABEL, "%{public}s sensorId is invalid", __func__);
+        return SENSOR_NATIVE_SAM_ERR;
+    }
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
@@ -93,6 +111,10 @@ int32_t SensorServiceClient::EnableSensor(uint32_t sensorId, int64_t samplingPer
 int32_t SensorServiceClient::DisableSensor(uint32_t sensorId)
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    if (!IsValidSensorId(sensorId)) {
+        HiLog::Error(LABEL, "%{public}s sensorId is invalid", __func__);
+        return SENSOR_NATIVE_SAM_ERR;
+    }
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
@@ -108,6 +130,10 @@ int32_t SensorServiceClient::DisableSensor(uint32_t sensorId)
 int32_t SensorServiceClient::RunCommand(uint32_t sensorId, int32_t cmdType, int32_t params)
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    if (!IsValidSensorId(sensorId)) {
+        HiLog::Error(LABEL, "%{public}s sensorId is invalid", __func__);
+        return SENSOR_NATIVE_SAM_ERR;
+    }
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);

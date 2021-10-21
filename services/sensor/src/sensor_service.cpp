@@ -258,6 +258,7 @@ ErrCode SensorService::EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
     auto ret = SaveSubscriber(sensorId, samplingPeriodNs, maxReportDelayNs);
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s SaveSubscriber failed", __func__);
+        clientInfo_.RemoveSubscriber(sensorId, this->GetCallingPid());
         return ret;
     }
 
@@ -284,6 +285,10 @@ ErrCode SensorService::DisableSensor(uint32_t sensorId)
     if (clientPid < 0) {
         HiLog::Error(LABEL, "%{public}s clientPid is invalid, clientPid : %{public}d", __func__, clientPid);
         return CLIENT_PID_INVALID_ERR;
+    }
+    if (clientInfo_.GetSensorState(sensorId) != SENSOR_ENABLED) {
+        HiLog::Error(LABEL, "%{public}s sensor should be enabled first", __func__);
+        return DISABLE_SENSOR_ERR;
     }
     if (sensorManager_.IsOtherClientUsingSensor(sensorId, clientPid)) {
         HiLog::Warn(LABEL, "%{public}s other client is using this sensor now, cannot disable", __func__);

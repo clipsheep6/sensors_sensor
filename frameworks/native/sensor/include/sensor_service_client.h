@@ -44,6 +44,7 @@ private:
     int32_t InitServiceClient();
     void UpdateSensorInfoMap(uint32_t sensorId, int64_t samplingPeroid, int64_t maxReportDelay);
     void DeleteSensorInfoItem(uint32_t sensorId);
+    bool IsValidSensorId(uint32_t sensorId);
     std::mutex clientMutex_;
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_;
     sptr<ISensorService> sensorServer_;

@@ -142,7 +142,11 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
     }
     int32_t fd = GetReceiveDataFd();
     eventHandler_->RemoveFileDescriptorListener(fd);
-
+    eventHandler_ = nullptr;
+    if (eventRunner_ != nullptr) {
+        eventRunner_->Stop();
+        eventRunner_ = nullptr;
+    }
     threadStop_ = true;
 
     if (sensorDataThread_.joinable()) {
