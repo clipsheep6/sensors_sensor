@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,47 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#import("//build/config/ohos/rules.gni")
-import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "sensors/sensor/interfaces"
-ohos_unittest("SensorJsTest") {
-  module_out_path = module_output_path
 
-  include_dirs = [
-    "//third_party/node/src",
-    "//native_engine",
-    "//base/sensors/sensor/interfaces/native/include",
-    "//base/sensors/sensor/interfaces/plugin/include",
-    "//utils/native/base/include",
-    "./include",
-    "//third_party/libuv/include",
-    "//foundation/ace/napi",
-    "//foundation/ace/napi/interfaces/kits",
-    "//foundation/ace/napi/native_engine",
-    "//foundation/ace/napi/native_engine/impl/quickjs",
-  ]
-  defines = [
-    "APP_LOG_TAG = \"sensroJs\"",
-    "LOG_DOMAIN = 0xD002700",
-  ]
-  sources = [ "sensor_js_test.cpp" ]
-  deps = [
-    "//base/sensors/sensor/interfaces/native:sensor_interface_native",
-    "//base/sensors/sensor/interfaces/plugin:sensor",
-    "//foundation/ace/napi:ace_napi",
-    "//foundation/ace/napi/:ace_napi_quickjs",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
-    "//third_party/libuv:uv_static",
-    "//third_party/quickjs:qjs",
-    "//utils/native/base:utils",
-  ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-  relative_install_dir = "module"
-  part_name = "sensor"
-  subsystem_name = "sensors"
+module_output_path = "sensor/interfaces"
+ohos_js_unittest("SensorJsTest") {
+  module_out_path = module_output_path
+  hap_profile = "./config.json"
+  certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
 }
+
 group("unittest") {
   testonly = true
   deps = [ ":SensorJsTest" ]

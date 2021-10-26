@@ -192,6 +192,7 @@ int32_t SensorAgentProxy::ActivateSensor(int32_t sensorId, const SensorUser *use
     g_reportInterval = -1;
     if (ret != 0) {
         HiLog::Error(LABEL, "%{public}s enable sensor failed, ret: %{public}d", __func__, ret);
+        g_subscribeMap.erase(sensorId);
         return OHOS::Sensors::ERROR;
     }
     return OHOS::Sensors::SUCCESS;

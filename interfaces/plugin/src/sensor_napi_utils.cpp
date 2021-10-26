@@ -119,7 +119,7 @@ void EmitAsyncCallbackWork(AsyncCallbackInfo *asyncCallbackInfo)
         [](napi_env env, void* data) {},
         [](napi_env env, napi_status status, void* data) {
             HiLog::Debug(LABEL, "%{public}s napi_create_async_work in", __func__);
-            AsyncCallbackInfo *asyncCallbackInfo = (AsyncCallbackInfo *)data;
+            AsyncCallbackInfo *asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data);
             napi_value callback;
             napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
             napi_value callResult = nullptr;
@@ -145,11 +145,11 @@ void EmitAsyncCallbackWork(AsyncCallbackInfo *asyncCallbackInfo)
                     return;
                 }
                 std::vector<std::string> sensorAttribute = g_sensorAttributeList[sensorTypeId];
-                float *sensorData = asyncCallbackInfo->sensorData;
                 napi_create_object(env, &result[1]);
                 for (size_t i = 0; i < sensorAttribute.size(); i++) {
                     napi_value message = nullptr;
-                    double a = *sensorData;
+                    double a = asyncCallbackInfo->sensorData[i];
+                    HiLog::Info(LABEL, "%{public}s data id %{public}f", __func__, a);
                     napi_create_double(env, a, &message);
                     napi_set_named_property(env, result[1], sensorAttribute[i].c_str(), message);
                 }
@@ -164,7 +164,6 @@ void EmitAsyncCallbackWork(AsyncCallbackInfo *asyncCallbackInfo)
                 asyncCallbackInfo = nullptr;
             }
             HiLog::Debug(LABEL, "%{public}s napi_create_async_work left", __func__);
-            free(result);
         },
         asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork);

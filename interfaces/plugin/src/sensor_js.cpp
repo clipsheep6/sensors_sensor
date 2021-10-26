@@ -51,7 +51,7 @@ static void DataCallbackImpl(SensorEvent *event)
         if ((int32_t)onCallbackInfo.first == sensorTypeId) {
             onCallbackInfo.second->sensorTypeId = sensorTypeId;
             onCallbackInfo.second->sensorDataLength = event->dataLen;
-            if (memcpy_s(onCallbackInfo.second->sensorData, sizeof(data), data, sizeof(data)) != EOK) {
+            if (memcpy_s(onCallbackInfo.second->sensorData, event->dataLen, data, event->dataLen) != EOK) {
                 HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
                 return;
             }
@@ -66,7 +66,7 @@ static void DataCallbackImpl(SensorEvent *event)
     struct AsyncCallbackInfo *onceCallbackInfo = g_onceCallbackInfos[sensorTypeId];
     onceCallbackInfo->sensorTypeId = sensorTypeId;
     onceCallbackInfo->sensorDataLength = event->dataLen;
-    if (memcpy_s(onceCallbackInfo->sensorData, sizeof(data), data, sizeof(data)) != EOK) {
+    if (memcpy_s(onceCallbackInfo->sensorData, event->dataLen, data, event->dataLen) != EOK) {
         HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
         return;
     }

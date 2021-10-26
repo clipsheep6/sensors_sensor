@@ -53,8 +53,6 @@ ReportDataCallback::~ReportDataCallback()
 
 int32_t ReportDataCallback::ZReportDataCallback(const struct SensorEvent* event, sptr<ReportDataCallback> cb)
 {
-    float *data = (float*)event->data;
-    HiLog::Info(LABEL, "%{public}s in, sensorData: %{public}f", __func__, *(data));
     if (cb == nullptr || cb->eventsBuf_.circularBuf == nullptr || event == nullptr) {
         HiLog::Error(LABEL, "%{public}s callback or circularBuf or event cannot be null", __func__);
         return ERROR;
@@ -68,6 +66,7 @@ int32_t ReportDataCallback::ZReportDataCallback(const struct SensorEvent* event,
         .dataLen = event->dataLen
     };
     eventCopy.data = new uint8_t[SENSOR_DATA_LENGHT];
+    HiLog::Info(LABEL, "%{public}s dataLength: %{public}d", __func__, event->dataLen);
     if (memcpy_s(eventCopy.data, event->dataLen, event->data, event->dataLen) != EOK) {
         HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
         return COPY_ERR;
