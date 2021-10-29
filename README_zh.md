@@ -143,7 +143,7 @@ sensor导入模块的示例代码如下：
 1.  导包。
 2.  注册并监听加速度传感器数据的变化。
 3.  取消订阅加速度传感器数据的变化。
-4.  注册并监听重力传感器数据的变化一次。
+4.  注册并监听加速度传感器数据的变化一次。
 
 示例代码：
 
@@ -153,7 +153,7 @@ import sensor from '@ohos.sensor';
 export default {
     onCreate() {
         //步骤2 监听传感器数据变化，并注册传感器类型
-        sensor.on(sensor.SensorType.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
+        sensor.on(sensor.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
             if (error) {
                 console.error("Failed to subscribe to acceleration data. Error code: " + error.code + "; message: " + error.message);
                 return;
@@ -162,7 +162,7 @@ export default {
         }, {'interval':200000000});
         //步骤3 设置10秒后取消订阅传感器数据
         setTimeout(function(){
-            sensor.off(SensorType.SENSOR_TYPE_ID_ACCELEROMETER, function(error) {
+            sensor.off(sensor.SENSOR_TYPE_ID_ACCELEROMETER, function(error) {
                 if (error) {
                     console.error("Failed to unsubscribe from acceleration data. Error code: " + error.code + "; message: " + error.message);
                     return;
@@ -171,12 +171,12 @@ export default {
             });
         } ,10000);
         //步骤4 监听传感器数据变化一次，并注册传感器类型
-        sensor.once(sensor.SensorType.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
+        sensor.once(sensor.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
             if (error) {
                 console.error("Failed to subscribe to gravity data. Error code: " + error.code + "; message: " + error.message);
                 return;
             }
-            console.info("Gravity data obtained. x: " + data.x + "; y: " + data.y + "; z: " + data.z);
+            console.info("Acceleration data obtained. x: " + data.x + "; y: " + data.y + "; z: " + data.z);
        });
     }
     onDestroy() {

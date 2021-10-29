@@ -55,7 +55,7 @@ describe("SensorJsTest", function () {
         console.info('----------------------SensorJsTest001---------------------------');
         function offPromise() {
             return new Promise((resolve, reject) => {
-                    sensor.off(0, (error) =>{
+                    sensor.off(5, (error) =>{
                         if(error) {
                             console.info('SensorJsTest001  off error');
                             expect(false).assertTrue();
@@ -75,7 +75,7 @@ describe("SensorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            sensor.on(0, function(error, data) {
+            sensor.on(5, function(error, data) {
                 if (error) {
                     console.info('SensorJsTest001  on error');
                     expect(false).assertTrue();
@@ -83,8 +83,8 @@ describe("SensorJsTest", function () {
                         reject();
                     }, 500);
                 } else {
-                    console.info('SensorJsTest001  on success');
-                    expect(typeof(data.x)).assertEqual("number");
+                    console.info('SensorJsTest001  on success, success data: ' + data.intensity);
+                    expect(typeof(data.intensity)).assertEqual("number");
                     setTimeout(()=>{
                         resolve();
                     }, 500);
@@ -133,7 +133,7 @@ describe("SensorJsTest", function () {
         console.info('----------------------SensorJsTest003---------------------------');
         function offPromise() {
             return new Promise((resolve, reject) => {
-                    sensor.off(0, (error) =>{
+                    sensor.off(5, (error) =>{
                         if(error) {
                             console.info('SensorJsTest003  off error');
                             expect(false).assertTrue();
@@ -154,7 +154,7 @@ describe("SensorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            sensor.on(0, function(error, data) {
+            sensor.on(5, function(error, data) {
                 if (error) {
                     console.info('SensorJsTest003  on error');
                     expect(false).assertTrue();
@@ -162,8 +162,8 @@ describe("SensorJsTest", function () {
                         reject();
                     }, 500);
                 } else {
-                    console.info('SensorJsTest003  on success');
-                    expect(typeof(data.x)).assertEqual("number");
+                    console.info('SensorJsTest003  on success data: ' + data.intensity);
+                    expect(typeof(data.intensity)).assertEqual("number");
                     setTimeout(()=>{
                         resolve();
                     }, 500);
@@ -187,7 +187,7 @@ describe("SensorJsTest", function () {
      */
     it("SensorJsTest004", 0, function () {
         console.info('----------------------SensorJsTest004---------------------------');
-        sensor.on(0, function(){}, {'interval': 100000000}, 5);
+        sensor.on(5, function(){}, {'interval': 100000000}, 5);
         expect(true).assertTrue();
         console.info('----------------------SensorJsTest004--------------------------- end');
     })
@@ -204,14 +204,14 @@ describe("SensorJsTest", function () {
                 console.info('SensorJsTest005  once error');
                 expect(false).assertTrue();
             } else {
-                console.info('SensorJsTest005  once success');
-                expect(typeof(data.x)).assertEqual("number");
+                console.info('SensorJsTest005  once success data: ' + data.intensity);
+                expect(typeof(data.intensity)).assertEqual("number");
             }
             setTimeout(()=>{
                 done();
             }, 500);
         }
-        sensor.once(0, onceSensorCallback);
+        sensor.once(5, onceSensorCallback);
     })
 
     /*
@@ -226,7 +226,7 @@ describe("SensorJsTest", function () {
                 console.info('SensorJsTest006  on success');
                 expect(true).assertTrue();
             } else {
-                console.info('SensorJsTest006  on error' + data.x);
+                console.info('SensorJsTest006  on error');
                 expect(false).assertTrue();
             }
             setTimeout(()=>{
@@ -243,7 +243,7 @@ describe("SensorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("SensorJsTest007", 0, function () {
-        sensor.once(0, function(){}, 5);
+        sensor.once(5, function(){}, 5);
         expect(true).assertTrue();
     })
 
@@ -288,7 +288,7 @@ describe("SensorJsTest", function () {
                 done();
             }, 500);
         }
-        sensor.off(0, offCallback);
+        sensor.off(5, offCallback);
     })
 
     /*
@@ -310,7 +310,7 @@ describe("SensorJsTest", function () {
                 done();
             }, 500);
         }
-        sensor.off(1000000, offCallback);
+        sensor.off(2000000, offCallback);
     })
 
     /*
@@ -325,14 +325,14 @@ describe("SensorJsTest", function () {
                 console.info('SensorJsTest011  once success');
                 expect(true).assertTrue();
             } else {
-                console.info('SensorJsTest011  once error' + data.x);
+                console.info('SensorJsTest011  once error');
                 expect(false).assertTrue();
             }
             setTimeout(()=>{
                 done();
             }, 500);
         }
-        sensor.once(1000000, onceSensorCallback);
+        sensor.once(2000000, onceSensorCallback);
     })
 
     /*
@@ -342,19 +342,19 @@ describe("SensorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("SensorJsTest012", 0, async function (done) {
-        function offCallback(error) {
+        function onCallback(error) {
             if (error) {
-                console.info('SensorJsTest012  off success');
+                console.info('SensorJsTest012  on success');
                 expect(true).assertTrue();
             } else {
-                console.info('SensorJsTest012  off error');
+                console.info('SensorJsTest012  on error');
                 expect(false).assertTrue();
             }
             setTimeout(()=>{
                 done();
             }, 500);
         }
-        sensor.on(1000000, offCallback);
+        sensor.on(2000000, onCallback);
     })
 
     /*
@@ -364,7 +364,7 @@ describe("SensorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("SensorJsTest013", 0, function () {
-        sensor.off(0, 5);
+        sensor.off(5, 5);
         expect(true).assertTrue();
     })
 
@@ -379,7 +379,7 @@ describe("SensorJsTest", function () {
         console.info('----------------------SensorJsTest014---------------------------');
         function offPromise2() {
             return new Promise((resolve, reject) => {
-                    sensor.off(0, (error) =>{
+                    sensor.off(5, (error) =>{
                         if(error) {
                             console.info('SensorJsTest014  off2 success');
                             expect(true).assertTrue();
@@ -401,7 +401,7 @@ describe("SensorJsTest", function () {
 
         function offPromise1() {
             return new Promise((resolve, reject) => {
-                    sensor.off(0, (error) =>{
+                    sensor.off(5, (error) =>{
                         if(error) {
                             console.info('SensorJsTest014  off1  error');
                             expect(false).assertTrue();
@@ -420,7 +420,7 @@ describe("SensorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            sensor.on(0, function(error, data) {
+            sensor.on(5, function(error, data) {
                 if (error) {
                     console.info('SensorJsTest014  on error');
                     expect(false).assertTrue();
@@ -428,8 +428,8 @@ describe("SensorJsTest", function () {
                         reject();
                     }, 500);
                 } else {
-                    console.info('SensorJsTest014  on success');
-                    expect(typeof(data.x)).assertEqual("number");
+                    console.info('SensorJsTest014  on success data: ' + data.intensity);
+                    expect(typeof(data.intensity)).assertEqual("number");
                     setTimeout(()=>{
                         resolve();
                     }, 500);
@@ -455,7 +455,7 @@ describe("SensorJsTest", function () {
         console.info('----------------------SensorJsTest015---------------------------');
         function offPromise() {
             return new Promise((resolve, reject) => {
-                sensor.off(0, (error) =>{
+                sensor.off(5, (error) =>{
                     if(error) {
                         console.info('SensorJsTest015  off error');
                         expect(false).assertTrue();
@@ -476,7 +476,7 @@ describe("SensorJsTest", function () {
         }
         function onPromise2() {
             return new Promise((resolve, reject) => {
-                sensor.on(0, function(error, data) {
+                sensor.on(5, function(error, data) {
                     if (error) {
                         console.info('SensorJsTest015  on2 error');
                         expect(false).assertTrue();
@@ -484,8 +484,8 @@ describe("SensorJsTest", function () {
                             reject();
                         }, 500);
                     } else {
-                        console.info('SensorJsTest015  on2 success');
-                        expect(typeof(data.x)).assertEqual("number");
+                        console.info('SensorJsTest015  on2 success data: ' + data.intensity);
+                        expect(typeof(data.intensity)).assertEqual("number");
                         setTimeout(()=>{
                             resolve();
                         }, 500);
@@ -495,7 +495,7 @@ describe("SensorJsTest", function () {
         }
 
         let onPromise1 = new Promise((resolve, reject) => {
-            sensor.on(0, function(error, data) {
+            sensor.on(5, function(error, data) {
                 if (error) {
                     console.info('SensorJsTest015  on1 error');
                     expect(false).assertTrue();
@@ -503,8 +503,8 @@ describe("SensorJsTest", function () {
                         reject();
                     }, 500);
                 } else {
-                    console.info('SensorJsTest015  on1 success');
-                    expect(typeof(data.x)).assertEqual("number");
+                    console.info('SensorJsTest015  on1 success data: ' + data.intensity);
+                    expect(typeof(data.intensity)).assertEqual("number");
                     setTimeout(()=>{
                         resolve();
                     }, 500);
@@ -531,7 +531,7 @@ describe("SensorJsTest", function () {
         console.info('----------------------SensorJsTest016---------------------------');
         function offPromise() {
             return new Promise((resolve, reject) => {
-                sensor.off(0, (error) =>{
+                sensor.off(5, (error) =>{
                     if(error) {
                         console.info('SensorJsTest016  off error');
                         expect(false).assertTrue();
@@ -552,7 +552,7 @@ describe("SensorJsTest", function () {
         }
         function oncePromise() {
             return new Promise((resolve, reject) => {
-                sensor.once(0, function(error, data) {
+                sensor.once(5, function(error, data) {
                     if (error) {
                         console.info('SensorJsTest016  once error');
                         expect(false).assertTrue();
@@ -560,8 +560,8 @@ describe("SensorJsTest", function () {
                             reject();
                         }, 500);
                     } else {
-                        console.info('SensorJsTest016  once success');
-                        expect(typeof(data.x)).assertEqual("number");
+                        console.info('SensorJsTest016  once success data: ' + data.intensity);
+                        expect(typeof(data.intensity)).assertEqual("number");
                         setTimeout(()=>{
                             resolve();
                         }, 500);
@@ -571,7 +571,7 @@ describe("SensorJsTest", function () {
         }
 
         let onPromise1 = new Promise((resolve, reject) => {
-            sensor.on(0, function(error, data) {
+            sensor.on(5, function(error, data) {
                 if (error) {
                     console.info('SensorJsTest016  on1 error');
                     expect(false).assertTrue();
@@ -579,8 +579,8 @@ describe("SensorJsTest", function () {
                         reject();
                     }, 500);
                 } else {
-                    console.info('SensorJsTest016  on1 success');
-                    expect(typeof(data.x)).assertEqual("number");
+                    console.info('SensorJsTest016  on1 success data: ' + data.intensity);
+                    expect(typeof(data.intensity)).assertEqual("number");
                     setTimeout(()=>{
                         resolve();
                     }, 500);

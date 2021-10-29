@@ -143,7 +143,7 @@ The sensor JS APIs listen for sensor data changes. If an API is called multiple 
 1.  Import the sensor package.
 2.  Subscribe to and listen for data changes of an acceleration sensor.
 3.  Unsubscribe from data changes of the acceleration sensor.
-4.  Subscribe to and listen for a data change of a gravity sensor.
+4.  Subscribe to and listen for a data change of a acceleration sensor.
 
 Example:
 
@@ -153,7 +153,7 @@ import sensor from '@ohos.sensor';
 export default {
     onCreate() {
         // Step 2 Subscribe to and listen for data changes of a type of sensor.
-        sensor.on(sensor.SensorType.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
+        sensor.on(sensor.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
             if (error) {
                 console.error("Failed to subscribe to acceleration data. Error code: " + error.code + "; message: " + error.message);
                 return;
@@ -162,7 +162,7 @@ export default {
         }, {'interval':200000000});
         // Step 3 Unsubscribe from data changes of the sensor 10 seconds later.
         setTimeout(function(){
-            sensor.off(SensorType.SENSOR_TYPE_ID_ACCELEROMETER, function(error) {
+            sensor.off(sensor.SENSOR_TYPE_ID_ACCELEROMETER, function(error) {
                 if (error) {
                     console.error("Failed to unsubscribe from acceleration data. Error code: " + error.code + "; message: " + error.message);
                     return;
@@ -171,12 +171,12 @@ export default {
             });
         } ,10000);
         // Step 4 Subscribe to and listen for a data change of a type of sensor.
-        sensor.once(sensor.SensorType.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
+        sensor.once(sensor.SENSOR_TYPE_ID_ACCELEROMETER, (error, data) => {
             if (error) {
                 console.error("Failed to subscribe to gravity data. Error code: " + error.code + "; message: " + error.message);
                 return;
             }
-            console.info("Gravity data obtained. x: " + data.x + "; y: " + data.y + "; z: " + data.z);
+            console.info("Acceleration data obtained. x: " + data.x + "; y: " + data.y + "; z: " + data.z);
        });
     }
     onDestroy() {
