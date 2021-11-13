@@ -56,7 +56,7 @@ static void DataCallbackImpl(SensorEvent *event)
                 return;
             }
             onCallbackInfo.second->status = 1;
-            EmitAsyncCallbackWork((struct AsyncCallbackInfo *)(onCallbackInfo.second));
+            EmitUvEventLoop((struct AsyncCallbackInfo *)(onCallbackInfo.second));
         }
     }
     if (g_onceCallbackInfos.find(sensorTypeId) == g_onceCallbackInfos.end()) {
@@ -71,7 +71,7 @@ static void DataCallbackImpl(SensorEvent *event)
         return;
     }
     onceCallbackInfo->status = 2;
-    EmitAsyncCallbackWork((struct AsyncCallbackInfo *)(onceCallbackInfo));
+    EmitUvEventLoop((struct AsyncCallbackInfo *)(onceCallbackInfo));
     if (g_onCallbackInfos.find(sensorTypeId) == g_onCallbackInfos.end()) {
         HiLog::Debug(LABEL, "%{public}s no subscription to change sensor data, need to cancel registration", __func__);
         UnsubscribeSensor(sensorTypeId);
@@ -250,7 +250,6 @@ static napi_value Off(napi_env env, napi_callback_info info)
         asyncCallbackInfo->status = 0;
         if (g_onCallbackInfos.find(sensorTypeId) != g_onCallbackInfos.end()) {
             napi_delete_reference(env, g_onCallbackInfos[sensorTypeId]->callback[0]);
-            napi_delete_async_work(env, g_onCallbackInfos[sensorTypeId]->asyncWork);
             delete g_onCallbackInfos[sensorTypeId];
             g_onCallbackInfos[sensorTypeId] = nullptr;
             g_onCallbackInfos.erase(sensorTypeId);

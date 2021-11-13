@@ -133,39 +133,87 @@ void EmitAsyncCallbackWork(AsyncCallbackInfo *asyncCallbackInfo)
                 napi_create_error(env, code, message, &result[0]);
                 napi_get_undefined(env, &result[1]);
             } else if (asyncCallbackInfo->status == 0) {
-                napi_create_object(env, &result[1]);
-                napi_value message = nullptr;
-                napi_create_int32(env, asyncCallbackInfo->status, &message);
-                napi_set_named_property(env, result[1], "code", message);
-                napi_get_undefined(env, &result[0]);
-            } else {
-                int32_t sensorTypeId = asyncCallbackInfo->sensorTypeId;
-                if (g_sensorAttributeList.count(sensorTypeId) == 0) {
-                    HiLog::Error(LABEL, "%{public}s count of sensorTypeId is zero", __func__);
-                    return;
-                }
-                std::vector<std::string> sensorAttribute = g_sensorAttributeList[sensorTypeId];
-                napi_create_object(env, &result[1]);
-                for (size_t i = 0; i < sensorAttribute.size(); i++) {
-                    napi_value message = nullptr;
-                    double a = asyncCallbackInfo->sensorData[i];
-                    HiLog::Info(LABEL, "%{public}s data id %{public}f", __func__, a);
-                    napi_create_double(env, a, &message);
-                    napi_set_named_property(env, result[1], sensorAttribute[i].c_str(), message);
-                }
+                napi_get_undefined(env, &result[1]);
                 napi_get_undefined(env, &result[0]);
             }
             napi_call_function(env, nullptr, callback, 2, result, &callResult);
-            if (asyncCallbackInfo->status != 1) {
-                HiLog::Debug(LABEL, "%{public}s not a continuous callback, need to release asyncCallbackInfo", __func__);
-                napi_delete_reference(env, asyncCallbackInfo->callback[0]);
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-                delete asyncCallbackInfo;
-                asyncCallbackInfo = nullptr;
-            }
+            napi_delete_reference(env, asyncCallbackInfo->callback[0]);
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
             HiLog::Debug(LABEL, "%{public}s napi_create_async_work left", __func__);
         },
         asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork);
     HiLog::Debug(LABEL, "%{public}s end", __func__);
+}
+
+void EmitUvEventLoop(AsyncCallbackInfo *asyncCallbackInfo)
+{
+    uv_loop_s *loop(nullptr);
+    HiLog::Error(LABEL, "%{public}s env: %{public}p", __func__, asyncCallbackInfo->env);
+    napi_get_uv_event_loop(asyncCallbackInfo->env, &loop);
+    if (loop == nullptr) {
+        HiLog::Error(LABEL, "%{public}s loop is null", __func__);
+        return;
+    }
+
+    uv_work_t *work = new(std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HiLog::Error(LABEL, "%{public}s work is null", __func__);
+        return;
+    }
+
+    work->data = reinterpret_cast<void *>(asyncCallbackInfo);
+    uv_queue_work(loop, work, [] (uv_work_t *work) {}, [] (uv_work_t *work, int status) {
+        AsyncCallbackInfo *asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(work->data);
+        if (asyncCallbackInfo == nullptr) {
+            HiLog::Error(LABEL, "%{public}s asyncCallbackInfo is null", __func__);
+            return;
+        }
+        napi_env env = asyncCallbackInfo->env;
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        if (asyncCallbackInfo->callback[0] == nullptr) {
+            HiLog::Error(LABEL, "%{public}s callback is null", __func__);
+            return;
+        }
+        napi_value callback;
+        napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
+        napi_value callResult = nullptr;
+        napi_value result[2] = {0};
+        if (asyncCallbackInfo->status < 0) {
+            HiLog::Debug(LABEL, "%{public}s status < 0 in", __func__);
+            napi_value code = nullptr;
+            napi_value message = nullptr;
+            napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
+            napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
+            napi_create_error(env, code, message, &result[0]);
+            napi_get_undefined(env, &result[1]); 
+        } else {
+            int32_t sensorTypeId = asyncCallbackInfo->sensorTypeId;
+            if (g_sensorAttributeList.count(sensorTypeId) == 0) {
+                HiLog::Error(LABEL, "%{public}s count of sensorTypeId is zero", __func__);
+                return;
+            }
+            std::vector<std::string> sensorAttribute = g_sensorAttributeList[sensorTypeId];
+            napi_create_object(env, &result[1]);
+            for (size_t i = 0; i < sensorAttribute.size(); i++) {
+                napi_value message = nullptr;
+                double a = asyncCallbackInfo->sensorData[i];
+                HiLog::Info(LABEL, "%{public}s data id %{public}f", __func__, a);
+                napi_create_double(env, a, &message);
+                napi_set_named_property(env, result[1], sensorAttribute[i].c_str(), message);
+            }
+            napi_get_undefined(env, &result[0]);
+        }
+        napi_call_function(env, undefined, callback, 2, result, &callResult);
+        if (asyncCallbackInfo->status != 1) {
+            napi_delete_reference(env, asyncCallbackInfo->callback[0]);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
+        }
+        delete work;
+        work = nullptr;
+    });
 }
