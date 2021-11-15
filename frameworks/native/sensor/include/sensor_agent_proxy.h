@@ -17,10 +17,14 @@
 #define SENSOR_PROXY_H
 
 #include <map>
-#include "sensor_agent_type.h"
+#include <thread>
+
 #include "refbase.h"
+#include "sensor_agent_type.h"
 #include "sensor_data_channel.h"
 
+namespace OHOS {
+namespace Sensors {
 struct SensorNativeData;
 struct SensorIdList;
 typedef int32_t (*SensorDataCallback)(struct SensorNativeData *events, uint32_t num);
@@ -30,7 +34,7 @@ public:
     SensorAgentProxy();
     ~SensorAgentProxy();
     static const SensorAgentProxy *GetSensorsObj();
-    int32_t CreateSensorDataChannel(const SensorUser *user) const;
+    int32_t CreateSensorDataChannel() const;
     int32_t DestroySensorDataChannel() const;
     int32_t GetSensorId(struct SensorIdList *sensorId, uint32_t sensorGroup, uint32_t sensorType) const;
     int32_t GetDefaultSensorId(uint32_t sensorGroup, uint32_t sensorType) const;
@@ -49,8 +53,15 @@ private:
     static void HandleSensorData(SensorEvent *events, int32_t num, void *data);
     static void FillSensorAccuracy(struct SensorNativeData &data, SensorEvent &event);
     static OHOS::sptr<SensorAgentProxy> sensorObj_;
+    static std::mutex subscribeMutex_;
+    static std::mutex chanelMutex_;
     OHOS::sptr<OHOS::Sensors::SensorDataChannel> dataChannel_;
-    static SensorUser *user_;
-    static const std::map<int32_t, int32_t> g_sensorDataLenthMap;
+    static bool g_isChannelCreated;
+    static int64_t g_samplingInterval;
+    static int64_t g_reportInterval;
+    static std::map<int32_t, const SensorUser *> g_subscribeMap;
+    static std::map<int32_t, const SensorUser *> g_unsubscribeMap;
 };
+}  // namespace Sensors
+}  // namespace OHOS
 #endif  // endif SENSOR_PROXY_H

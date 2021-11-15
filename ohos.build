@@ -29,9 +29,7 @@
         }
       ],
       "test_list": [
-        "//base/sensors/sensor/frameworks/native/sensor/test:unittest",
         "//base/sensors/sensor/interfaces/native/test:unittest",
-        "//base/sensors/sensor/services/sensor/test:unittest",
         "//base/sensors/sensor/interfaces/plugin/test/unittest:unittest"
       ]
     }

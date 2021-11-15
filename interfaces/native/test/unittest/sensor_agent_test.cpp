@@ -80,15 +80,17 @@ HWTEST_F(SensorAgentTest, SensorNativeApiTest_001, TestSize.Level1)
 
     ret = SetBatch(sensorTypeId, &user, 100000000, 100000000);
     ASSERT_EQ(ret, 0);
+
     ret = ActivateSensor(sensorTypeId, &user);
     ASSERT_EQ(ret, 0);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     ASSERT_EQ(ret, 0);
 
-    ret = UnsubscribeSensor(sensorTypeId, &user);
-    ASSERT_EQ(ret, 0);
     ret = DeactivateSensor(sensorTypeId, &user);
+    ASSERT_EQ(ret, 0);
+
+    ret = UnsubscribeSensor(sensorTypeId, &user);
     ASSERT_EQ(ret, 0);
 }
 }  // namespace Sensors

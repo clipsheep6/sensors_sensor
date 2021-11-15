@@ -39,6 +39,7 @@ ohos_shared_library("libsensor_native") {
     "//drivers/peripheral/sensor/interfaces/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/appexecfwk/standard/libs/test/moduletest/common/event_handler",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
   deps = [
     "$SUBSYSTEM_DIR/sensor/services/sensor:libsensor_service",

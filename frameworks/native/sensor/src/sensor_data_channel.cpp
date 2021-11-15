@@ -36,7 +36,6 @@ using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
 std::shared_ptr<MyEventHandler> SensorDataChannel::eventHandler_;
 std::shared_ptr<AppExecFwk::EventRunner> SensorDataChannel::eventRunner_;
-int32_t SensorDataChannel::receiveFd_ = 0;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_NATIVE, "SensorDataChannel" };
@@ -47,15 +46,8 @@ const uint32_t STOP_EVENT_ID = 0;
 
 SensorDataChannel::SensorDataChannel()
     : dataCB_(nullptr),
-      privateData_(nullptr),
-      threadStop_(true)
-{
-    receiveDataBuff_ = new (std::nothrow) SensorEvent[SENSOR_READ_DATA_SIZE];
-    if (receiveDataBuff_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s receiveDataBuff_ cannot be null", __func__);
-        return;
-    }
-}
+      privateData_(nullptr)
+{}
 
 int32_t SensorDataChannel::CreateSensorDataChannel(DataChannelCB callBack, void *data)
 {
@@ -78,17 +70,12 @@ int32_t SensorDataChannel::RestoreSensorDataChannel()
         HiLog::Error(LABEL, "%{public}s fd not close", __func__);
         return SENSOR_CHANNEL_RESTORE_FD_ERR;
     }
-    if (sensorDataThread_.joinable()) {
-        HiLog::Error(LABEL, "%{public}s  thread exit", __func__);
-        return SENSOR_CHANNEL_RESTORE_THREAD_ERR;
-    }
     return InnerSensorDataChannel();
 }
 
 int32_t SensorDataChannel::InnerSensorDataChannel()
 {
-    std::lock_guard<std::mutex> threadLock(treadMutex_);
-
+    std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
     // create basic data channel
     int32_t ret = CreateSensorBasicChannel(SENSOR_READ_DATA_SIZE, SENSOR_READ_DATA_SIZE);
     if (ret != ERR_OK) {
@@ -108,8 +95,8 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
         return -1;
     }
 
-    receiveFd_ = GetReceiveDataFd();
-    auto inResult = handler->AddFileDescriptorListener(receiveFd_, AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
+    int32_t receiveFd = GetReceiveDataFd();
+    auto inResult = handler->AddFileDescriptorListener(receiveFd, AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
     if (inResult != 0) {
         HiLog::Error(LABEL, "%{public}s AddFileDescriptorListener fail", __func__);
         return -1;
@@ -133,44 +120,23 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
 
 int32_t SensorDataChannel::DestroySensorDataChannel()
 {
-    std::lock_guard<std::mutex> threadLock(treadMutex_);
-    // send wakeup signal to sensor_fwk_read_data thread
-
-    if (eventHandler_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s handler is null", __func__);
+    std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
+    if (eventHandler_ == nullptr || eventRunner_ == nullptr) {
+        HiLog::Error(LABEL, "%{public}s handler or eventRunner is null", __func__);
         return -1;
     }
-    int32_t fd = GetReceiveDataFd();
-    eventHandler_->RemoveFileDescriptorListener(fd);
+    int32_t receiveFd = GetReceiveDataFd();
+    eventHandler_->RemoveFileDescriptorListener(receiveFd);
     eventHandler_ = nullptr;
-    if (eventRunner_ != nullptr) {
-        eventRunner_->Stop();
-        eventRunner_ = nullptr;
-    }
-    threadStop_ = true;
-
-    if (sensorDataThread_.joinable()) {
-        sensorDataThread_.join();
-    }
-    // destroy sensor basic channel
+    eventRunner_->Stop();
+    eventRunner_ = nullptr;
+    // destroy sensor basic channelx
     return DestroySensorBasicChannel();
-}
-bool SensorDataChannel::IsThreadExit()
-{
-    return (!sensorDataThread_.joinable()) && (threadStop_);
-}
-
-bool SensorDataChannel::IsThreadStart()
-{
-    return (sensorDataThread_.joinable()) && (!threadStop_);
 }
 
 SensorDataChannel::~SensorDataChannel()
 {
     DestroySensorDataChannel();
-    if (receiveDataBuff_ != nullptr) {
-        delete[] receiveDataBuff_;
-    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

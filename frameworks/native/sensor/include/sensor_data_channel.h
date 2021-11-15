@@ -42,10 +42,7 @@ public:
 private:
     static void threadProcessTask(SensorDataChannel *sensorChannel);
     int32_t InnerSensorDataChannel();
-    bool threadStop_ = true;
-    std::mutex treadMutex_;
-    std::thread sensorDataThread_;
-    struct SensorEvent *receiveDataBuff_ = nullptr;
+    std::mutex eventRunnerMutex_;
     static std::shared_ptr<MyEventHandler> eventHandler_;
     static std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
     static int32_t receiveFd_;

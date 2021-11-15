@@ -31,6 +31,9 @@ constexpr int32_t RECEIVE_DATA_SIZE = 100;
 }  // namespace
 
 MyFileDescriptorListener::MyFileDescriptorListener()
+    :channel_(nullptr),
+     receiveDataBuff_(
+        new (std::nothrow) TransferSensorEvents[sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE])
 {}
 
 void MyFileDescriptorListener::OnReadable(int32_t fileDescriptor)
@@ -42,12 +45,14 @@ void MyFileDescriptorListener::OnReadable(int32_t fileDescriptor)
     }
 
     FileDescriptorListener::OnReadable(fileDescriptor);
-
-    struct TransferSensorEvents *receiveDataBuff_ =
-        new (std::nothrow) TransferSensorEvents[sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE];
-    int32_t len = recv(fileDescriptor, receiveDataBuff_, sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE, NULL);
+    if (receiveDataBuff_ == nullptr) {
+        receiveDataBuff_ =
+            new (std::nothrow) TransferSensorEvents[sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE];
+    }
+    int32_t len =
+        recv(fileDescriptor, receiveDataBuff_, sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE, NULL);
+    int32_t eventSize = sizeof(struct TransferSensorEvents);
     while (len > 0) {
-        int32_t eventSize = sizeof(struct TransferSensorEvents);
         int32_t num = len / eventSize;
         for (int i = 0; i < num; i++) {
             SensorEvent event = {
@@ -80,6 +85,9 @@ void MyFileDescriptorListener::OnShutdown(int32_t fileDescriptor)
     }
 
     FileDescriptorListener::OnShutdown(fileDescriptor);
+    if (receiveDataBuff_ != nullptr) {
+        delete[] receiveDataBuff_;
+    }
 }
 
 void MyFileDescriptorListener::OnException(int32_t fileDescriptor)
@@ -90,6 +98,9 @@ void MyFileDescriptorListener::OnException(int32_t fileDescriptor)
     }
 
     FileDescriptorListener::OnException(fileDescriptor);
+    if (receiveDataBuff_ != nullptr) {
+        delete[] receiveDataBuff_;
+    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Sensors {
 constexpr int32_t INVALID_FD = -1;
+constexpr int32_t SENSOR_MAX_LENGTH = 64;
 struct TransferSensorEvents {
     uint32_t sensorTypeId; /**< Sensor type ID */
     int32_t version; /**< Sensor algorithm version */
@@ -33,7 +34,7 @@ struct TransferSensorEvents {
     int32_t option; /**< Sensor data options, including the measurement range and accuracy */
     int32_t mode; /**< Sensor data reporting mode (described in {@link SensorMode}) */
     uint32_t dataLen; /**< Sensor data length */
-    uint8_t data[16];
+    uint8_t data[SENSOR_MAX_LENGTH];
 };
 class SensorBasicDataChannel : public RefBase {
 public:
