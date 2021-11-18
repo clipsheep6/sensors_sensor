@@ -67,8 +67,6 @@ typedef enum SensorTypeId {
     SENSOR_TYPE_ID_NONE = 0,                   /**< None */
     SENSOR_TYPE_ID_ACCELEROMETER = 1,          /**< Acceleration sensor */
     SENSOR_TYPE_ID_GYROSCOPE = 2,              /**< Gyroscope sensor */
-    SENSOR_TYPE_ID_PHOTOPLETHYSMOGRAPH = 3,    /**< Photoplethysmography sensor */
-    SENSOR_TYPE_ID_ELECTROCARDIOGRAPH = 4,     /**< Electrocardiogram (ECG) sensor */
     SENSOR_TYPE_ID_AMBIENT_LIGHT = 5,          /**< Ambient light sensor */
     SENSOR_TYPE_ID_MAGNETIC_FIELD = 6,         /**< Magnetic field sensor */
     SENSOR_TYPE_ID_CAPACITIVE = 7,             /**< Capacitive sensor */

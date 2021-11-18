@@ -61,10 +61,11 @@ void SensorDataCallbackImpl(SensorEvent *event)
 }
 
 /*
- * @tc.name: SensorNativeApiTest_001
- * @tc.desc: sensor native api test
- * @tc.type: FUNC
- * @tc.author: wuzhihui
+ * Feature: sensor
+ * Function: SubscribeSensor
+ * FunctionPoints: Check the interface function
+ * EnvConditions: mobile that can run ohos test framework
+ * CaseDescription: Verify the senser service framework process.
  */
 HWTEST_F(SensorAgentTest, SensorNativeApiTest_001, TestSize.Level1)
 {
