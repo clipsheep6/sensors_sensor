@@ -128,12 +128,6 @@ typedef struct SensorEvent {
     uint32_t dataLen;      /**< Sensor data length */
 } SensorEvent;
 
-struct Test {
-char ip[30];
-char name[30];
-int32_t *data;
-};
-
 /**
  * @brief Defines the callback for data reporting by the sensor agent.
  *
@@ -179,194 +173,182 @@ typedef enum SensorMode {
  * @brief 加速度传感器的数据结构
  */
 typedef struct AccelData {
-    /**< 加速度X轴 */
-    int32_t axisX;
-    /**< 加速度Y轴 */
-    int32_t axisY;
-    /**< 加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    /**< 加速度X轴分量,单位：m/s² */
+    float axisX;
+    /**< 加速度Y轴分量，单位：m/s² */
+    float axisY;
+    /**< 加速度Z轴分量，单位：m/s² */
+    float axisZ;
 } AccelData;
 
 /**
  * @brief 线性加速度传感器的数据结构
  */
 typedef struct LinearAccelData {
-    /**< 线性加速度X轴 */
-    int32_t axisX;
-    /**< 线性加速度Y轴 */
-    int32_t axisY;
-    /**< 线性加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    /**< 线性加速度X轴分量，单位：m/s² */
+    float axisX;
+    /**< 线性加速度Y轴分量，单位：m/s² */
+    float axisY;
+    /**< 线性加速度Z轴分量，单位：m/s² */
+    float axisZ;
 } LineraAccelData;
 
 /**
  * @brief 陀螺仪传感器的数据结构
  */
 typedef struct GyroscopeData {
-    /**< 加速度X轴 */
-    int32_t axisX;
-    /**< 加速度Y轴 */
-    int32_t axisY;
-    /**< 加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    /**< 设备X轴旋转角度，单位：rad/s */
+    float axisX;
+    /**< 设备Y轴旋转角度，单位：rad/s */
+    float axisY;
+    /**< 设备Z轴旋转角度，单位：rad/s */
+    float axisZ;
 } GyroscopeData;
 
 /**
  * @brief 重力传感器的数据结构
  */
 typedef struct GravityData {
-    /**< 重力加速度X轴 */
-    int32_t axisX;
-    /**< 重力加速度Y轴 */
-    int32_t axisY;
-    /**< 重力加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    /**< 重力加速度X轴分量，单位：m/s² */
+    float axisX;
+    /**< 重力加速度Y轴分量，单位：m/s² */
+    float axisY;
+    /**< 重力加速度Z轴分量，单位：m/s² */
+    float axisZ;
 } GravityData;
 
 /**
  * @brief 未校准加速度传感器的数据结构
  */
 typedef struct AccelUncalibratedData {
-    /**< 未校准加速度X轴 */
-    int32_t axisX;
-    /**< 未校准加速度Y轴 */
-    int32_t axisY;
-    /**< 未校准加速度Z轴 */
-    int32_t axisZ;
-    /**< 未校准加速度X轴偏量 */
-    int32_t axisBiasX;
-    /**< 未校准加速度Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 未校准加速度Z轴偏量 */
-    int32_t axisBiasZ;
+    /**< 加速度X轴分量，单位：m/s² */
+    float axisX;
+    /**< 加速度Y轴分量，单位：m/s² */
+    float axisY;
+    /**< 加速度Z轴分量，单位：m/s² */
+    float axisZ;
+    /**< X轴估算偏差，单位：m/s² */
+    float axisBiasX;
+    /**< Y轴估算偏差，单位：m/s² */
+    float axisBiasY;
+    /**< Z轴估算偏差，单位：m/s² */
+    float axisBiasZ;
 } AccelUncalibratedData;
 
 /**
  * @brief 未校准陀螺仪传感器的数据结构
  */
 typedef struct GyroUncalibratedData {
-    /**< 未校准加速度X轴 */
-    int32_t axisX;
-    /**< 未校准加速度Y轴 */
-    int32_t axisY;
-    /**< 未校准加速度Z轴 */
-    int32_t axisZ;
-    /**< 未校准加速度X轴偏量 */
-    int32_t axisBiasX;
-    /**< 未校准加速度Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 未校准加速度Z轴偏量 */
-    int32_t axisBiasZ;
+    /**< 设备X轴旋转角度，单位：rad/s */
+    float axisX;
+    /**< 设备Y轴旋转角度，单位：rad/s */
+    float axisY;
+    /**< 设备Z轴旋转角度，单位：rad/s */
+    float axisZ;
+    /**< X轴估算偏差，单位：rad/s */
+    float axisBiasX;
+    /**< Y轴估算偏差，单位：rad/s */
+    float axisBiasY;
+    /**< Z轴估算偏差，单位：rad/s */
+    float axisBiasZ;
 } GyroUncalibratedData;
 
 /**
  * @brief 大幅度动作传感器的数据结构
  */
 typedef struct SignificantMotionData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 设备是否存在大幅度动作，1表示发生大幅动作，0表示没有 */
+    int32_t significantMotionStatus;
 } SignificantMotionData;
 
 /**
  * @brief 计步器检测传感器的数据结构
  */
 typedef struct PedometerDetectData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 检测用户的计步动作，1表示用户产生计步行走动作，0表示没有 */
+    int32_t pedometerStatus;
 } PedometerDetectData;
 
 /**
  * @brief 计步器传感器的数据结构
  */
 typedef struct PedometerData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 用户的行走步数 */
+    int32_t stepCount;
 } PedometerData;
 
 /**
  * @brief  环境温度传感器的数据结构
  */
 typedef struct AmbientTemperatureData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 环境温度，单位：摄氏度(°C) */
+    float temperature;
 } AmbientTemperatureData;
 
 /**
  * @brief 湿度传感器的数据结构
  */
 typedef struct HumidityData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 相对湿度，以百分比（%）表示 */
+    float relativeHumidity;
 } HumidityData;
 
 /**
  * @brief 磁场传感器的数据结构
  */
 typedef struct MagneticFieldData {
-    /**< 磁力计X轴 */
-    int32_t axisX;
-    /**< 磁力计Y轴 */
-    int32_t axisY;
-    /**< 磁力计Z轴 */
-    int32_t axisZ;
-    /**< 磁力计数据精度 */
-    int32_t accuracy;
+    /**< 地磁场X轴分量，单位：μT */
+    float axisX;
+    /**< 地磁场Y轴分量，单位：μT */
+    float axisY;
+    /**< 地磁场Z轴分量，单位：μT */
+    float axisZ;
 } MagneticFieldData;
 
 /**
  * @brief 未校准磁场传感器的数据结构
  */
 typedef struct MagneticFieldUncalibratedData {
-    /**< 磁力计X轴 */
-    int32_t axisX;
-    /**< 磁力计Y轴 */
-    int32_t axisY;
-    /**< 磁力计Z轴 */
-    int32_t axisZ;
-    /**< 磁力计X轴偏量 */
-    int32_t axisBiasX;
-    /**< 磁力计Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 磁力计Z轴偏量 */
-    int32_t axisBiasZ;
+    /**< 地磁场X轴分量，单位：μT */
+    float axisX;
+    /**< 地磁场Y轴分量，单位：μT */
+    float axisY;
+    /**< 地磁场Z轴分量，单位：μT */
+    float axisZ;
+    /**< X轴估算偏差，单位：μT */
+    float axisBiasX;
+    /**< Y轴估算偏差，单位：μT */
+    float axisBiasY;
+    /**< Z轴估算偏差，单位：μT */
+    float axisBiasZ;
 } MagneticFieldUncalibratedData;
 
 /**
  * @brief 气压计传感器的数据结构
  */
 typedef struct BarometerData {
-    /**< 气压值 */
-    int32_t pressure;
+    /**< 气压值，单位：hPa */
+    float pressure;
 } BarometerData;
 
 /**
  * @brief 设备方向传感器的数据结构
  */
 typedef struct DeviceOrientationData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 设备旋转方向，单位：rad */
+    float deviceOrientation;
 } DeviceOrientationData;
 
 /**
  * @brief 方向传感器的数据结构
  */
 typedef struct OrientationData {
-    /**< 方位角（磁北方向与 Y 轴之间的夹角） */
-    int32_t axisX;
-    /**< 俯仰（绕 X 轴旋转，Z 轴向 Y 轴移动时为正值） */
-    int32_t axisY;
-    /**< 滚动（绕 Y 轴旋转，当 X 轴向 Z 轴移动时为正值）*/
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    /**< 方位角（磁北方向与 Y 轴之间的夹角）,单位：rad */
+    float axisX;
+    /**< 俯仰（绕 X 轴旋转，Z 轴向 Y 轴移动时为正值）,单位：rad */
+    float axisY;
+    /**< 滚动（绕 Y 轴旋转，当 X 轴向 Z 轴移动时为正值）,单位：rad*/
+    float axisZ;
 } OrientationData;
 
 /**
@@ -374,13 +356,13 @@ typedef struct OrientationData {
  */
 typedef struct RotationVectorData {
     /**< x分量 */
-    int32_t axisX;
+    float axisX;
     /**< y分量 */
-    int32_t axisY;
+    float axisY;
     /**< z分量 */
-    int32_t axisZ;
+    float axisZ;
     /**< w分量 */
-    int32_t axisW;
+    float axisW;
 } RotationVectorData;
 
 /**
@@ -388,13 +370,13 @@ typedef struct RotationVectorData {
  */
 typedef struct GameRotationVectorData {
     /**< x分量 */
-    int32_t axisX;
+    float axisX;
     /**< y分量 */
-    int32_t axisY;
+    float axisY;
     /**< z分量 */
-    int32_t axisZ;
+    float axisZ;
     /**< w分量 */
-    int32_t axisW;
+    float axisW;
 } GameRotationVectorData;
 
 /**
@@ -402,55 +384,45 @@ typedef struct GameRotationVectorData {
  */
 typedef struct GeomagneticRotaVectorData {
     /**< x分量 */
-    int32_t axisX;
+    float axisX;
     /**< y分量 */
-    int32_t axisY;
+    float axisY;
     /**< z分量 */
-    int32_t axisZ;
+    float axisZ;
     /**< w分量 */
-    int32_t axisW;
+    float axisW;
 } GeomagneticRotaVectorData;
 
 /**
  * @brief 接近光传感器的数据结构
  */
 typedef struct ProximityData {
-    /**< 接近程度 */
-    int32_t scalar;
+    /**< 可见物体相对于设备屏幕的接近或者远离状态，0表示接近，1表示远离 */
+    int32_t proximity;
 } ProximityData;
 
 /**
  * @brief 环境光传感器的数据结构
  */
 typedef struct AmbientLightData {
-    /**< 环境强弱 */
-    int32_t scalar;
+    /**< 设备周围光线强度，单位：lux */
+    float light;
 } AmbientLightData;
-
-/**
- * @brief 元数据传感器的数据结构
- */
-typedef struct MetaData {
-    /**< 标量 */
-    int32_t scalar;
-} MetaData;
 
 /**
  * @brief 心率传感器的数据结构
  */
 typedef struct HeartRateData {
     /**< 心率值，单位bpm */
-    int32_t heartRateBpm;
-    /**< 心率状态 */
-    int32_t temperatureStatus;
+    int32_t heartRate;
 } HeartRateData;
 
 /**
  * @brief 佩戴检测传感器的数据结构
  */
 typedef struct WearDetectionData {
-    /**< 标量 */
-    int32_t scalar;
+    /**< 检测用户是否佩戴，1表示佩戴，0表示没有 */
+    int32_t wearStatus;
 } WearDetectionData;
 
 #ifdef __cplusplus
