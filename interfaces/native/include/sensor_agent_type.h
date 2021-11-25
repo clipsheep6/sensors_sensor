@@ -258,7 +258,7 @@ typedef struct GyroUncalibratedData {
  */
 typedef struct SignificantMotionData {
     /**< 设备是否存在大幅度动作，1表示发生大幅动作，0表示没有 */
-    int8_t significantMotionStatus;
+    int32_t significantMotionStatus;
 } SignificantMotionData;
 
 /**
@@ -266,7 +266,7 @@ typedef struct SignificantMotionData {
  */
 typedef struct PedometerDetectData {
     /**< 检测用户的计步动作，1表示用户产生计步行走动作，0表示没有 */
-    int8_t pedometerStatus;
+    int32_t pedometerStatus;
 } PedometerDetectData;
 
 /**
@@ -274,7 +274,7 @@ typedef struct PedometerDetectData {
  */
 typedef struct PedometerData {
     /**< 用户的行走步数 */
-    int64_t stepCount;
+    int32_t stepCount;
 } PedometerData;
 
 /**
@@ -397,8 +397,8 @@ typedef struct GeomagneticRotaVectorData {
  * @brief 接近光传感器的数据结构
  */
 typedef struct ProximityData {
-    /**< 可见物体相对于设备屏幕的接近或者远离状态，0.0表示接近，5.0表示远离 */
-    float proximity;
+    /**< 可见物体相对于设备屏幕的接近或者远离状态，0表示接近，1表示远离 */
+    int32_t proximity;
 } ProximityData;
 
 /**
@@ -414,15 +414,15 @@ typedef struct AmbientLightData {
  */
 typedef struct HeartRateData {
     /**< 心率值，单位bpm */
-    float heartRate;
+    int32_t heartRate;
 } HeartRateData;
 
 /**
  * @brief 佩戴检测传感器的数据结构
  */
 typedef struct WearDetectionData {
-    /**< 检测用户是否佩戴，1.0表示佩戴，0.0表示没有 */
-    float wearStatus;
+    /**< 检测用户是否佩戴，1表示佩戴，0表示没有 */
+    int32_t wearStatus;
 } WearDetectionData;
 
 #ifdef __cplusplus
