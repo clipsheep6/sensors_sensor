@@ -49,9 +49,10 @@ static void DataCallbackImpl(SensorEvent *event)
     float *data = (float *)(event->data);
     for (auto &onCallbackInfo: g_onCallbackInfos) {
         if ((int32_t)onCallbackInfo.first == sensorTypeId) {
-            onCallbackInfo.second->sensorTypeId = sensorTypeId;
-            onCallbackInfo.second->sensorDataLength = event->dataLen;
-            if (memcpy_s(onCallbackInfo.second->sensorData, event->dataLen, data, event->dataLen) != EOK) {
+            onCallbackInfo.second->sensorData.sensorTypeId = sensorTypeId;
+            onCallbackInfo.second->sensorData.dataLength = event->dataLen;
+            onCallbackInfo.second->sensorData.timestamp = event->timestamp;
+            if (memcpy_s(onCallbackInfo.second->sensorData.data, event->dataLen, data, event->dataLen) != EOK) {
                 HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
                 return;
             }
@@ -64,9 +65,10 @@ static void DataCallbackImpl(SensorEvent *event)
         return;
     }
     struct AsyncCallbackInfo *onceCallbackInfo = g_onceCallbackInfos[sensorTypeId];
-    onceCallbackInfo->sensorTypeId = sensorTypeId;
-    onceCallbackInfo->sensorDataLength = event->dataLen;
-    if (memcpy_s(onceCallbackInfo->sensorData, event->dataLen, data, event->dataLen) != EOK) {
+    onceCallbackInfo->sensorData.sensorTypeId = sensorTypeId;
+    onceCallbackInfo->sensorData.dataLength = event->dataLen;
+    onceCallbackInfo->sensorData.timestamp = event->timestamp;
+    if (memcpy_s(onceCallbackInfo->sensorData.data, event->dataLen, data, event->dataLen) != EOK) {
         HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
         return;
     }

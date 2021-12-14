@@ -21,14 +21,20 @@
 
 #define EVENT_INVALID_PARAMETER (-1);
 #define EVENT_OK 0;
+
+struct SensorData {
+    int32_t sensorTypeId;
+    int32_t dataLength;
+    float data[16];
+    int64_t timestamp;
+};
+
 struct AsyncCallbackInfo {
     napi_env env;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback[1] = { 0 };
-    int32_t sensorTypeId;
-    int32_t sensorDataLength;
-    float sensorData[16];
+    SensorData sensorData;
     int32_t status;
 };
 

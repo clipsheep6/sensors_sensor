@@ -191,20 +191,22 @@ void EmitUvEventLoop(AsyncCallbackInfo *asyncCallbackInfo)
             napi_create_error(env, code, message, &result[0]);
             napi_get_undefined(env, &result[1]); 
         } else {
-            int32_t sensorTypeId = asyncCallbackInfo->sensorTypeId;
-            if (g_sensorAttributeList.count(sensorTypeId) == 0) {
+            int32_t sensorTypeId = asyncCallbackInfo->sensorData.sensorTypeId;
+            if ((g_sensorAttributeList.count(sensorTypeId)) == 0 || (g_sensorAttributeList[sensorTypeId].size()
+                != (asyncCallbackInfo->sensorData.dataLength / sizeof(float)))) {
                 HiLog::Error(LABEL, "%{public}s count of sensorTypeId is zero", __func__);
                 return;
             }
             std::vector<std::string> sensorAttribute = g_sensorAttributeList[sensorTypeId];
             napi_create_object(env, &result[1]);
+            napi_value message = nullptr;
             for (size_t i = 0; i < sensorAttribute.size(); i++) {
-                napi_value message = nullptr;
-                double a = asyncCallbackInfo->sensorData[i];
-                HiLog::Info(LABEL, "%{public}s data id %{public}f", __func__, a);
-                napi_create_double(env, a, &message);
+                napi_create_double(env, asyncCallbackInfo->sensorData.data[i], &message);
                 napi_set_named_property(env, result[1], sensorAttribute[i].c_str(), message);
+                message = nullptr;
             }
+            napi_create_int64(env, asyncCallbackInfo->sensorData.timestamp, &message);
+            napi_set_named_property(env, result[1], "timestamp", message);
             napi_get_undefined(env, &result[0]);
         }
         napi_call_function(env, undefined, callback, 2, result, &callResult);
