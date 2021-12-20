@@ -12,8 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef SENSOR_JS_H
+#define SENSOR_JS_H
+
 #include "sensor_agent.h"
 
 static int32_t UnsubscribeSensor(int32_t sensorTypeId);
 static void DataCallbackImpl(SensorEvent *event);
 static int32_t SubscribeSensor(int32_t sensorTypeId, int64_t interval, RecordSensorCallback callback);
+#endif // SENSOR_JS_H

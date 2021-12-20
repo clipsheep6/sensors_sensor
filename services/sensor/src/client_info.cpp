@@ -614,7 +614,6 @@ void ClientInfo::GetSensorChannelInfo(std::vector<SensorChannelInfo> &channelInf
                 continue;
             }
             channel.SetUid(uid);
-            // BundleManager bundleManager_;
             std::string packageName("");
             channel.SetSensorId(sensorIt.first);
             channel.SetPackageName(packageName);

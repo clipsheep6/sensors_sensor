@@ -39,9 +39,7 @@ std::map<int32_t, int64_t> DmdReport::eventMap_ = {
     { MISC_SERVICE_EXCEPTION, 0 },
     { SENSOR_SERVICE_IPC_EXCEPTION, 0 },
     { MISC_SERVICE_IPC_EXCEPTION, 0 },
-    { SENSOR_HIDL_SERVICE_EXCEPTION, 0 },
-    { LIGHT_HIDL_SERVICE_EXCEPTION, 0 },
-    { VIBRATOR_HIDL_SERVICE_EXCEPTION, 0 },
+    { SENSOR_HDF_SERVICE_EXCEPTION, 0 },
     { SENSOR_DATA_CHANNEL_EXCEPTION, 0 },
 };
 
@@ -66,12 +64,8 @@ static std::string GetEventName(int32_t eventId)
             return "SensorServiceIpcException";
         case MISC_SERVICE_IPC_EXCEPTION:
             return "MiscServiceIpcException";
-        case SENSOR_HIDL_SERVICE_EXCEPTION:
-            return "SensorHidlServiceException";
-        case LIGHT_HIDL_SERVICE_EXCEPTION:
-            return "LightHidlServiceException";
-        case VIBRATOR_HIDL_SERVICE_EXCEPTION:
-            return "VibratorHidlServiceException";
+        case SENSOR_HDF_SERVICE_EXCEPTION:
+            return "SensorHdfServiceException";
         case SENSOR_DATA_CHANNEL_EXCEPTION:
             return "SensorDataChannelException";
         default:

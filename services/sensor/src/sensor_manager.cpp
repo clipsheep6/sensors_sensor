@@ -179,7 +179,6 @@ ErrCode SensorManager::AfterDisableSensor(uint32_t sensorId)
         auto ret = clientInfo_.GetStoreEvent(sensorId, event);
         if (ret == ERR_OK) {
             HiLog::Debug(LABEL, "%{public}s change the default state is far", __func__);
-            // event.light.data[0] = PROXIMITY_FAR;
             event.data[0] = PROXIMITY_FAR;
             clientInfo_.StoreEvent(event);
         }

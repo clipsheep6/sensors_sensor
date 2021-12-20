@@ -32,6 +32,15 @@ MyFileDescriptorListener::MyFileDescriptorListener()
         new (std::nothrow) TransferSensorEvents[sizeof(struct TransferSensorEvents) * RECEIVE_DATA_SIZE])
 {}
 
+MyFileDescriptorListener::~MyFileDescriptorListener()
+{
+    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    if (receiveDataBuff_ != nullptr) {
+        delete[] receiveDataBuff_;
+        receiveDataBuff_ = nullptr;
+    }
+}
+
 void MyFileDescriptorListener::OnReadable(int32_t fileDescriptor)
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
@@ -83,6 +92,7 @@ void MyFileDescriptorListener::OnShutdown(int32_t fileDescriptor)
     FileDescriptorListener::OnShutdown(fileDescriptor);
     if (receiveDataBuff_ != nullptr) {
         delete[] receiveDataBuff_;
+        receiveDataBuff_ = nullptr;
     }
 }
 
@@ -96,6 +106,7 @@ void MyFileDescriptorListener::OnException(int32_t fileDescriptor)
     FileDescriptorListener::OnException(fileDescriptor);
     if (receiveDataBuff_ != nullptr) {
         delete[] receiveDataBuff_;
+        receiveDataBuff_ = nullptr;
     }
 }
 }  // namespace Sensors

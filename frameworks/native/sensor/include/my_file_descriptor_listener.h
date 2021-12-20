@@ -32,7 +32,7 @@ class MyFileDescriptorListener : public AppExecFwk::FileDescriptorListener {
 public:
     explicit MyFileDescriptorListener();
 
-    ~MyFileDescriptorListener() = default;
+    ~MyFileDescriptorListener();
 
     void OnReadable(int32_t fileDescriptor) override;
 
@@ -41,7 +41,7 @@ public:
     void OnShutdown(int32_t fileDescriptor) override;
 
     void OnException(int32_t fileDescriptor) override;
-    
+
     void SetChannel(SensorDataChannel* channel);
 
 private:
