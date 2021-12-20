@@ -39,8 +39,6 @@ ohos_shared_library("libsensor_service") {
     "//drivers/peripheral/sensor/interfaces/include",
   ]
 
-  cflags = [ "-Wno-error=inconsistent-missing-override" ]
-
   deps = [
     "$SUBSYSTEM_DIR/sensor/utils:libsensor_utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
