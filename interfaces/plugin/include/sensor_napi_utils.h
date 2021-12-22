@@ -26,7 +26,8 @@ using std::string;
 
 const int32_t THREE_DIMENSIONAL_MATRIX_LENGTH = 9;
 const int32_t FOUR_DIMENSIONAL_MATRIX_LENGTH = 16;
-
+const int32_t QUATERNION_LENGTH = 4;
+const int32_t ROTATION_VECTOR_LENGTH = 3;
 struct GeomagneticData {
     float x;
     float y;
@@ -49,12 +50,16 @@ struct SensorData {
     int64_t timestamp;
 };
 
+struct ReserveData {
+    float reserve[16];
+    int32_t length;
+};
+
 union CallbackData {
     SensorData sensorData;
     GeomagneticData geomagneticData;
     RationMatrixData rationMatrixData;
-    float reserve[16];
-    int32_t dataLength;
+    ReserveData reserveData;
 };
 
 struct BusinessError {

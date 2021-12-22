@@ -249,13 +249,13 @@ void ConvertToGeomagneticData(napi_env env, AsyncCallbackInfo *asyncCallbackInfo
 void ConvertToNumber(napi_env env, AsyncCallbackInfo *asyncCallbackInfo, napi_value result[2])
 {
     napi_get_undefined(env, &result[0]);
-    napi_create_double(env, static_cast<double>(asyncCallbackInfo->data.reserve[0]), &result[1]);
+    napi_create_double(env, static_cast<double>(asyncCallbackInfo->data.reserveData.reserve[0]), &result[1]);
 }
 
 void ConvertToArray(napi_env env, AsyncCallbackInfo *asyncCallbackInfo, napi_value result[2])
 {
     napi_get_undefined(env, &result[0]);
-    CreateNapiArray(env, asyncCallbackInfo->data.reserve, asyncCallbackInfo->data.dataLength, result[1]);
+    CreateNapiArray(env, asyncCallbackInfo->data.reserveData.reserve, asyncCallbackInfo->data.reserveData.length, result[1]);
 }
 
 void ConvertToRotationMatrix(napi_env env, AsyncCallbackInfo *asyncCallbackInfo, napi_value result[2])

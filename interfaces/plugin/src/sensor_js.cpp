@@ -351,9 +351,9 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
         asyncCallbackInfo->error.code = ret;
     } else {
         for (int32_t i = 0; i < inRotationVectorLength; i++) {
-            asyncCallbackInfo->data.reserve[i] = outRotationVector[i];
+            asyncCallbackInfo->data.reserveData.reserve[i] = outRotationVector[i];
         }
-        asyncCallbackInfo->data.dataLength = inRotationVectorLength;
+        asyncCallbackInfo->data.reserveData.length = inRotationVectorLength;
     }
     if (argc == 2) {
         napi_deferred deferred = nullptr;
@@ -392,7 +392,7 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     };
     std::vector<float> curRotationVector = GetCppArrayFloat(env, args[0]);
     std::vector<float> preRotationVector = GetCppArrayFloat(env, args[1]);
-    std::vector<float> angleChange(3);
+    std::vector<float> angleChange(ROTATION_VECTOR_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getAngleModify(curRotationVector, preRotationVector, angleChange);
     if (ret < 0) {
@@ -400,9 +400,9 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
     } else {
-        asyncCallbackInfo->data.dataLength = angleChange.size();
-        for (int32_t i = 0; i < asyncCallbackInfo->data.dataLength; i++) {
-            asyncCallbackInfo->data.reserve[i] = angleChange[i];
+        asyncCallbackInfo->data.reserveData.length = ROTATION_VECTOR_LENGTH;
+        for (int32_t i = 0; i < ROTATION_VECTOR_LENGTH; i++) {
+            asyncCallbackInfo->data.reserveData.reserve[i] = angleChange[i];
         }
     }
     if (argc == 2) {
@@ -441,7 +441,7 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
         .type = GET_DIRECTION,
     };
     std::vector<float> rotationMatrix = GetCppArrayFloat(env, args[0]);
-    std::vector<float> rotationAngle(3);
+    std::vector<float> rotationAngle(ROTATION_VECTOR_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getDirection(rotationMatrix, rotationAngle);
     if (ret < 0) {
@@ -449,9 +449,9 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
     } else {
-        asyncCallbackInfo->data.dataLength = rotationAngle.size();
-        for (int32_t i = 0; i < asyncCallbackInfo->data.dataLength; i++) {
-            asyncCallbackInfo->data.reserve[i] = rotationAngle[i];
+        asyncCallbackInfo->data.reserveData.length = ROTATION_VECTOR_LENGTH;
+        for (int32_t i = 0; i < ROTATION_VECTOR_LENGTH; i++) {
+            asyncCallbackInfo->data.reserveData.reserve[i] = rotationAngle[i];
         }
     }
     if (argc == 1) {
@@ -490,7 +490,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
         .type = CREATE_QUATERNION,
     };
     std::vector<float> rotationVector = GetCppArrayFloat(env, args[0]);
-    std::vector<float> quaternion(4);
+    std::vector<float> quaternion(QUATERNION_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->createQuaternion(rotationVector, quaternion);
     if (ret < 0) {
@@ -498,9 +498,9 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
     } else {
-        asyncCallbackInfo->data.dataLength = quaternion.size();
-        for (int32_t i = 0; i < asyncCallbackInfo->data.dataLength; i++) {
-            asyncCallbackInfo->data.reserve[i] = quaternion[i];
+        asyncCallbackInfo->data.reserveData.length = QUATERNION_LENGTH;
+        for (int32_t i = 0; i < QUATERNION_LENGTH; i++) {
+            asyncCallbackInfo->data.reserveData.reserve[i] = quaternion[i];
         }
     }
     if (argc == 1) {
@@ -549,7 +549,7 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
     } else {
-        asyncCallbackInfo->data.reserve[0] = altitude;
+        asyncCallbackInfo->data.reserveData.reserve[0] = altitude;
     }
     if (argc == 2) {
         napi_deferred deferred = nullptr;
@@ -595,7 +595,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
     } else {
-        asyncCallbackInfo->data.reserve[0] = geomagneticDip;
+        asyncCallbackInfo->data.reserveData.reserve[0] = geomagneticDip;
     }
     if (argc == 1) {
         napi_deferred deferred = nullptr;
@@ -642,9 +642,9 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
             asyncCallbackInfo->type = FAIL;
             asyncCallbackInfo->error.code = ret;
         } else {
-            asyncCallbackInfo->data.dataLength = rotationMatrix.size();
-            for (int32_t i = 0; i < asyncCallbackInfo->data.dataLength; i++) {
-                asyncCallbackInfo->data.reserve[i] = rotationMatrix[i];
+            asyncCallbackInfo->data.reserveData.length = THREE_DIMENSIONAL_MATRIX_LENGTH;
+            for (int32_t i = 0; i < THREE_DIMENSIONAL_MATRIX_LENGTH; i++) {
+                asyncCallbackInfo->data.reserveData.reserve[i] = rotationMatrix[i];
             }
         }
         if (argc == 1) {
