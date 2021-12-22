@@ -50,20 +50,18 @@ static void DataCallbackImpl(SensorEvent *event)
     }
     int32_t sensorTypeId = event->sensorTypeId;
     float *data = (float *)(event->data);
-    if (g_onCallbackInfos.find(sensorTypeId) == g_onCallbackInfos.end()) {
-        HiLog::Debug(LABEL, "%{public}s no subscribe to the sensor data", __func__);
-        return;
+    if (g_onCallbackInfos.find(sensorTypeId) != g_onCallbackInfos.end()) {
+        struct AsyncCallbackInfo *onCallbackInfo = g_onCallbackInfos[sensorTypeId];
+        onCallbackInfo->data.sensorData.sensorTypeId = sensorTypeId;
+        onCallbackInfo->data.sensorData.dataLength = event->dataLen;
+        onCallbackInfo->data.sensorData.timestamp = event->timestamp;
+        if (memcpy_s(onCallbackInfo->data.sensorData.data, event->dataLen, data, event->dataLen) != EOK) {
+            HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
+            return;
+        }
+        onCallbackInfo->type = ON_CALLBACK;
+        EmitUvEventLoop((struct AsyncCallbackInfo *)(onCallbackInfo));
     }
-    struct AsyncCallbackInfo *onCallbackInfo = g_onCallbackInfos[sensorTypeId];
-    onCallbackInfo->data.sensorData.sensorTypeId = sensorTypeId;
-    onCallbackInfo->data.sensorData.dataLength = event->dataLen;
-    onCallbackInfo->data.sensorData.timestamp = event->timestamp;
-    if (memcpy_s(onCallbackInfo->data.sensorData.data, event->dataLen, data, event->dataLen) != EOK) {
-        HiLog::Error(LABEL, "%{public}s copy data failed", __func__);
-        return;
-    }
-    onCallbackInfo->type = ON_CALLBACK;
-    EmitUvEventLoop((struct AsyncCallbackInfo *)(onCallbackInfo));
 
     if (g_onceCallbackInfos.find(sensorTypeId) == g_onceCallbackInfos.end()) {
         HiLog::Debug(LABEL, "%{public}s no subscribe to the sensor data once", __func__);
@@ -428,7 +426,7 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
 
 static napi_value GetDirection(napi_env env, napi_callback_info info)
 {
-    size_t argc;
+    size_t argc = 3;
     napi_value args[3] = { 0 };
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
@@ -662,8 +660,10 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!IsMatchArrayType(env, args[1]) || (argc == 3 && !IsMatchType(env, args[1], napi_function))) {
+    if (!IsMatchArrayType(env, args[1]) || (argc == 3 && !IsMatchType(env, args[2], napi_function))) {
         HiLog::Info(LABEL, "%{public}s argument error", __func__);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
         return nullptr;
     }
     asyncCallbackInfo->type = ROTATION_INCLINATION_MATRIX;
@@ -691,12 +691,6 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
         asyncCallbackInfo->deferred = deferred;
         EmitPromiseWork(asyncCallbackInfo);
         return promise;
-    }
-    if (!IsMatchType(env, args[2], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-        return nullptr;
     }
     napi_create_reference(env, args[2], 1, &asyncCallbackInfo->callback[0]);
     EmitAsyncCallbackWork(asyncCallbackInfo);
