@@ -160,7 +160,7 @@ ErrCode SensorServiceImpl::Register(RecordDataCallback cb) const
         HiLog::Error(LABEL, " %{public}s,", "test sensorHdi get Module instance failed\n\r");
         return ERR_INVALID_VALUE;
     }
-    int32_t ret = sensorInterface_->Register(cb);
+    int32_t ret = sensorInterface_->Register(0, cb);
     if (ret < 0) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         return ERR_INVALID_VALUE;
@@ -188,7 +188,7 @@ ErrCode SensorServiceImpl::RegisteDataReport(ZReportDataCb cb, sptr<ReportDataCa
 ErrCode SensorServiceImpl::Unregister(void) const
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    int32_t ret = sensorInterface_->Unregister();
+    int32_t ret = sensorInterface_->Unregister(0);
     if (ret < 0) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         return ERR_INVALID_VALUE;
