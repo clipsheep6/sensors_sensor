@@ -202,7 +202,7 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
     sensorList_.clear();
     sensorServer_ = nullptr;
 
-    // STEP4 : ReGet hsensors  3601 service
+    // STEP4 : ReGet sensors  3601 service
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
@@ -210,7 +210,7 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
         return;
     }
 
-    // STEP5 : Retransfer new channel to hsensors
+    // STEP5 : Retransfer new channel to sensors
     sensorServer_->TransferDataChannel(dataChannel_, sensorClientStub_);
 
     // STEP6 : Restore Sensor status
