@@ -26,7 +26,7 @@ static constexpr HiLogLabel LABEL = {LOG_CORE, OHOS::SensorsLogDomain::SENSORS_I
 
 int32_t SensorAlgorithm::createQuaternion(std::vector<float> rotationVector, std::vector<float> &quaternion)
 {
-    if (rotationVector.size() < ROTATION_VECTOR_LENGTH) {
+    if (rotationVector.size() < ROTATION_VECTOR_LENGTH || rotationVector.size() > QUATERNION_LENGTH) {
         HiLog::Error(LABEL, "%{public}s Invalid input rotationVector parameter", __func__);
         return OHOS::Sensors::ERROR;
     }
