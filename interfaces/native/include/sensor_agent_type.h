@@ -176,280 +176,232 @@ typedef enum SensorMode {
 } SensorMode;
 
 /**
- * @brief 加速度传感器的数据结构
+ * @brief Defines the accelerometer data structure. Measures the acceleration applied to
+ * the device on three physical axes (x, y, and z) in m/s2.
+ *
  */
 typedef struct AccelData {
-    /**< 加速度X轴 */
-    int32_t axisX;
-    /**< 加速度Y轴 */
-    int32_t axisY;
-    /**< 加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } AccelData;
 
 /**
- * @brief 线性加速度传感器的数据结构
+ * @brief Defines the linear accelerometer data structure. Measures the linear acceleration applied to
+ * the device on three physical axes (x, y, and z) in m/s2.
  */
 typedef struct LinearAccelData {
-    /**< 线性加速度X轴 */
-    int32_t axisX;
-    /**< 线性加速度Y轴 */
-    int32_t axisY;
-    /**< 线性加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } LineraAccelData;
 
 /**
- * @brief 陀螺仪传感器的数据结构
+ * @brief Defines the gyroscope sensor data structure. Measures the rotational angular velocity of the
+ * device on three physical axes (x, y, and z) in rad/s.
  */
 typedef struct GyroscopeData {
-    /**< 加速度X轴 */
-    int32_t axisX;
-    /**< 加速度Y轴 */
-    int32_t axisY;
-    /**< 加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } GyroscopeData;
 
 /**
- * @brief 重力传感器的数据结构
+ * @brief Defines the gravity sensor data structure. Measures the acceleration of gravity applied
+ * to the device on three physical axes (x, y, and z) in m/s2.
  */
 typedef struct GravityData {
-    /**< 重力加速度X轴 */
-    int32_t axisX;
-    /**< 重力加速度Y轴 */
-    int32_t axisY;
-    /**< 重力加速度Z轴 */
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } GravityData;
 
 /**
- * @brief 未校准加速度传感器的数据结构
+ * @brief Defines the uncalibred accelerometer data structure. Measures the uncalibred accelerometer applied to
+ * the device on three physical axes (x, y, and z) in m/s2.
  */
 typedef struct AccelUncalibratedData {
-    /**< 未校准加速度X轴 */
-    int32_t axisX;
-    /**< 未校准加速度Y轴 */
-    int32_t axisY;
-    /**< 未校准加速度Z轴 */
-    int32_t axisZ;
-    /**< 未校准加速度X轴偏量 */
-    int32_t axisBiasX;
-    /**< 未校准加速度Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 未校准加速度Z轴偏量 */
-    int32_t axisBiasZ;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisBiasX;
+    float axisBiasY;
+    float axisBiasZ;
 } AccelUncalibratedData;
 
 /**
- * @brief 未校准陀螺仪传感器的数据结构
+ * @brief Defines the uncalibred gyroscope sensor data structure. Measures the uncalibred rotational angular velocity of the
+ * device on three physical axes (x, y, and z) in rad/s.
  */
 typedef struct GyroUncalibratedData {
-    /**< 未校准加速度X轴 */
-    int32_t axisX;
-    /**< 未校准加速度Y轴 */
-    int32_t axisY;
-    /**< 未校准加速度Z轴 */
-    int32_t axisZ;
-    /**< 未校准加速度X轴偏量 */
-    int32_t axisBiasX;
-    /**< 未校准加速度Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 未校准加速度Z轴偏量 */
-    int32_t axisBiasZ;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisBiasX;
+    float axisBiasY;
+    float axisBiasZ;
 } GyroUncalibratedData;
 
 /**
- * @brief 大幅度动作传感器的数据结构
+ * @brief Defines the significant Motion sensor data structure. Measures whether there is substantial motion in the device on
+ * the three physical axes (x, y, and z); a value of 1 indicates the presence of large motion; and a value of 0 indicates that
+ * there is no large movement.
  */
 typedef struct SignificantMotionData {
-    /**< 标量 */
     int32_t scalar;
 } SignificantMotionData;
 
 /**
- * @brief 计步器检测传感器的数据结构
+ * @brief Defines the pedometer detection sensor data structure. Detects the user's step counting action; if the value is 1, it
+ * means that the user has generated the action of counting walking; if the value is 0, it means that the user has not moved.
  */
 typedef struct PedometerDetectData {
-    /**< 标量 */
     int32_t scalar;
 } PedometerDetectData;
 
 /**
- * @brief 计步器传感器的数据结构
+ * @brief Defines the pedometer sensor data structure. Counts the number of steps taken by the user.
  */
 typedef struct PedometerData {
-    /**< 标量 */
-    int32_t scalar;
+    int32_t count;
 } PedometerData;
 
 /**
- * @brief  环境温度传感器的数据结构
+ * @brief Defines the ambient temperature sensor data structure. Measures ambient temperature in degrees Celsius (°C)
  */
 typedef struct AmbientTemperatureData {
-    /**< 标量 */
-    int32_t scalar;
+    float degrees;
 } AmbientTemperatureData;
 
 /**
- * @brief 湿度传感器的数据结构
+ * @brief Define the humidity sensor data structure. Measures the relative humidity of the environment,
+ * expressed as a percentage (%).
  */
 typedef struct HumidityData {
-    /**< 标量 */
-    int32_t scalar;
+    float humidity;
 } HumidityData;
 
 /**
- * @brief 磁场传感器的数据结构
+ * @brief Defines the magnetic field sensor data structure. Measure the ambient geomagnetic field in three
+ * physical axes (x, y, z) in μT.
  */
 typedef struct MagneticFieldData {
-    /**< 磁力计X轴 */
-    int32_t axisX;
-    /**< 磁力计Y轴 */
-    int32_t axisY;
-    /**< 磁力计Z轴 */
-    int32_t axisZ;
-    /**< 磁力计数据精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } MagneticFieldData;
 
 /**
- * @brief 未校准磁场传感器的数据结构
+ * @brief Defines the uncalibred magnetic field sensor data structure. Measure the uncalibred ambient geomagnetic field in three
+ * physical axes (x, y, z) in μT.
  */
 typedef struct MagneticFieldUncalibratedData {
-    /**< 磁力计X轴 */
-    int32_t axisX;
-    /**< 磁力计Y轴 */
-    int32_t axisY;
-    /**< 磁力计Z轴 */
-    int32_t axisZ;
-    /**< 磁力计X轴偏量 */
-    int32_t axisBiasX;
-    /**< 磁力计Y轴偏量 */
-    int32_t axisBiasY;
-    /**< 磁力计Z轴偏量 */
-    int32_t axisBiasZ;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisBiasX;
+    float axisBiasY;
+    float axisBiasZ;
 } MagneticFieldUncalibratedData;
 
 /**
- * @brief 气压计传感器的数据结构
+ * @brief Defines the barometer sensor data structure. Measures ambient air pressure in : hPa or mbar.
  */
 typedef struct BarometerData {
-    /**< 气压值 */
-    int32_t pressure;
+    float pressure;
 } BarometerData;
 
 /**
- * @brief 设备方向传感器的数据结构
+ * @brief Defines the device orientation sensor data structure. Measure the direction of rotation of the device in rad.
  */
 typedef struct DeviceOrientationData {
-    /**< 标量 */
-    int32_t scalar;
+    float scalar;
 } DeviceOrientationData;
 
 /**
- * @brief 方向传感器的数据结构
+ * @brief Defines the orientation sensor data structure. Measures the angle value of the rotation of the device
+ * around all three physical axes (x, y, z), in rad.
  */
 typedef struct OrientationData {
-    /**< 方位角（磁北方向与 Y 轴之间的夹角） */
-    int32_t axisX;
-    /**< 俯仰（绕 X 轴旋转，Z 轴向 Y 轴移动时为正值） */
-    int32_t axisY;
-    /**< 滚动（绕 Y 轴旋转，当 X 轴向 Z 轴移动时为正值）*/
-    int32_t axisZ;
-    /**< 校准精度 */
-    int32_t accuracy;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float accuracy;
 } OrientationData;
 
 /**
- * @brief 旋转矢量传感器的数据结构
+ * @brief Defines the rotation vector sensor data structure. Measuring device game rotation vector, composite sensor:
+ * synthesized by acceleration sensor, gyroscope sensor.
  */
 typedef struct RotationVectorData {
-    /**< x分量 */
-    int32_t axisX;
-    /**< y分量 */
-    int32_t axisY;
-    /**< z分量 */
-    int32_t axisZ;
-    /**< w分量 */
-    int32_t axisW;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisW;
 } RotationVectorData;
 
 /**
- * @brief 游戏旋转矢量传感器的数据结构
+ * @brief Defines the game rotation vector sensor data structure. Measuring device game rotation vector, composite sensor:
+ * synthesized by acceleration sensor, gyroscope sensor.
  */
 typedef struct GameRotationVectorData {
-    /**< x分量 */
-    int32_t axisX;
-    /**< y分量 */
-    int32_t axisY;
-    /**< z分量 */
-    int32_t axisZ;
-    /**< w分量 */
-    int32_t axisW;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisW;
 } GameRotationVectorData;
 
 /**
- * @brief 地磁旋转矢量传感器的数据结构
+ * @brief Defines the geomagnetic rotation vector sensor data structure. Measuring device geomagnetic rotation vector, composite
+ *  sensor: synthesized by acceleration sensor and magnetic field sensor.
  */
 typedef struct GeomagneticRotaVectorData {
-    /**< x分量 */
-    int32_t axisX;
-    /**< y分量 */
-    int32_t axisY;
-    /**< z分量 */
-    int32_t axisZ;
-    /**< w分量 */
-    int32_t axisW;
+    float axisX;
+    float axisY;
+    float axisZ;
+    float axisW;
 } GeomagneticRotaVectorData;
 
 /**
- * @brief 接近光传感器的数据结构
+ * @brief Defines the proximity light sensor data structure. Measures the proximity or distance of visible objects relative to
+ * the device display, where 0 indicates proximity and 1 indicates distance.
  */
 typedef struct ProximityData {
-    /**< 接近程度 */
     int32_t scalar;
 } ProximityData;
 
 /**
- * @brief 环境光传感器的数据结构
+ * @brief Defines the ambient light sensor data structure. Measures the intensity of light around the device in lux.
  */
 typedef struct AmbientLightData {
-    /**< 环境强弱 */
-    int32_t scalar;
+    float intensity;
 } AmbientLightData;
 
 /**
- * @brief 元数据传感器的数据结构
+ * @brief Defines the hall sensor data structure. Measure whether there is magnetic attraction around the device,
+ * 0 means no magnet attraction, and 1 means there is magnet attraction.
  */
-typedef struct MetaData {
-    /**< 标量 */
+typedef struct HallData {
     int32_t scalar;
-} MetaData;
+} HallData;
 
 /**
- * @brief 心率传感器的数据结构
+ * @brief Define the heart rate sensor data structure. Measures the user's heart rate, in bpm.
  */
 typedef struct HeartRateData {
-    /**< 心率值，单位bpm */
     int32_t heartRateBpm;
-    /**< 心率状态 */
-    int32_t temperatureStatus;
 } HeartRateData;
 
 /**
- * @brief 佩戴检测传感器的数据结构
+ * @brief Defines the wear detection sensor data structure. To detect whether the user is wearing it,
+ * 0 means not wearing it, while 1 means wearing it
  */
 typedef struct WearDetectionData {
-    /**< 标量 */
     int32_t scalar;
 } WearDetectionData;
 
