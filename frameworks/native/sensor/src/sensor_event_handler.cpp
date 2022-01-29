@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "my_event_handler.h"
+#include "sensor_event_handler.h"
 #include "sensors_log_domain.h"
 
 namespace OHOS {
@@ -24,12 +24,12 @@ using namespace OHOS::AppExecFwk;
 namespace {
 }  // namespace
 
-MyEventHandler::MyEventHandler(const std::shared_ptr<EventRunner> &runner):EventHandler(runner){}
+SensorEventHandler::SensorEventHandler(const std::shared_ptr<EventRunner> &runner):EventHandler(runner){}
 
 /**
  * Function: Process the event. Override the method of base class.
  * @param event The event need to be processed.
  */
-void MyEventHandler::ProcessEvent(const InnerEvent::Pointer &event){}
+void SensorEventHandler::ProcessEvent(const InnerEvent::Pointer &event){}
 }  // namespace Sensors
 }  // namespace OHOS
