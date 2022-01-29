@@ -20,7 +20,7 @@
 #include <thread>
 #include "sensor_basic_data_channel.h"
 #include "sensor_agent_type.h"
-#include "my_event_handler.h"
+#include "sensor_event_handler.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -43,7 +43,7 @@ private:
     static void threadProcessTask(SensorDataChannel *sensorChannel);
     int32_t InnerSensorDataChannel();
     std::mutex eventRunnerMutex_;
-    static std::shared_ptr<MyEventHandler> eventHandler_;
+    static std::shared_ptr<SensorEventHandler> eventHandler_;
     static std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
     static int32_t receiveFd_;
 };

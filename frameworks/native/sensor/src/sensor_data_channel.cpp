@@ -21,7 +21,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 
-#include "my_file_descriptor_listener.h"
+#include "sensor_event_listener.h"
 #include "sensors_errors.h"
 #include "sensors_log_domain.h"
 #include "string_ex.h"
@@ -34,7 +34,7 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
-std::shared_ptr<MyEventHandler> SensorDataChannel::eventHandler_;
+std::shared_ptr<SensorEventHandler> SensorDataChannel::eventHandler_;
 std::shared_ptr<AppExecFwk::EventRunner> SensorDataChannel::eventRunner_;
 
 namespace {
@@ -82,14 +82,14 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
         HiLog::Error(LABEL, "%{public}s create basic channel failed, ret : %{public}d", __func__, ret);
         return ret;
     }
-    auto listener = std::make_shared<MyFileDescriptorListener>();
+    auto listener = std::make_shared<SensorEventListener>();
     listener->SetChannel(this);
     auto myRunner = AppExecFwk::EventRunner::Create(true);
     if (myRunner == nullptr) {
         HiLog::Error(LABEL, "%{public}s myRunner is null", __func__);
         return -1;
     }
-    auto handler = std::make_shared<MyEventHandler>(myRunner);
+    auto handler = std::make_shared<SensorEventHandler>(myRunner);
     if (handler == nullptr) {
         HiLog::Error(LABEL, "%{public}s handler is null", __func__);
         return -1;
