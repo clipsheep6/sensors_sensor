@@ -24,12 +24,12 @@ using namespace OHOS::AppExecFwk;
 namespace {
 }  // namespace
 
-SensorEventHandler::SensorEventHandler(const std::shared_ptr<EventRunner> &runner):EventHandler(runner){}
+SensorEventHandler::SensorEventHandler(const std::shared_ptr<EventRunner> &runner):EventHandler(runner) {}
 
 /**
  * Function: Process the event. Override the method of base class.
  * @param event The event need to be processed.
  */
-void SensorEventHandler::ProcessEvent(const InnerEvent::Pointer &event){}
+void SensorEventHandler::ProcessEvent(const InnerEvent::Pointer &event) {}
 }  // namespace Sensors
 }  // namespace OHOS
