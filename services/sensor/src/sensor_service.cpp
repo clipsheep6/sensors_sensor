@@ -82,9 +82,6 @@ void SensorService::OnStart()
         HiLog::Error(LABEL, "%{public}s failed, sensorDataProcesser_ cannot be null", __func__);
         return;
     }
-    if (!InitSensorPolicy()) {
-        HiLog::Error(LABEL, "%{public}s Init sensor policy error", __func__);
-    }
 
     if (!SystemAbility::Publish(this)) {
         HiLog::Error(LABEL, "%{public}s publish SensorService error", __func__);
@@ -135,11 +132,6 @@ bool SensorService::InitSensorList()
             sensorMap_.insert(std::make_pair(it.GetSensorId(), it));
         }
     }
-    return true;
-}
-
-bool SensorService::InitSensorPolicy()
-{
     return true;
 }
 
