@@ -130,10 +130,10 @@ std::vector<std::vector<float>> GeomagneticField::GetSchmidtQuasiNormalFactors(i
         schmidtQuasiNormFactors[row].resize(row + 1);
         schmidtQuasiNormFactors[row][0] =
             schmidtQuasiNormFactors[row - 1][0] * (2 * row - 1) / static_cast<float>(row);
-        for (int32_t columnIndex = 1; columnIndex <= row; columnIndex++) {
-            schmidtQuasiNormFactors[row][columnIndex] = schmidtQuasiNormFactors[row][columnIndex - 1]
-                * static_cast<float>(sqrt((row - columnIndex + 1) * ((columnIndex == 1) ? 2 : 1)
-                / static_cast<float>(row + columnIndex)));
+        for (int32_t column = 1; column <= row; column++) {
+            schmidtQuasiNormFactors[row][column] = schmidtQuasiNormFactors[row][column - 1]
+                * static_cast<float>(sqrt((row - column + 1) * ((column == 1) ? 2 : 1)
+                / static_cast<float>(row + column)));
         }
     }
     return schmidtQuasiNormFactors;
@@ -149,24 +149,24 @@ void GeomagneticField::CalculateGeomagneticComponent(double latDiffRad, int64_t 
     float gcY = 0.0f;
     float gcZ = 0.0f;
     for (int32_t row = 1; row < GAUSSIAN_COEFFICIENT_DIMENSION; row++) {
-        for (int32_t columnIndex = 0; columnIndex <= row; columnIndex++) {
-            float g = GAUSS_COEFFICIENT_G[row][columnIndex] + yearsSinceBase
-                * DELTA_GAUSS_COEFFICIENT_G[row][columnIndex];
-            float h = GAUSS_COEFFICIENT_H[row][columnIndex] + yearsSinceBase
-                * DELTA_GAUSS_COEFFICIENT_H[row][columnIndex];
+        for (int32_t column = 0; column <= row; column++) {
+            float g = GAUSS_COEFFICIENT_G[row][column] + yearsSinceBase
+                * DELTA_GAUSS_COEFFICIENT_G[row][column];
+            float h = GAUSS_COEFFICIENT_H[row][column] + yearsSinceBase
+                * DELTA_GAUSS_COEFFICIENT_H[row][column];
             gcX += relativeRadiusPower[row + 2]
-                * (g * cosMLongitude[columnIndex] + h * sinMLongitude[columnIndex])
-                * polynomialsDerivative[row][columnIndex]
-                * schmidtQuasiNormalFactors[row][columnIndex];
-            gcY += relativeRadiusPower[row + 2] * columnIndex
-                * (g * sinMLongitude[columnIndex] - h * cosMLongitude[columnIndex])
-                * polynomials[row][columnIndex]
-                * schmidtQuasiNormalFactors[row][columnIndex]
+                * (g * cosMLongitude[column] + h * sinMLongitude[column])
+                * polynomialsDerivative[row][column]
+                * schmidtQuasiNormalFactors[row][column];
+            gcY += relativeRadiusPower[row + 2] * column
+                * (g * sinMLongitude[column] - h * cosMLongitude[column])
+                * polynomials[row][column]
+                * schmidtQuasiNormalFactors[row][column]
                 * inverseCosLatitude;
             gcZ -= (row + 1) * relativeRadiusPower[row + 2]
-                * (g * cosMLongitude[columnIndex] + h * sinMLongitude[columnIndex])
-                * polynomials[row][columnIndex]
-                * schmidtQuasiNormalFactors[row][columnIndex];
+                * (g * cosMLongitude[column] + h * sinMLongitude[column])
+                * polynomials[row][column]
+                * schmidtQuasiNormalFactors[row][column];
         }
         northComponent = static_cast<float>(gcX * cos(latDiffRad) + gcZ * sin(latDiffRad));
         eastComponent = gcY;
@@ -233,23 +233,23 @@ void GeomagneticField::InitLegendreTable(int32_t expansionDegree, float thetaRad
     for (int32_t row = 1; row <= expansionDegree; row++) {
         polynomials[row].resize(row + 1);
         polynomialsDerivative[row].resize(row + 1);
-        for (int32_t columnIndex = 0; columnIndex <= row; columnIndex++) {
-            if (row == columnIndex) {
-                polynomials[row][columnIndex] = sinValue * polynomials[row - 1][columnIndex - 1];
-                polynomialsDerivative[row][columnIndex] = cosValue * polynomials[row - 1][columnIndex - 1]
-                    + sinValue * polynomialsDerivative[row - 1][columnIndex - 1];
-            } else if (row == 1 || columnIndex == row - 1) {
-                polynomials[row][columnIndex] = cosValue * polynomials[row - 1][columnIndex];
-                polynomialsDerivative[row][columnIndex] = -sinValue * polynomials[row - 1][columnIndex]
-                    + cosValue * polynomialsDerivative[row - 1][columnIndex];
+        for (int32_t column = 0; column <= row; column++) {
+            if (row == column) {
+                polynomials[row][column] = sinValue * polynomials[row - 1][column - 1];
+                polynomialsDerivative[row][column] = cosValue * polynomials[row - 1][column - 1]
+                    + sinValue * polynomialsDerivative[row - 1][column - 1];
+            } else if (row == 1 || column == row - 1) {
+                polynomials[row][column] = cosValue * polynomials[row - 1][column];
+                polynomialsDerivative[row][column] = -sinValue * polynomials[row - 1][column]
+                    + cosValue * polynomialsDerivative[row - 1][column];
             } else {
-                float k = ((row - 1) * (row - 1) - columnIndex * columnIndex)
+                float k = ((row - 1) * (row - 1) - column * column)
                     / static_cast<float>((2 * row - 1) * (2 * row - 3));
-                polynomials[row][columnIndex] = cosValue * polynomials[row - 1][columnIndex]
-                    - k * polynomials[row - 2][columnIndex];
-                polynomialsDerivative[row][columnIndex] = -sinValue * polynomials[row - 1][columnIndex]
-                    + cosValue * polynomialsDerivative[row - 1][columnIndex]
-                    - k * polynomialsDerivative[row - 2][columnIndex];
+                polynomials[row][column] = cosValue * polynomials[row - 1][column]
+                    - k * polynomials[row - 2][column];
+                polynomialsDerivative[row][column] = -sinValue * polynomials[row - 1][column]
+                    + cosValue * polynomialsDerivative[row - 1][column]
+                    - k * polynomialsDerivative[row - 2][column];
             }
         }
     }
