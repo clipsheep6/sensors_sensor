@@ -259,25 +259,23 @@ static uint32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value ca
     std::vector<struct AsyncCallbackInfo*> callbackInfos = g_onCallbackInfos[sensorTypeId];
     std::vector<struct AsyncCallbackInfo*>::iterator iter;
     for (iter = callbackInfos.begin(); iter != callbackInfos.end();) {
-        if (*iter == nullptr || (*iter)->callback[0] == nullptr) {
-            HiLog::Error(LABEL, "%{public}s arg is null", __func__);
-            continue;
+        if (*iter != nullptr && (*iter)->callback[0] != nullptr) {
+            napi_value sensorCallback = nullptr;
+            napi_get_reference_value(env, (*iter)->callback[0], &sensorCallback);
+            if (IsNapiValueSame(env, callback, sensorCallback)) {
+                napi_delete_reference(env, (*iter)->callback[0]);
+                (*iter)->callback[0] = nullptr;
+                delete *iter;
+                *iter = nullptr;
+                callbackInfos.erase(iter++);
+                if (callbackInfos.empty()) {
+                    g_onCallbackInfos.erase(sensorTypeId);
+                    return 0;
+                }
+                break;
+            } 
         }
-        napi_value sensorCallback = nullptr;
-        napi_get_reference_value(env, (*iter)->callback[0], &sensorCallback);
-        if (IsNapiValueSame(env, callback, sensorCallback)) {
-            napi_delete_reference(env, (*iter)->callback[0]);
-            (*iter)->callback[0] = nullptr;
-            delete *iter;
-            *iter = nullptr;
-            callbackInfos.erase(iter++);
-            if (callbackInfos.empty()) {
-                g_onCallbackInfos.erase(sensorTypeId);
-                return 0;
-            }
-        } else {
-            ++iter;
-        }
+        iter++;
     }
     g_onCallbackInfos[sensorTypeId] = callbackInfos;
     return callbackInfos.size();
