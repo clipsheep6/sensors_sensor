@@ -39,6 +39,8 @@
 using namespace OHOS::HiviewDFX;
 static constexpr HiLogLabel LABEL = {LOG_CORE, 0xD002708, "SensorJsAPI"};
 
+const int32_t REPORTING_INTERVAL = 200000000;
+
 static std::map<int32_t, struct AsyncCallbackInfo*> g_onceCallbackInfos;
 static std::map<int32_t, std::vector<struct AsyncCallbackInfo*>> g_onCallbackInfos;
 
@@ -46,7 +48,7 @@ static void DataCallbackImpl(SensorEvent *event)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
     if (event == nullptr) {
-        HiLog::Error(LABEL, "%{public}s event is null!", __func__);
+        HiLog::Error(LABEL, "%{public}s event is null", __func__);
         return;
     }
     int32_t sensorTypeId = event->sensorTypeId;
@@ -98,12 +100,12 @@ static int32_t UnsubscribeSensor(int32_t sensorTypeId)
 {
     HiLog::Info(LABEL, "%{public}s in", __func__);
     int32_t ret = DeactivateSensor(sensorTypeId, &user);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s  DeactivateSensor failed", __func__);
         return ret;
     }
     ret = UnsubscribeSensor(sensorTypeId, &user);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s  UnsubscribeSensor failed", __func__);
         return ret;
     }
@@ -115,17 +117,17 @@ static int32_t SubscribeSensor(int32_t sensorTypeId, int64_t interval, RecordSen
 {
     HiLog::Info(LABEL, "%{public}s in, sensorTypeId: %{public}d", __func__, sensorTypeId);
     int32_t ret = SubscribeSensor(sensorTypeId, &user);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s subscribeSensor failed", __func__);
         return ret;
     }
     ret = SetBatch(sensorTypeId, &user, interval, 0);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s set batch failed", __func__);
         return ret;
     }
     ret = ActivateSensor(sensorTypeId, &user);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s activateSensor failed", __func__);
         return ret;
     }
@@ -159,7 +161,7 @@ static napi_value Once(napi_env env, napi_callback_info info)
     if (g_onCallbackInfos.find(sensorTypeId) == g_onCallbackInfos.end()) {
         HiLog::Debug(LABEL, "%{public}s no subscription to change sensor data, registration is required", __func__);
         int32_t ret = SubscribeSensor(sensorTypeId, 200000000, DataCallbackImpl);
-        if (ret < 0) {
+        if (ret != OHOS::ERR_OK) {
             HiLog::Error(LABEL, "%{public}s subscribe Sensor failed", __func__);
             g_onceCallbackInfos.erase(sensorTypeId);
             return nullptr;
@@ -171,10 +173,11 @@ static napi_value Once(napi_env env, napi_callback_info info)
 
 static bool IsSubscribed(napi_env env, int32_t sensorTypeId, napi_value callback)
 {
+    HiLog::Info(LABEL, "%{public}s in, sensorTypeId: %{public}d", __func__, sensorTypeId);
     if (g_onCallbackInfos.find(sensorTypeId) == g_onCallbackInfos.end()) {
         return false;
     }
-    std::vector<struct AsyncCallbackInfo*> callbackInfos = g_onCallbackInfos[sensorTypeId];
+    std::vector<AsyncCallbackInfo*> callbackInfos = g_onCallbackInfos[sensorTypeId];
     for (auto callbackInfo : callbackInfos) {
         napi_value sensorCallback = nullptr;
         napi_get_reference_value(env, callbackInfo->callback[0], &sensorCallback);
@@ -219,18 +222,18 @@ static napi_value On(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int32_t sensorTypeId = GetCppInt32(args[0], env);
-    int64_t interval = 200000000;
+    int64_t interval = REPORTING_INTERVAL;
     if (argc == 3) {
         napi_value value = NapiGetNamedProperty(args[2], "interval", env);
         if (!IsMatchType(env, value, napi_number)) {
-            HiLog::Error(LABEL, "%{public}s argument should be napi_number type!", __func__);
+            HiLog::Error(LABEL, "%{public}s argument should be napi_number type", __func__);
             return nullptr;
         }
         interval = GetCppInt64(value, env);
         HiLog::Debug(LABEL, "%{public}s interval is %{public}lld", __func__, interval);
     }
     int32_t ret = SubscribeSensor(sensorTypeId, interval, DataCallbackImpl);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s subscribeSensor failed", __func__);
         return nullptr;
     }
@@ -255,7 +258,11 @@ static uint32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value ca
 {
     std::vector<struct AsyncCallbackInfo*> callbackInfos = g_onCallbackInfos[sensorTypeId];
     std::vector<struct AsyncCallbackInfo*>::iterator iter;
-    for (iter = callbackInfos.begin(); iter != callbackInfos.end(); iter++) {
+    for (iter = callbackInfos.begin(); iter != callbackInfos.end();) {
+        if (*iter == nullptr || (*iter)->callback[0] == nullptr) {
+            HiLog::Error(LABEL, "%{public}s arg is null", __func__);
+            continue;
+        }
         napi_value sensorCallback = nullptr;
         napi_get_reference_value(env, (*iter)->callback[0], &sensorCallback);
         if (IsNapiValueSame(env, callback, sensorCallback)) {
@@ -263,11 +270,13 @@ static uint32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value ca
             (*iter)->callback[0] = nullptr;
             delete *iter;
             *iter = nullptr;
-            callbackInfos.erase(iter);
+            callbackInfos.erase(iter++);
             if (callbackInfos.empty()) {
                 g_onCallbackInfos.erase(sensorTypeId);
                 return 0;
             }
+        } else {
+            ++iter;
         }
     }
     g_onCallbackInfos[sensorTypeId] = callbackInfos;
@@ -282,7 +291,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
     if (argc < 1 || argc > 2 || !IsMatchType(env, args[0], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     int32_t sensorTypeId = GetCppInt32(args[0], env);
@@ -299,7 +308,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
         RemoveAllCallback(env, sensorTypeId);
     }
     int32_t ret = UnsubscribeSensor(sensorTypeId);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s UnsubscribeSensor failed", __func__);
     }
     return nullptr;
@@ -313,11 +322,11 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 2 || argc > 3) {
-        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match.", __func__);
+        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match", __func__);
         return nullptr;
     }
     if (!IsMatchType(env, args[0], napi_object) || !IsMatchType(env, args[1], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s argument is invalid.", __func__);
+        HiLog::Error(LABEL, "%{public}s argument is invalid", __func__);
         return nullptr;
     }
     napi_value napiLatitude = NapiGetNamedProperty(args[0], "latitude", env);
@@ -381,7 +390,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     napi_value napiAxisX = NapiGetNamedProperty(args[1], "axisX", env);
     napi_value napiAxisY = NapiGetNamedProperty(args[1], "axisY", env);
     if ((!IsMatchType(env, napiAxisX, napi_number)) || (!IsMatchType(env, napiAxisY, napi_number))) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_number type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_number type", __func__);
         return nullptr;
     }
     int32_t axisX = GetCppInt32(napiAxisX, env);
@@ -396,7 +405,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     std::vector<float> outRotationVector(inRotationVectorLength);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->transformCoordinateSystem(inRotationVector, axisX, axisY, outRotationVector);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s EmitPromiseWork  failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -415,7 +424,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
         return promise;
     }
     if (!IsMatchType(env, args[2], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -446,7 +455,7 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     std::vector<float> angleChange(ROTATION_VECTOR_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getAngleModify(curRotationVector, preRotationVector, angleChange);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -495,7 +504,7 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
     std::vector<float> rotationAngle(ROTATION_VECTOR_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getDirection(rotationMatrix, rotationAngle);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -514,7 +523,7 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         napi_value result;
         napi_get_undefined(env, &result);
         delete asyncCallbackInfo;
@@ -533,7 +542,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 1 || argc > 2 || !IsMatchArrayType(env, args[0])) {
-        HiLog::Error(LABEL, "%{public}s argument error!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument error", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -546,7 +555,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     std::vector<float> quaternion(QUATERNION_LENGTH);
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->createQuaternion(rotationVector, quaternion);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -565,7 +574,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be function!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be function", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -583,7 +592,7 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 2 || argc > 3 || !IsMatchType(env, args[0], napi_number)
         || !IsMatchType(env, args[1], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -597,7 +606,7 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     float altitude = 0;
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getAltitude(seaPressure, currentPressure, &altitude);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -630,7 +639,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 1 || argc > 2 || !IsMatchArrayType(env, args[0])) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -643,7 +652,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     float geomagneticDip = 0;
     std::unique_ptr<SensorAlgorithm> sensorAlgorithm = std::make_unique<SensorAlgorithm>();
     int32_t ret = sensorAlgorithm->getGeomagneticDip(inclinationMatrix, &geomagneticDip);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -659,7 +668,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be function!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be function", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -690,7 +699,7 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
         std::vector<float> rotationVector = GetCppArrayFloat(env, args[0]);
         std::vector<float> rotationMatrix(THREE_DIMENSIONAL_MATRIX_LENGTH);
         int32_t ret = sensorAlgorithm->createRotationMatrix(rotationVector, rotationMatrix);
-        if (ret < 0) {
+        if (ret != OHOS::ERR_OK) {
             HiLog::Error(LABEL, "%{public}s failed", __func__);
             asyncCallbackInfo->type = FAIL;
             asyncCallbackInfo->error.code = ret;
@@ -725,7 +734,7 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
     std::vector<float> rotation(THREE_DIMENSIONAL_MATRIX_LENGTH);
     std::vector<float> inclination(THREE_DIMENSIONAL_MATRIX_LENGTH);
     int32_t ret = sensorAlgorithm->createRotationAndInclination(gravity, geomagnetic, rotation, inclination);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -770,7 +779,7 @@ static napi_value GetSensorList(napi_env env, napi_callback_info info)
         .type = GET_SENSOR_LIST,
     };
     int32_t ret = GetAllSensors(&sensorInfos, &count);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s get sensor list failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -779,7 +788,6 @@ static napi_value GetSensorList(napi_env env, napi_callback_info info)
             asyncCallbackInfo->sensorInfos.push_back(*(sensorInfos + i));
         }
     }
-
     if (argc == 0) {
         napi_deferred deferred = nullptr;
         napi_value promise = nullptr;
@@ -819,7 +827,7 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
     SensorInfo *sensorInfos = nullptr;
     int32_t count = 0;
     int32_t ret = GetAllSensors(&sensorInfos, &count);
-    if (ret < 0) {
+    if (ret != OHOS::ERR_OK) {
         HiLog::Error(LABEL, "%{public}s get sensorlist failed", __func__);
         asyncCallbackInfo->type = FAIL;
         asyncCallbackInfo->error.code = ret;
@@ -845,7 +853,7 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
