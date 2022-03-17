@@ -47,7 +47,7 @@ static std::map<int32_t, std::vector<struct AsyncCallbackInfo*>> g_onCallbackInf
 static void DataCallbackImpl(SensorEvent *event)
 {
     if (event == nullptr) {
-        HiLog::Error(LABEL, "%{public}s event is null!", __func__);
+        HiLog::Error(LABEL, "%{public}s event is null", __func__);
         return;
     }
     int32_t sensorTypeId = event->sensorTypeId;
@@ -224,7 +224,7 @@ static napi_value On(napi_env env, napi_callback_info info)
     if (argc == 3) {
         napi_value value = NapiGetNamedProperty(args[2], "interval", env);
         if (!IsMatchType(env, value, napi_number)) {
-            HiLog::Error(LABEL, "%{public}s argument should be napi_number type!", __func__);
+            HiLog::Error(LABEL, "%{public}s argument should be napi_number type", __func__);
             return nullptr;
         }
         interval = GetCppInt64(value, env);
@@ -256,7 +256,11 @@ static uint32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value ca
 {
     std::vector<struct AsyncCallbackInfo*> callbackInfos = g_onCallbackInfos[sensorTypeId];
     std::vector<struct AsyncCallbackInfo*>::iterator iter;
-    for (iter = callbackInfos.begin(); iter != callbackInfos.end(); iter++) {
+    for (iter = callbackInfos.begin(); iter != callbackInfos.end();) {
+        if (*iter == nullptr || (*iter)->callback[0] == nullptr) {
+            HiLog::Error(LABEL, "%{public}s arg is null", __func__);
+            continue;
+        }
         napi_value sensorCallback = nullptr;
         napi_get_reference_value(env, (*iter)->callback[0], &sensorCallback);
         if (IsNapiValueSame(env, callback, sensorCallback)) {
@@ -264,11 +268,13 @@ static uint32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value ca
             (*iter)->callback[0] = nullptr;
             delete *iter;
             *iter = nullptr;
-            callbackInfos.erase(iter);
+            callbackInfos.erase(iter++);
             if (callbackInfos.empty()) {
                 g_onCallbackInfos.erase(sensorTypeId);
                 return 0;
             }
+        } else {
+            ++iter;
         }
     }
     g_onCallbackInfos[sensorTypeId] = callbackInfos;
@@ -283,7 +289,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, NULL));
     if (argc < 1 || argc > 2 || !IsMatchType(env, args[0], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     int32_t sensorTypeId = GetCppInt32(args[0], env);
@@ -314,11 +320,11 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 2 || argc > 3) {
-        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match.", __func__);
+        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match", __func__);
         return nullptr;
     }
     if (!IsMatchType(env, args[0], napi_object) || !IsMatchType(env, args[1], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s argument is invalid.", __func__);
+        HiLog::Error(LABEL, "%{public}s argument is invalid", __func__);
         return nullptr;
     }
     napi_value napiLatitude = NapiGetNamedProperty(args[0], "latitude", env);
@@ -382,7 +388,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     napi_value napiAxisX = NapiGetNamedProperty(args[1], "axisX", env);
     napi_value napiAxisY = NapiGetNamedProperty(args[1], "axisY", env);
     if ((!IsMatchType(env, napiAxisX, napi_number)) || (!IsMatchType(env, napiAxisY, napi_number))) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_number type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_number type", __func__);
         return nullptr;
     }
     int32_t axisX = GetCppInt32(napiAxisX, env);
@@ -416,7 +422,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
         return promise;
     }
     if (!IsMatchType(env, args[2], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -515,7 +521,7 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         napi_value result;
         napi_get_undefined(env, &result);
         delete asyncCallbackInfo;
@@ -534,7 +540,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 1 || argc > 2 || !IsMatchArrayType(env, args[0])) {
-        HiLog::Error(LABEL, "%{public}s argument error!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument error", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -566,7 +572,7 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be function!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be function", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -584,7 +590,7 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 2 || argc > 3 || !IsMatchType(env, args[0], napi_number)
         || !IsMatchType(env, args[1], napi_number)) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -631,7 +637,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr));
     if (argc < 1 || argc > 2 || !IsMatchArrayType(env, args[0])) {
-        HiLog::Error(LABEL, "%{public}s Invalid input.", __func__);
+        HiLog::Error(LABEL, "%{public}s Invalid input", __func__);
         return nullptr;
     }
     AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
@@ -660,7 +666,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be function!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be function", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
@@ -845,7 +851,7 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
         return promise;
     }
     if (!IsMatchType(env, args[1], napi_function)) {
-        HiLog::Error(LABEL, "%{public}s argument should be napi_function type!", __func__);
+        HiLog::Error(LABEL, "%{public}s argument should be napi_function type", __func__);
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
         return nullptr;
