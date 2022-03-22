@@ -309,4 +309,3 @@ float GeomagneticField::ObtainTotalIntensity()
     float totalIntensity = static_cast<float>(sqrt(sumOfSquares));
     return totalIntensity;
 }
-

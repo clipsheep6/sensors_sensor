@@ -145,3 +145,4 @@ int32_t SensorHdiConnection::DestroyHdiConnection()
 }
 }  // namespace Sensors
 }  // namespace OHOS
+
