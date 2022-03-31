@@ -50,6 +50,12 @@ int32_t SensorEventCallback::OnDataEvent(const HdfSensorEvents& event)
     for (int32_t i = 0; i < static_cast<int32_t>(dataSize); i++) {
         sensorEvent.data[i] = event.data[i];
     }
+    
+    if (sensorEvent.sensorTypeId == SENSOR_TYPE_ID_PROXIMITY) {
+        ProximityData* data = (ProximityData*)sensorEvent.data;
+        HiLog::Debug(LABEL, "%{public}s ProximityData = %{public}f",__func__ ,data->scalar);
+    }
+    
     (void)(reportDataCallback_->*(reportDataCb_))(&sensorEvent, reportDataCallback_);
     ISensorHdiConnection::dataCondition_.notify_one();
     return ERR_OK;
