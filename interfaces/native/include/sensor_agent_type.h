@@ -366,7 +366,7 @@ typedef struct GeomagneticRotaVectorData {
  * the device display, where 0 indicates proximity and 1 indicates distance.
  */
 typedef struct ProximityData {
-    int32_t scalar;
+    float scalar;
 } ProximityData;
 
 /**
