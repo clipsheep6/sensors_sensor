@@ -49,6 +49,8 @@ ohos_shared_library("sensor_interface_native") {
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
   part_name = "sensor"
   subsystem_name = "sensors"
 }
