@@ -511,6 +511,11 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
          * count of the smart pointer is guaranteed to be 1.
          */
         asyncCallbackInfo->DecStrongRef(nullptr);
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(asyncCallbackInfo->env, &scope);
+        if (scope == nullptr) {
+            return;
+        }
         napi_env env = asyncCallbackInfo->env;
         napi_value callback = nullptr;
         CHKNRV(env, napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback),
@@ -521,6 +526,7 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             "Asynccallback Type invalid in uv work");
         g_convertfuncList[asyncCallbackInfo->type](env, asyncCallbackInfo, result);
         CHKNRV(env, napi_call_function(env, nullptr, callback, 1, &result[1], &callResult), "napi_call_function");
+        napi_close_handle_scope(asyncCallbackInfo->env, scope);
         asyncCallbackInfo->work = nullptr;
         freeWork(work);
     });
