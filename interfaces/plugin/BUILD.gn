@@ -13,7 +13,7 @@
 
 #import("//build/config/ohos/rules.gni")
 import("//build/ohos.gni")
-ohos_shared_library("sensor") {
+ohos_shared_library("libsensor_sensor") {
   include_dirs = [
     "//third_party/node/src",
     "//native_engine",
@@ -45,5 +45,5 @@ ohos_shared_library("sensor") {
 }
 
 group("sensor_js_target") {
-  deps = [ ":sensor" ]
+  deps = [ ":libsensor_sensor" ]
 }
