@@ -34,8 +34,8 @@ public:
     void SetChannel(SensorDataChannel* channel);
 
 private:
+    int32_t ReceiveData(int32_t fileDescriptor, void *vaddr, size_t size);
     SensorDataChannel* channel_;
-    TransferSensorEvents *receiveDataBuff_ = nullptr;
 };
 }  // namespace Sensors
 }  // namespace OHOS
