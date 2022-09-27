@@ -23,6 +23,13 @@
 
 namespace OHOS {
 namespace Sensors {
+// Error code for user
+enum ErrorCode : int32_t {
+    PERMISSION_DENIED = 201, // Use this error code when permission is denied.
+    PARAMETER_ERROR = 401, // Use this error code when the input parameter type or range does not match.
+    SERVICE_EXCEPTION = 14500101 // Use this error code when the service is exception.
+};
+
 enum {
     MODULE_COMMON = 0x00,
     MODULE_SENSORS_DEVICE = 0x01,
