@@ -16,9 +16,13 @@
 #define SENSOR_NAPI_UTILS_H
 
 #include <iostream>
+#include <map>
+#include <optional>
 
 #include "async_callback_info.h"
 #include "refbase.h"
+#include "sensors_errors.h"
+
 namespace OHOS {
 namespace Sensors {
 using std::vector;
@@ -59,27 +63,39 @@ bool CreateFailMessage(CallbackDataType type, int32_t code, string message,
 bool ConvertToBodyData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
 bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
 
-#define GET_AND_THROW_NAPI_ERROR(env, message) \
+struct NapiError {
+    std::string errorCode;
+    std::string message;
+};
+
+const std::map<int32_t, NapiError> ERROR_MESSAGES = {
+    {SERVICE_EXCEPTION,  {"14500101", "Service exception."}},
+    {PERMISSION_DENIED,  {"201", "Permission denied."}},
+    {PARAMETER_ERROR,  {"401", "The parameter invalid."}},
+};
+
+inline const std::optional<NapiError> GetNapiError(int32_t errorCode) {
+    auto iter = ERROR_MESSAGES.find(errorCode);
+    if (iter != ERROR_MESSAGES.end()) {
+        return iter->second;
+    }
+    return std::nullopt;
+}
+
+#define THROWERR(env, code, message) \
     do { \
-        const napi_extended_error_info* errorInfo = nullptr; \
-        napi_get_last_error_info((env), &errorInfo); \
-        bool isPending = false; \
-        napi_is_exception_pending((env), &isPending); \
-        if (!isPending && errorInfo != nullptr) { \
-            std::string errDesc = std::string(__FUNCTION__) + ": " + #message + " fail. "; \
-            std::string errorMessage = \
-                errorInfo->error_message != nullptr ? errorInfo->error_message : "empty error message"; \
-            errDesc += errorMessage; \
-            napi_throw_error((env), nullptr, errDesc.c_str()); \
-        } \
+        MISC_HILOGE("message: %{public}s, code: %{public}s", #message, (#code)); \
+        auto error = GetNapiError(code); \
+        if (error.has_value()) { \
+            auto napiError = error.value(); \
+            napi_throw_error(env, napiError.codes.c_str(), napiError.message.c_str()); \
+        }\
     } while (0)
 
 #define CHKNCR(env, cond, message, retVal) \
     do { \
         if (!(cond)) { \
             SEN_HILOGE("(%{public}s)", #message); \
-            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
-            napi_throw_error(env, nullptr, errDesc.c_str()); \
             return retVal; \
         } \
     } while (0)
@@ -88,8 +104,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if (!(cond)) { \
             SEN_HILOGE("(%{public}s)", #message); \
-            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
-            napi_throw_error(env, nullptr, errDesc.c_str()); \
             return nullptr; \
         } \
     } while (0)
@@ -98,8 +112,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if (!(cond)) { \
             SEN_HILOGE("(%{public}s)", #message); \
-            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
-            napi_throw_error(env, nullptr, errDesc.c_str()); \
             return false; \
         } \
     } while (0)
@@ -108,8 +120,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if (!(cond)) { \
             SEN_HILOGE("(%{public}s)", #message); \
-            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
-            napi_throw_error(env, nullptr, errDesc.c_str()); \
             return; \
         } \
     } while (0)
@@ -118,8 +128,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     { \
         if (!(cond)) { \
             SEN_HILOGW("(%{public}s)", #message); \
-            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
-            napi_throw_error(env, nullptr, errDesc.c_str()); \
             continue; \
         } \
     }
@@ -128,7 +136,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if ((state) != napi_ok) { \
             SEN_HILOGE("(%{public}s) fail", #message); \
-            GET_AND_THROW_NAPI_ERROR((env), (message)); \
             return retVal; \
         } \
     } while (0)
@@ -137,7 +144,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if ((state) != napi_ok) { \
             SEN_HILOGE("(%{public}s) fail", #message); \
-            GET_AND_THROW_NAPI_ERROR((env), (message)); \
             return nullptr; \
         } \
     } while (0)
@@ -146,7 +152,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if ((state) != napi_ok) { \
             SEN_HILOGE("(%{public}s) fail", #message); \
-            GET_AND_THROW_NAPI_ERROR((env), (message)); \
             return false; \
         } \
     } while (0)
@@ -155,7 +160,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     do { \
         if ((state) != napi_ok) { \
             SEN_HILOGE("(%{public}s) fail", #message); \
-            GET_AND_THROW_NAPI_ERROR((env), (message)); \
             return; \
         } \
     } while (0)
@@ -164,7 +168,6 @@ bool ConvertToCompass(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallback
     { \
         if ((state) != napi_ok) { \
             SEN_HILOGW("(%{public}s) fail", #message); \
-            GET_AND_THROW_NAPI_ERROR((env), (message)); \
             continue; \
         } \
     }
