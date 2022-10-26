@@ -14,12 +14,38 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+module_output_path = "sensors/sensor"
+
+ohos_fuzztest("SetModeFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file =
+      "//base/sensors/sensor/interfaces/native/test/fuzztest/setmode_fuzzer"
+
+  include_dirs = [
+    "//base/sensors/sensor/interfaces/native/test/fuzztest/setmode_fuzzer",
+    "//base/sensors/sensor/interfaces/native/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "setmode_fuzzer.cpp" ]
+
+  deps = [ "//base/sensors/sensor/interfaces/native:sensor_interface_native" ]
+
+  external_deps = [ "c_utils:utils" ]
+}
 
 group("fuzztest") {
   testonly = true
-  deps = [
-    "getallsensors_fuzzer:fuzztest",
-    "sensoragent_fuzzer:fuzztest",
-    "setmode_fuzzer:fuzztest",
+  deps = []
+  deps += [
+    # deps file
+    ":SetModeFuzzTest",
   ]
 }
