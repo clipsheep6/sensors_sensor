@@ -21,7 +21,7 @@
 #include "sensor_agent_type.h"
 
 template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -37,9 +37,9 @@ bool SetModeFuzzTest(const uint8_t* data, size_t size)
     }
     int32_t option;
     size_t startPos = 0;
-    startPos = GetObject<int32_t>(option, data + startPos, size - startPos);
+    startPos = GetObject<int32_t>(data + startPos, size - startPos, option);
     SensorUser user;
-    GetObject<SensorUser>(user, data + startPos, size - startPos);
+    GetObject<SensorUser>(data + startPos, size - startPos, user);
     if (SetMode(option, &user, option) != 0) {
         return false;
     }
