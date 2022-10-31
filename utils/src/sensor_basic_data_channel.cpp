@@ -28,7 +28,7 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorBasicChannel" };
-constexpr int32_t SENSOR_READ_DATA_SIZE = sizeof(SensorEvent) * 100;
+constexpr int32_t SENSOR_READ_DATA_SIZE = sizeof(TransferSensorEvents) * 100;
 constexpr int32_t DEFAULT_CHANNEL_SIZE = 2 * 1024;
 constexpr int32_t SOCKET_PAIR_SIZE = 2;
 }  // namespace
@@ -174,6 +174,10 @@ int32_t SensorBasicDataChannel::ReceiveData(void *vaddr, size_t size)
     do {
         length = recv(receiveFd_, vaddr, size, MSG_DONTWAIT);
     } while (errno == EINTR);
+    if (length < 0) {
+        SEN_HILOGE("length:%{public}zu, errno:%{public}d", length, errno);
+        return 0;
+    }
     return length;
 }
 
