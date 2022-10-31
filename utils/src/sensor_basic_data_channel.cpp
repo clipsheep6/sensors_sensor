@@ -106,7 +106,7 @@ int32_t SensorBasicDataChannel::CreateSensorBasicChannel()
 int32_t SensorBasicDataChannel::CreateSensorBasicChannel(MessageParcel &data)
 {
     CALL_LOG_ENTER;
-    if ((sendFd_ != -1) || (receiveFd_ != -1)) {
+    if ((sendFd_ != -1)) {
         SEN_HILOGD("already create socketpair");
         return ERR_OK;
     }
