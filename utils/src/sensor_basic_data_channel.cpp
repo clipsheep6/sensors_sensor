@@ -54,37 +54,47 @@ int32_t SensorBasicDataChannel::CreateSensorBasicChannel()
         receiveFd_ = -1;
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
+    auto closeFdWhenErr = [] (int32_t &fd){
+        close(fd);
+        fd = -1;
+    };
     // set socket attr
     int32_t ret = setsockopt(socketPair[0], SOL_SOCKET, SO_SNDBUF, &SENSOR_READ_DATA_SIZE,
                              sizeof(SENSOR_READ_DATA_SIZE));
     if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 0 failed");
+        closeFdWhenErr(socketPair[0]);
+        SEN_HILOGE("setsockopt socketpair 0 failed, ret:%{public}d, errno:%{public}d", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     ret = setsockopt(socketPair[1], SOL_SOCKET, SO_RCVBUF, &SENSOR_READ_DATA_SIZE, sizeof(SENSOR_READ_DATA_SIZE));
     if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 1 failed");
+        closeFdWhenErr(socketPair[1]);
+        SEN_HILOGE("setsockopt socketpair 1 failed, ret:%{public}d, errno:%{public}d", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     int32_t bufferSize = DEFAULT_CHANNEL_SIZE;
     ret = setsockopt(socketPair[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 0 failed");
+        closeFdWhenErr(socketPair[0]);
+        SEN_HILOGE("setsockopt socketpair 0 failed, ret:%{public}d, errno:%{public}d", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     ret = setsockopt(socketPair[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 1 failed");
+        closeFdWhenErr(socketPair[1]);
+        SEN_HILOGE("setsockopt socketpair 1 failed, ret:%{public}d, errno:%{public}d", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     ret = fcntl(socketPair[0], F_SETFL, O_NONBLOCK);
     if (ret != 0) {
-        SEN_HILOGE("fcntl socketpair 0 failed");
+        closeFdWhenErr(socketPair[0]);
+        SEN_HILOGE("fcntl socketpair 0 failed, ret:%{public}d, errno:{public}d", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     ret = fcntl(socketPair[1], F_SETFL, O_NONBLOCK);
     if (ret != 0) {
-        SEN_HILOGE("fcntl socketpair 1 failed");
+        closeFdWhenErr(socketPair[1]);
+        SEN_HILOGE("fcntl socketpair 1 failed, ret:%{public}d, errno:{public}", ret, errno);
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
     sendFd_ = socketPair[0];
