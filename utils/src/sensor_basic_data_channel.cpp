@@ -178,18 +178,6 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
     return ERR_OK;
 }
 
-int32_t SensorBasicDataChannel::ReceiveData(void *vaddr, size_t size)
-{
-    CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
-        SEN_HILOGE("failed, vaddr is null or receiveFd_ invalid");
-        return SENSOR_CHANNEL_RECEIVE_ADDR_ERR;
-    ssize_t length;
-    do {
-        length = recv(receiveFd_, vaddr, size, MSG_DONTWAIT);
-    } while (errno == EINTR);
-    return length;
-}
-
 int32_t SensorBasicDataChannel::GetSendDataFd() const
 {
     return sendFd_;
@@ -200,7 +188,7 @@ int32_t SensorBasicDataChannel::GetReceiveDataFd() const
     return receiveFd_;
 }
 
-int32_t SensorBasicDataChannel::DestroySensorBasicChannel()
+void SensorBasicDataChannel::DestroySensorBasicChannel()
 {
     if (sendFd_ >= 0) {
         close(sendFd_);
@@ -212,7 +200,6 @@ int32_t SensorBasicDataChannel::DestroySensorBasicChannel()
         receiveFd_ = -1;
         SEN_HILOGD("close receiveFd_ success");
     }
-    return ERR_OK;
 }
 
 const std::unordered_map<uint32_t, SensorEvent> &SensorBasicDataChannel::GetDataCacheBuf() const
