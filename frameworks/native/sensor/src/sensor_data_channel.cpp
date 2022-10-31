@@ -78,7 +78,8 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
     CHKPL(eventHandler_);
     eventHandler_ = nullptr;
     // destroy sensor basic channelx
-    return DestroySensorBasicChannel();
+    DestroySensorBasicChannel();
+    return ERR_OK;
 }
 
 SensorDataChannel::~SensorDataChannel()

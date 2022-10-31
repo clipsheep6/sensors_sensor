@@ -41,9 +41,9 @@ public:
     SensorBasicDataChannel();
     virtual ~SensorBasicDataChannel();
     int32_t CreateSensorBasicChannel();
-    int32_t CreateSensorBasicChannel(MessageParcel &data);
     void DestroySensorBasicChannel();
     int32_t GetSendDataFd() const;
+    void SetSendDataFd(int32_t sendFd);
     int32_t GetReceiveDataFd() const;
     int32_t SendToBinder(MessageParcel &data);
     void CloseSendFd();
