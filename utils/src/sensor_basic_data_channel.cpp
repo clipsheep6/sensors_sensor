@@ -31,6 +31,7 @@ constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorBasicChannel"
 constexpr int32_t SENSOR_READ_DATA_SIZE = sizeof(SensorEvent) * 100;
 constexpr int32_t DEFAULT_CHANNEL_SIZE = 2 * 1024;
 constexpr int32_t SOCKET_PAIR_SIZE = 2;
+constexpr int32_t SEND_RETRY_LIMIT = 32;
 }  // namespace
 
 SensorBasicDataChannel::SensorBasicDataChannel() : sendFd_(-1), receiveFd_(-1), isActive_(false)
@@ -159,13 +160,15 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
 {
     CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
     if (sendFd_ < 0) {
-        SEN_HILOGE("failed, param is invalid");
+        SEN_HILOGE("failed, sendFd is invalid");
         return SENSOR_CHANNEL_SEND_ADDR_ERR;
     }
-    ssize_t length;
+    ssize_t length = 0;
+    int32_t retryCount = 0;
     do {
         length = send(sendFd_, vaddr, size, MSG_DONTWAIT | MSG_NOSIGNAL);
-    } while (errno == EINTR);
+        retryCount++;
+    } while (retryNum <= SEND_RETRY_LIMIT && errno == EINTR);
     if (length < 0) {
         HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::SENSOR, "SENSOR_DATA_CHANNEL_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "SendData", "ERROR_CODE", errno);
