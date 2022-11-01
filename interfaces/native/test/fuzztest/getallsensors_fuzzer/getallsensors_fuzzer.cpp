@@ -21,7 +21,7 @@
 #include "sensor_agent_type.h"
 
 template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)   ddd
+size_t GetObject(const uint8_t *data, size_t size, T &object)   ddd ccc
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
