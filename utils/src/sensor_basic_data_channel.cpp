@@ -31,6 +31,7 @@ constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorBasicChannel"
 constexpr int32_t SENSOR_READ_DATA_SIZE = sizeof(SensorData) * 100;
 constexpr int32_t DEFAULT_CHANNEL_SIZE = 2 * 1024;
 constexpr int32_t SOCKET_PAIR_SIZE = 2;
+constexpr int32_t SEND_RETRY_LIMIT = 32;
 }  // namespace
 
 SensorBasicDataChannel::SensorBasicDataChannel() : sendFd_(-1), receiveFd_(-1), isActive_(false)
@@ -54,64 +55,33 @@ int32_t SensorBasicDataChannel::CreateSensorBasicChannel()
         receiveFd_ = -1;
         return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
     }
+
+    int32_t ret  = 0;
+    auto closeFdWhenErr = [&ret] (int32_t &sockFd) {
+        if (ret != 0) {
+            SEN_HILOGE("sockFd:%{public}d, ret:%{public}d, errno:%{public}d", sockFd, ret, errno);
+            close(sockFd);
+            sockFd = -1;
+        }
+        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
+    };
     // set socket attr
-    int32_t ret = setsockopt(socketPair[0], SOL_SOCKET, SO_SNDBUF, &SENSOR_READ_DATA_SIZE,
-                             sizeof(SENSOR_READ_DATA_SIZE));
-    if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 0 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    ret = setsockopt(socketPair[0], SOL_SOCKET, SO_SNDBUF, &SENSOR_READ_DATA_SIZE, sizeof(SENSOR_READ_DATA_SIZE));
+    closeFdWhenErr(socketPair[0]);
     ret = setsockopt(socketPair[1], SOL_SOCKET, SO_RCVBUF, &SENSOR_READ_DATA_SIZE, sizeof(SENSOR_READ_DATA_SIZE));
-    if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 1 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    closeFdWhenErr(socketPair[1]);
     int32_t bufferSize = DEFAULT_CHANNEL_SIZE;
     ret = setsockopt(socketPair[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 0 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    closeFdWhenErr(socketPair[0]);
     ret = setsockopt(socketPair[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
-    if (ret != 0) {
-        SEN_HILOGE("setsockopt socketpair 1 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    closeFdWhenErr(socketPair[1]);
     ret = fcntl(socketPair[0], F_SETFL, O_NONBLOCK);
-    if (ret != 0) {
-        SEN_HILOGE("fcntl socketpair 0 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    closeFdWhenErr(socketPair[0]);
     ret = fcntl(socketPair[1], F_SETFL, O_NONBLOCK);
-    if (ret != 0) {
-        SEN_HILOGE("fcntl socketpair 1 failed");
-        return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
-    }
+    closeFdWhenErr(socketPair[1]);
     sendFd_ = socketPair[0];
     receiveFd_ = socketPair[1];
-    SEN_HILOGD("create socketpair success,receiveFd_:%{public}d,sendFd_:%{public}d", receiveFd_, sendFd_);
-    return ERR_OK;
-}
-
-int32_t SensorBasicDataChannel::CreateSensorBasicChannel(MessageParcel &data)
-{
-    CALL_LOG_ENTER;
-    if ((sendFd_ != -1) || (receiveFd_ != -1)) {
-        SEN_HILOGD("already create socketpair");
-        return ERR_OK;
-    }
-    int32_t tmpFd = data.ReadFileDescriptor();
-    if (tmpFd < 0) {
-        SEN_HILOGE("ReadFileDescriptor is failed");
-        sendFd_ = -1;
-        return SENSOR_CHANNEL_DUP_ERR;
-    }
-    sendFd_ = dup(tmpFd);
-    if (sendFd_ < 0) {
-        SEN_HILOGE("dup FileDescriptor is failed");
-        sendFd_ = -1;
-        return SENSOR_CHANNEL_DUP_ERR;
-    }
+    SEN_HILOGD("create socketpair success, receiveFd_:%{public}d, sendFd_:%{public}d", receiveFd_, sendFd_);
     return ERR_OK;
 }
 
@@ -149,13 +119,15 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
 {
     CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
     if (sendFd_ < 0) {
-        SEN_HILOGE("failed, param is invalid");
+        SEN_HILOGE("failed, sendFd is invalid");
         return SENSOR_CHANNEL_SEND_ADDR_ERR;
     }
-    ssize_t length;
+    ssize_t length = 0;
+    int32_t retryCount = 0;
     do {
         length = send(sendFd_, vaddr, size, MSG_DONTWAIT | MSG_NOSIGNAL);
-    } while (errno == EINTR);
+        retryCount++;
+    } while (retryCount <= SEND_RETRY_LIMIT && errno == EINTR);
     if (length < 0) {
         HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::SENSOR, "SENSOR_DATA_CHANNEL_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "SendData", "ERROR_CODE", errno);
@@ -165,21 +137,16 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
     return ERR_OK;
 }
 
-int32_t SensorBasicDataChannel::ReceiveData(void *vaddr, size_t size)
-{
-    CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
-        SEN_HILOGE("failed, vaddr is null or receiveFd_ invalid");
-        return SENSOR_CHANNEL_RECEIVE_ADDR_ERR;
-    ssize_t length;
-    do {
-        length = recv(receiveFd_, vaddr, size, MSG_DONTWAIT);
-    } while (errno == EINTR);
-    return length;
-}
-
 int32_t SensorBasicDataChannel::GetSendDataFd() const
 {
     return sendFd_;
+}
+
+void SensorBasicDataChannel::SetSendDataFd(int32_t sendFd)
+{
+    SEN_HILOGD("sendFd_:%{public}d", sendFd);
+    sendFd_ = sendFd;
+    return;
 }
 
 int32_t SensorBasicDataChannel::GetReceiveDataFd() const
@@ -187,7 +154,7 @@ int32_t SensorBasicDataChannel::GetReceiveDataFd() const
     return receiveFd_;
 }
 
-int32_t SensorBasicDataChannel::DestroySensorBasicChannel()
+void SensorBasicDataChannel::DestroySensorBasicChannel()
 {
     if (sendFd_ >= 0) {
         close(sendFd_);
@@ -199,7 +166,6 @@ int32_t SensorBasicDataChannel::DestroySensorBasicChannel()
         receiveFd_ = -1;
         SEN_HILOGD("close receiveFd_ success");
     }
-    return ERR_OK;
 }
 
 const std::unordered_map<uint32_t, SensorData> &SensorBasicDataChannel::GetDataCacheBuf() const
