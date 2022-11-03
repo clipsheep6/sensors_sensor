@@ -42,6 +42,7 @@ public:
     bool GetSensorStatus() const;
     void SetSensorStatus(bool isActive);
     const std::unordered_map<uint32_t, SensorData> &GetDataCacheBuf() const;
+    int32_t CloseFdWhenErr(int32_t &sockFd);
 
 private:
     int32_t sendFd_;
