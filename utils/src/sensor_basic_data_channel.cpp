@@ -91,28 +91,6 @@ int32_t SensorBasicDataChannel::CreateSensorBasicChannel()
     return SENSOR_CHANNEL_SOCKET_CREATE_ERR;
 }
 
-int32_t SensorBasicDataChannel::CreateSensorBasicChannel(MessageParcel &data)
-{
-    CALL_LOG_ENTER;
-    if (sendFd_ != -1) {
-        SEN_HILOGD("already create socketpair");
-        return ERR_OK;
-    }
-    int32_t tmpFd = data.ReadFileDescriptor();
-    if (tmpFd < 0) {
-        SEN_HILOGE("ReadFileDescriptor is failed");
-        sendFd_ = -1;
-        return SENSOR_CHANNEL_DUP_ERR;
-    }
-    sendFd_ = dup(tmpFd);
-    if (sendFd_ < 0) {
-        SEN_HILOGE("dup FileDescriptor is failed");
-        sendFd_ = -1;
-        return SENSOR_CHANNEL_DUP_ERR;
-    }
-    return ERR_OK;
-}
-
 SensorBasicDataChannel::~SensorBasicDataChannel()
 {
     DestroySensorBasicChannel();
@@ -147,7 +125,7 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
 {
     CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
     if (sendFd_ < 0) {
-        SEN_HILOGE("failed, param is invalid");
+        SEN_HILOGE("failed, sendFd is invalid");
         return SENSOR_CHANNEL_SEND_ADDR_ERR;
     }
     ssize_t length;
@@ -163,21 +141,14 @@ int32_t SensorBasicDataChannel::SendData(const void *vaddr, size_t size)
     return ERR_OK;
 }
 
-int32_t SensorBasicDataChannel::ReceiveData(void *vaddr, size_t size)
-{
-    CHKPR(vaddr, SENSOR_CHANNEL_SEND_ADDR_ERR);
-        SEN_HILOGE("failed, vaddr is null or receiveFd_ invalid");
-        return SENSOR_CHANNEL_RECEIVE_ADDR_ERR;
-    ssize_t length;
-    do {
-        length = recv(receiveFd_, vaddr, size, MSG_DONTWAIT);
-    } while (errno == EINTR);
-    return length;
-}
-
 int32_t SensorBasicDataChannel::GetSendDataFd() const
 {
     return sendFd_;
+}
+
+void SensorBasicDataChannel::SetSendDataFd(int32_t sendFd)
+{
+    sendFd_ = sendFd;
 }
 
 int32_t SensorBasicDataChannel::GetReceiveDataFd() const
