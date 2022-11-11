@@ -304,7 +304,7 @@ int32_t SensorDump::DataSizeBySensorId(uint32_t sensorId)
         case ACCELEROMETER_UNCALIBRATED:
             return UNCALIBRATED_DIMENSION;
         default:
-            SEN_HILOGW("sensorId: %{public}u,size: %{public}d", sensorId, COMMON_DIMENSION);
+            SEN_HILOGI("sensorId:%{public}u,size:%{public}d", sensorId, COMMON_DIMENSION);
             return COMMON_DIMENSION;
     }
 }

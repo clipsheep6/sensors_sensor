@@ -74,7 +74,7 @@ void SensorAgentProxy::HandleSensorData(SensorEvent *events, int32_t num, void *
     for (int32_t i = 0; i < num; ++i) {
         eventStream = events[i];
         if (g_subscribeMap.find(eventStream.sensorTypeId) == g_subscribeMap.end()) {
-            SEN_HILOGE("sensorTypeId not in g_subscribeMap");
+            SEN_HILOGW("sensorTypeId not in g_subscribeMap");
             return;
         }
         CHKPV(g_subscribeMap[eventStream.sensorTypeId]);
@@ -204,7 +204,7 @@ int32_t SensorAgentProxy::SetBatch(int32_t sensorId, const SensorUser *user, int
 
 int32_t SensorAgentProxy::SubscribeSensor(int32_t sensorId, const SensorUser *user) const
 {
-    SEN_HILOGI("in, sensorId:%{public}d", sensorId);
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
     if (!SenClient.IsValid(sensorId)) {
@@ -223,7 +223,7 @@ int32_t SensorAgentProxy::SubscribeSensor(int32_t sensorId, const SensorUser *us
 
 int32_t SensorAgentProxy::UnsubscribeSensor(int32_t sensorId, const SensorUser *user) const
 {
-    SEN_HILOGI("in, sensorId: %{public}d", sensorId);
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
     if (!SenClient.IsValid(sensorId)) {

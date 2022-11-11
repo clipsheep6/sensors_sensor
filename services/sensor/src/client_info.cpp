@@ -148,7 +148,7 @@ void ClientInfo::DestroyAppThreadInfo(int32_t pid)
     std::lock_guard<std::mutex> uidLock(uidMutex_);
     auto appThreadInfoItr = appThreadInfoMap_.find(pid);
     if (appThreadInfoItr == appThreadInfoMap_.end()) {
-        SEN_HILOGD("uid not exist, no need to destroy it");
+        SEN_HILOGE("uid not exist, no need to destroy it");
         return;
     }
     appThreadInfoMap_.erase(appThreadInfoItr);
@@ -246,7 +246,7 @@ void ClientInfo::RemoveSubscriber(uint32_t sensorId, uint32_t pid)
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     auto it = clientMap_.find(sensorId);
     if (it == clientMap_.end()) {
-        SEN_HILOGW("sensorId not exist");
+        SEN_HILOGE("sensorId not exist");
         return;
     }
     auto pidIt = it->second.find(pid);
@@ -288,7 +288,7 @@ void ClientInfo::ClearSensorInfo(uint32_t sensorId)
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     auto it = clientMap_.find(sensorId);
     if (it == clientMap_.end()) {
-        SEN_HILOGD("sensorId not exist, no need to clear it");
+        SEN_HILOGE("sensorId not exist, no need to clear it");
         return;
     }
     clientMap_.erase(it);
@@ -304,12 +304,12 @@ void ClientInfo::ClearCurPidSensorInfo(uint32_t sensorId, int32_t pid)
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     auto it = clientMap_.find(sensorId);
     if (it == clientMap_.end()) {
-        SEN_HILOGD("sensorId not exist, no need to clear it");
+        SEN_HILOGE("sensorId not exist, no need to clear it");
         return;
     }
     auto pidIt = it->second.find(pid);
     if (pidIt == it->second.end()) {
-        SEN_HILOGD("pid not exist, no need to clear it");
+        SEN_HILOGE("pid not exist, no need to clear it");
         return;
     }
     pidIt = it->second.erase(pidIt);

@@ -103,7 +103,7 @@ int32_t CompatibleConnection::SetMode(int32_t sensorId, int32_t mode)
 {
     int32_t ret = hdiServiceImpl_.SetMode(sensorId, mode);
     if (ret != 0) {
-        SEN_HILOGI("set mode failed, sensorId:%{public}d", sensorId);
+        SEN_HILOGE("set mode failed, sensorId:%{public}d", sensorId);
         return ret;
     }
     return ERR_OK;
@@ -118,7 +118,7 @@ int32_t CompatibleConnection::SetOption(int32_t sensorId, int32_t option)
 {
     int32_t ret = hdiServiceImpl_.SetOption(sensorId, option);
     if (ret != 0) {
-        SEN_HILOGI("set option failed, sensorId:%{public}d", sensorId);
+        SEN_HILOGE("set option failed, sensorId:%{public}d", sensorId);
         return ret;
     }
     return ERR_OK;

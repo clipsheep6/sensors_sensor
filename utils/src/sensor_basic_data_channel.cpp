@@ -56,27 +56,27 @@ int32_t SensorBasicDataChannel::CreateSensorBasicChannel()
     }
     // set socket attr
     if (setsockopt(socketPair[0], SOL_SOCKET, SO_SNDBUF, &SENSOR_READ_DATA_SIZE, sizeof(SENSOR_READ_DATA_SIZE)) != 0) {
-        SEN_HILOGE("setsockopt socketpair 0, SNDBUF failed, errno: %{public}d", errno);
+        SEN_HILOGE("setsockopt socketpair 0, SNDBUF failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(socketPair[1], SOL_SOCKET, SO_RCVBUF, &SENSOR_READ_DATA_SIZE, sizeof(SENSOR_READ_DATA_SIZE)) != 0) {
-        SEN_HILOGE("setsockopt socketpair 1, RCVBUF failed, errno: %{public}d", errno);
+        SEN_HILOGE("setsockopt socketpair 1, RCVBUF failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(socketPair[0], SOL_SOCKET, SO_RCVBUF, &DEFAULT_CHANNEL_SIZE, sizeof(DEFAULT_CHANNEL_SIZE)) != 0) {
-        SEN_HILOGE("setsockopt socketpair 0, RCVBUF failed, errno: %{public}d", errno);
+        SEN_HILOGE("setsockopt socketpair 0, RCVBUF failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(socketPair[1], SOL_SOCKET, SO_SNDBUF, &DEFAULT_CHANNEL_SIZE, sizeof(DEFAULT_CHANNEL_SIZE)) != 0) {
-        SEN_HILOGE("setsockopt socketpair 1, SNDBUF failed, errno: %{public}d", errno);
+        SEN_HILOGE("setsockopt socketpair 1, SNDBUF failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (fcntl(socketPair[0], F_SETFL, O_NONBLOCK) != 0) {
-        SEN_HILOGE("fcntl socketpair 0 failed, errno: %{public}d", errno);
+        SEN_HILOGE("fcntl socketpair 0 failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (fcntl(socketPair[1], F_SETFL, O_NONBLOCK) != 0) {
-        SEN_HILOGE("fcntl socketpair 1 failed, errno: %{public}d", errno);
+        SEN_HILOGE("fcntl socketpair 1 failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     sendFd_ = socketPair[0];

@@ -124,7 +124,7 @@ bool SensorService::InitSensorList()
         std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
         for (const auto &it : sensors_) {
             if (!(sensorMap_.insert(std::make_pair(it.GetSensorId(), it)).second)) {
-                SEN_HILOGW("sensorMap_ Insert failed");
+                SEN_HILOGE("sensorMap_ Insert failed");
             }
         }
     }
@@ -140,7 +140,7 @@ void SensorService::OnStop()
 {
     CALL_LOG_ENTER;
     if (state_ == SensorServiceState::STATE_STOPPED) {
-        SEN_HILOGW("already stopped");
+        SEN_HILOGI("already stopped");
         return;
     }
     state_ = SensorServiceState::STATE_STOPPED;
@@ -175,7 +175,7 @@ void SensorService::ReportOnChangeData(uint32_t sensorId)
         return;
     }
     if ((SENSOR_ON_CHANGE & it->second.GetFlags()) != SENSOR_ON_CHANGE) {
-        SEN_HILOGW("it is not onchange data, no need to report");
+        SEN_HILOGI("it is not onchange data, no need to report");
         return;
     }
     SensorData sensorData;
@@ -230,7 +230,7 @@ ErrCode SensorService::EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
         uint32_t flag = sensorManager_.GetSensorFlag(sensorId);
         ret = flushInfo_.FlushProcess(sensorId, flag, pid, true);
         if (ret != ERR_OK) {
-            SEN_HILOGE("ret : %{public}d", ret);
+            SEN_HILOGE("ret:%{public}d", ret);
         }
         ReportOnChangeData(sensorId);
         return ERR_OK;
@@ -265,7 +265,7 @@ ErrCode SensorService::DisableSensor(uint32_t sensorId, int32_t pid)
     ReportSensorSysEvent(sensorId, false, pid);
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
     if (sensorManager_.IsOtherClientUsingSensor(sensorId, pid)) {
-        SEN_HILOGW("other client is using this sensor now, cannot disable");
+        SEN_HILOGI("other client is using this sensor now, cannot disable");
         return ERR_OK;
     }
     if (sensorHdiConnection_.DisableSensor(sensorId) != ERR_OK) {
