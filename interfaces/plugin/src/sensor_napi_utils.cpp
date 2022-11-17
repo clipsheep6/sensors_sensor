@@ -187,7 +187,7 @@ std::map<int32_t, ConvertDataFunc> g_convertfuncList = {
     {ONCE_CALLBACK, ConvertToSensorData},
     {GET_GEOMAGNETIC_FIELD, ConvertToGeomagneticData},
     {GET_ALTITUDE, ConvertToNumber},
-    {GET_GEOMAGNITIC_DIP, ConvertToNumber},
+    {GET_GEOMAGNETIC_DIP, ConvertToNumber},
     {GET_ANGLE_MODIFY, ConvertToArray},
     {CREATE_ROTATION_MATRIX, ConvertToArray},
     {TRANSFORM_COORDINATE_SYSTEM, ConvertToArray},
@@ -318,8 +318,8 @@ bool ConvertToSensorData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallb
         return ConvertToBodyData(env, asyncCallbackInfo, result);
     }
     size_t size = g_sensorAttributeList[sensorTypeId].size();
-    uint32_t dataLenth = asyncCallbackInfo->data.sensorData.dataLength / sizeof(float);
-    CHKNCF(env, (size <= dataLenth), "Data length mismatch");
+    uint32_t dataLength = asyncCallbackInfo->data.sensorData.dataLength / sizeof(float);
+    CHKNCF(env, (size <= dataLength), "Data length mismatch");
 
     CHKNRF(env, napi_create_object(env, &result[1]), "napi_create_object");
     napi_value message = nullptr;
@@ -434,7 +434,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
             /**
              * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-             * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
              * asynchronous task is created, and subtract 1 from the reference count after the naked
              * pointer is converted to a pointer when the asynchronous task is executed, the reference
              * count of the smart pointer is guaranteed to be 1.
@@ -471,7 +471,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     }
 }
 
-void freeWork(uv_work_t *work)
+void DeleteWork(uv_work_t *work)
 {
     CHKPV(work);
     delete work;
@@ -486,15 +486,15 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     CHKPV(loop);
     uv_work_t *work = new(std::nothrow) uv_work_t;
     CHKPV(work);
-    asyncCallbackInfo->work = work;
     asyncCallbackInfo->IncStrongRef(nullptr);
     work->data = asyncCallbackInfo.GetRefPtr();
     int32_t ret = uv_queue_work(loop, work, [] (uv_work_t *work) { }, [] (uv_work_t *work, int status) {
         CHKPV(work);
         sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(work->data));
+        DeleteWork(work);
         /**
          * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-         * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+         * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
          * asynchronous task is created, and subtract 1 from the reference count after the naked
          * pointer is converted to a pointer when the asynchronous task is executed, the reference
          * count of the smart pointer is guaranteed to be 1.
@@ -530,14 +530,11 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             return;
         }
         napi_close_handle_scope(asyncCallbackInfo->env, scope);
-        asyncCallbackInfo->work = nullptr;
-        freeWork(work);
     });
     if (ret != 0) {
         SEN_HILOGE("uv_queue_work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
-        asyncCallbackInfo->work = nullptr;
-        freeWork(work);
+        DeleteWork(work);
     }
 }
 
@@ -557,7 +554,7 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
             /**
              * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-             * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
              * asynchronous task is created, and subtract 1 from the reference count after the naked
              * pointer is converted to a pointer when the asynchronous task is executed, the reference
              * count of the smart pointer is guaranteed to be 1.

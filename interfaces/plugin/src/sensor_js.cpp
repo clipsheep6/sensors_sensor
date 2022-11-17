@@ -40,7 +40,7 @@ constexpr int32_t INVALID_SENSOR_ID = -1;
 constexpr int32_t SENSOR_SUBSCRIBE_FAILURE = 1001;
 constexpr int32_t INPUT_ERROR = 202;
 constexpr float BODY_STATE_EXCEPT = 1.0f;
-constexpr float THREESHOLD = 0.000001f;
+constexpr float THRESHOLD = 0.000001f;
 }
 static std::map<std::string, int64_t> g_samplingPeriod = {
     {"normal", 200000000},
@@ -77,10 +77,11 @@ static bool copySensorData(sptr<AsyncCallbackInfo> callbackInfo, SensorEvent *ev
         std::lock_guard<std::mutex> onBodyLock(bodyMutex_);
         g_bodyState = *data;
         callbackInfo->data.sensorData.data[0] =
-            (fabs(g_bodyState - BODY_STATE_EXCEPT) < THREESHOLD) ? true : false;
+            (fabs(g_bodyState - BODY_STATE_EXCEPT) < THRESHOLD) ? true : false;
         return true;
     }
-    if (memcpy_s(callbackInfo->data.sensorData.data, event->dataLen, data, event->dataLen) != EOK) {
+    if (memcpy_s(callbackInfo->data.sensorData.data, sizeof(callbackInfo->data.sensorData.data),
+        data, event->dataLen) != EOK) {
         SEN_HILOGE("Copy data failed");
         return false;
     }
@@ -137,14 +138,17 @@ static void EmitOnceCallback(SensorEvent *event)
     if (iter == g_onceCallbackInfos.end()) {
         return;
     }
-    for (auto &onceCallbackInfo : iter->second) {
+    auto& onceCallbackInfos = iter->second;
+    while (!onceCallbackInfos.empty()) {
+        auto onceCallbackInfo = onceCallbackInfos.front();
+        auto beginIter = onceCallbackInfos.begin();
+        onceCallbackInfos.erase(beginIter);
         if (!copySensorData(onceCallbackInfo, event)) {
             SEN_HILOGE("Copy sensor data failed");
             continue;
         }
         EmitUvEventLoop(onceCallbackInfo);
     }
-    g_onceCallbackInfos[sensorTypeId].clear();
     g_onceCallbackInfos.erase(sensorTypeId);
 
     CHKCV((!CheckSubscribe(sensorTypeId)), "Has client subscribe, not need cancel subscribe");
@@ -843,7 +847,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
-        new (std::nothrow) AsyncCallbackInfo(env, GET_GEOMAGNITIC_DIP);
+        new (std::nothrow) AsyncCallbackInfo(env, GET_GEOMAGNETIC_DIP);
     CHKPP(asyncCallbackInfo);
     std::vector<float> inclinationMatrix;
     if (!GetFloatArray(env, args[0], inclinationMatrix)) {
@@ -1212,7 +1216,7 @@ napi_value GetBodyState(napi_env env, napi_callback_info info)
         "register success callback fail");
     std::lock_guard<std::mutex> onBodyLock(bodyMutex_);
     asyncCallbackInfo->data.sensorData.data[0] =
-        (fabs(g_bodyState - BODY_STATE_EXCEPT) < THREESHOLD) ? true : false;
+        (fabs(g_bodyState - BODY_STATE_EXCEPT) < THRESHOLD) ? true : false;
     EmitUvEventLoop(asyncCallbackInfo);
     return nullptr;
 }
