@@ -72,7 +72,7 @@ napi_value GetNamedProperty(const napi_env &env, const napi_value &object, strin
     bool status = false;
     CHKNRP(env, napi_has_named_property(env, object, name.c_str(), &status), "napi_has_named_property");
     if (!status) {
-        SEN_HILOGW("%{public}s not exists on the object", name.c_str());
+        SEN_HILOGI("%{public}s not exists on the object", name.c_str());
         return nullptr;
     }
     napi_value value = nullptr;
@@ -302,7 +302,7 @@ bool ConvertToFailData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbac
     int32_t code = asyncCallbackInfo->error.code;
     auto msg = GetNapiError(code);
     if (!msg) {
-        SEN_HILOGE("errCode: %{public}d is invalid", code);
+        SEN_HILOGE("errCode:%{public}d is invalid", code);
         return false;
     }
     result[0] = CreateBusinessError(env, code, msg.value());

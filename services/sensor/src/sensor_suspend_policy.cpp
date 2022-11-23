@@ -49,7 +49,7 @@ ErrCode SensorSuspendPolicy::DisableSensor(uint32_t sensorId, int32_t pid)
         return ERR_NO_INIT;
     }
     if (sensorManager_.IsOtherClientUsingSensor(sensorId, pid)) {
-        SEN_HILOGW("other client is using this sensor now, cannot disable");
+        SEN_HILOGI("other client is using this sensor now, cannot disable");
         return ERR_OK;
     }
     if (interface_.DisableSensor(sensorId) != ERR_OK) {
@@ -117,7 +117,7 @@ ErrCode SensorSuspendPolicy::EnableSensor(uint32_t sensorId, int32_t pid, int64_
         uint32_t flag = sensorManager_.GetSensorFlag(sensorId);
         ret = flushInfo_.FlushProcess(sensorId, flag, pid, true);
         if (ret != ERR_OK) {
-            SEN_HILOGW("ret:%{public}d", ret);
+            SEN_HILOGI("ret:%{public}d", ret);
         }
         return ERR_OK;
     }
@@ -143,7 +143,7 @@ std::vector<uint32_t> SensorSuspendPolicy::GetSensorIdByPid(int32_t pid)
         SEN_HILOGD("pid:%{public}d found", pid);
         return it->second;
     }
-    SEN_HILOGD("pid:%{public}d not found", pid);
+    SEN_HILOGE("pid:%{public}d not found", pid);
     return {};
 }
 

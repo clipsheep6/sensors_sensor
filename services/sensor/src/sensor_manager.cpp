@@ -69,7 +69,7 @@ bool SensorManager::SetBestSensorParams(uint32_t sensorId, int64_t samplingPerio
     }
     bestSamplingPeriodNs = (samplingPeriodNs < bestSamplingPeriodNs) ? samplingPeriodNs : bestSamplingPeriodNs;
     bestReportDelayNs = (maxReportDelayNs < bestReportDelayNs) ? maxReportDelayNs : bestReportDelayNs;
-    SEN_HILOGD("bestSamplingPeriodNs : %{public}" PRId64, bestSamplingPeriodNs);
+    SEN_HILOGD("bestSamplingPeriodNs:%{public}" PRId64, bestSamplingPeriodNs);
     auto ret = sensorHdiConnection_.SetBatch(sensorId, bestSamplingPeriodNs, bestReportDelayNs);
     if (ret != ERR_OK) {
         SEN_HILOGE("SetBatch is failed");
@@ -153,12 +153,12 @@ bool SensorManager::IsOtherClientUsingSensor(uint32_t sensorId, int32_t clientPi
 {
     CALL_LOG_ENTER;
     if (clientInfo_.OnlyCurPidSensorEnabled(sensorId, clientPid)) {
-        SEN_HILOGW("Only current client using this sensor");
+        SEN_HILOGI("Only current client using this sensor");
         return false;
     }
     clientInfo_.ClearCurPidSensorInfo(sensorId, clientPid);
     if (!ResetBestSensorParams(sensorId)) {
-        SEN_HILOGW("ResetBestSensorParams is failed");
+        SEN_HILOGE("ResetBestSensorParams is failed");
     }
     SEN_HILOGD("other client is using this sensor");
     return true;

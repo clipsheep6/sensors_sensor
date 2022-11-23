@@ -415,7 +415,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
             "There are other client subscribe as well, not need unsubscribe");
     }
     if (CheckSystemSubscribe(sensorTypeId)) {
-        SEN_HILOGW("There are other client subscribe system js api as well, not need unsubscribe");
+        SEN_HILOGI("There are other client subscribe system js api as well, not need unsubscribe");
         return nullptr;
     }
     int32_t ret = UnsubscribeSensor(sensorTypeId);
