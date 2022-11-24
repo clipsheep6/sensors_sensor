@@ -133,7 +133,6 @@ int32_t SensorAgentProxy::ActivateSensor(int32_t sensorId, const SensorUser *use
 {
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
-    std::lock_guard<std::mutex> subscribeLock(subscribeMutex_);
     if (g_samplingInterval < 0 || g_reportInterval < 0) {
         SEN_HILOGE("samplingPeriod or g_reportInterval is invalid");
         return ERROR;
@@ -142,6 +141,7 @@ int32_t SensorAgentProxy::ActivateSensor(int32_t sensorId, const SensorUser *use
         SEN_HILOGE("sensorId is invalid, %{public}d", sensorId);
         return PARAMETER_ERROR;
     }
+    std::lock_guard<std::mutex> subscribeLock(subscribeMutex_);
     if ((g_subscribeMap.find(sensorId) == g_subscribeMap.end()) || (g_subscribeMap[sensorId] != user)) {
         SEN_HILOGE("subscribe sensorId first");
         return ERROR;
