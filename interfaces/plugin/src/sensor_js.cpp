@@ -148,7 +148,6 @@ static void EmitOnceCallback(SensorEvent *event)
             continue;
         }
         EmitUvEventLoop(std::move(onceCallbackInfo));
-        onceCallbackInfo = nullptr;
     }
     g_onceCallbackInfos.erase(sensorTypeId);
 
