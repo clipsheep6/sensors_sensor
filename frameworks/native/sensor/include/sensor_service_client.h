@@ -28,6 +28,7 @@
 #include "sensor_client_stub.h"
 #include "sensor_data_channel.h"
 #include "sensor.h"
+#include "app_sensor.h"
 #include "sensor_service_proxy.h"
 
 
@@ -42,6 +43,9 @@ public:
     int32_t DestroyDataChannel();
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     bool IsValid(uint32_t sensorId);
+    int32_t SuspendSensors(int32_t pid);
+    int32_t ResumeSensors(int32_t pid);
+    std::vector<AppSensor> GetAppSensorList();
 
 private:
     int32_t InitServiceClient();

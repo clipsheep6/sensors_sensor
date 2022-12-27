@@ -54,6 +54,9 @@ public:
                                 const sptr<IRemoteObject> &sensorClient) override;
     ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
+    ErrCode SuspendSensors(int32_t pid) override;
+    ErrCode ResumeSensors(int32_t pid) override;
+    std::vector<AppSensor> GetAppSensorList() override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);

@@ -685,5 +685,27 @@ void ClientInfo::ClearDataQueue(int32_t sensorId)
         dumpQueue_.erase(it);
     }
 }
+
+std::vector<AppSensor> ClientInfo::GetAppSensorList()
+{
+    std::vector<AppSensor> appSensors;
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+    for (const auto &clientMapIt : clientMap_) {
+        for (const auto &pidSensorIt : clientMapIt.second) {
+            if (pidSensorIt.second.GetSensorState()) {
+                int32_t pid = pidSensorIt.first;
+                int32_t uid = GetUidByPid(pid);
+                AccessTokenID tokenId = GetTokenIdByPid(pid);
+                uint32_t sensorId = clientMapIt.first;
+                int64_t samplingPeriodNs = pidSensorIt.second.GetSamplingPeriodNs();
+                int64_t maxReportDelayNs = pidSensorIt.second.GetMaxReportDelayNs();
+                AppSensor appSensor(pid, uid, static_cast<uint32_t>(tokenId), sensorId,
+                                    samplingPeriodNs, maxReportDelayNs);
+                appSensors.push_back(appSensor);
+            }
+        }
+    }
+    return appSensors;
+}
 }  // namespace Sensors
 }  // namespace OHOS

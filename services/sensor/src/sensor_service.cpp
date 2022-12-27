@@ -26,6 +26,7 @@
 #include "securec.h"
 #include "sensor.h"
 #include "sensor_dump.h"
+#include "sensor_suspend_policy.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
@@ -325,7 +326,6 @@ ErrCode SensorService::DestroySensorChannel(sptr<IRemoteObject> sensorClient)
     const int32_t clientPid = GetCallingPid();
     if (clientPid < 0) {
         SEN_HILOGE("clientPid is invalid, clientPid:%{public}d", clientPid);
-        
         return CLIENT_PID_INVALID_ERR;
     }
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
@@ -403,6 +403,42 @@ int32_t SensorService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     });
     sensorDump.ParseCommand(fd, argList, sensors_, clientInfo_);
     return ERR_OK;
+}
+
+ErrCode SensorService::SuspendSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = SuspendPolicy->DoSuspend(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Suspend pid sensors is failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorService::ResumeSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = SuspendPolicy->DoResume(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Resume pid sensors is failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+std::vector<AppSensor> SensorService::GetAppSensorList()
+{
+    CALL_LOG_ENTER;
+    return clientInfo_.GetAppSensorList();
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -128,6 +128,12 @@ int32_t DeactivateSensor(int32_t sensorTypeId, const SensorUser *user);
  */
 int32_t SetMode(int32_t sensorTypeId, const SensorUser *user, int32_t mode);
 
+int32_t SuspendSensors(int32_t pid);
+
+int32_t ResumeSensors(int32_t pid);
+
+int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count);
+
 #ifdef __cplusplus
 #if __cplusplus
 }

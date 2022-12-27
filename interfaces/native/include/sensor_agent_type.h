@@ -38,6 +38,7 @@
 #define SENSOR_AGENT_TYPE_H
 
 #include <stdint.h>
+#include "app_thread_info.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -394,6 +395,13 @@ typedef struct HeartRateData {
 typedef struct WearDetectionData {
     float value;
 } WearDetectionData;
+
+typedef struct AppSensorInfo {
+    OHOS::Sensors::AppThreadInfo appThreadInfo;  /**< PID, UID, TokenID */
+    uint32_t sensorId;  /**< Sensor ID */
+    int64_t samplingPeriodNs;  /**< Sample period, in ns */
+    int64_t maxReportDelayNs;  /**< Maximum Report Delay, in ns */
+} AppSensorInfo;
 
 #ifdef __cplusplus
 #if __cplusplus

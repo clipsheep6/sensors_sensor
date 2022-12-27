@@ -39,6 +39,7 @@ ohos_shared_library("libsensor") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
+    "access_token:libaccesstoken_sdk",
   ]
   relative_install_dir = "module"
   part_name = "sensor"

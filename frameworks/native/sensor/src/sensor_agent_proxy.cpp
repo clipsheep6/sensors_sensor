@@ -331,5 +331,63 @@ int32_t SensorAgentProxy::GetAllSensors(SensorInfo **sensorInfo, int32_t *count)
     *count = sensorInfoCount_;
     return SUCCESS;
 }
+
+int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.SuspendSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.ResumeSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count) const
+{
+    CALL_LOG_ENTER;
+    CHKPR(appSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(count, OHOS::Sensors::ERROR);
+    std::vector<AppSensor> appSensorList = SenClient.GetAppSensorList();
+    if (appSensorList.empty()) {
+        SEN_HILOGE("get app sensor lists failed");
+        return ERROR;
+    }
+    size_t appSensorInfoCount = appSensorList.size();
+    if (appSensorInfoCount > MAX_SENSOR_LIST_SIZE) {
+        SEN_HILOGE("The number of app sensors exceeds the maximum value");
+        return ERROR;
+    }
+    AppSensorInfo *appSensor = (AppSensorInfo *)malloc(sizeof(AppSensorInfo) * appSensorInfoCount);
+    CHKPR(appSensor, ERROR);
+    for (size_t i = 0; i < appSensorInfoCount; ++i) {
+        AppSensorInfo *curAppSensor = appSensor + i;
+        curAppSensor->appThreadInfo = AppThreadInfo(appSensorList[i].pid, appSensorList[i].uid,
+                                                    static_cast<AccessTokenID>(appSensorList[i].tokenId));
+        curAppSensor->sensorId = appSensorList[i].sensorId;
+        curAppSensor->samplingPeriodNs = appSensorList[i].samplingPeriodNs;
+        curAppSensor->maxReportDelayNs = appSensorList[i].maxReportDelayNs;
+    }
+    *appSensorInfos = appSensor;
+    *count = static_cast<int32_t>(appSensorInfoCount);
+    return SUCCESS;
+}
 }  // namespace Sensors
 }  // namespace OHOS

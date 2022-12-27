@@ -18,6 +18,7 @@
 
 #include <map>
 #include <thread>
+#include <vector>
 
 #include "refbase.h"
 
@@ -43,6 +44,9 @@ public:
     int32_t SetMode(int32_t sensorId, const SensorUser *user, int32_t mode) const;
     int32_t SetOption(int32_t sensorId, const SensorUser *user, int32_t option) const;
     int32_t GetAllSensors(SensorInfo **sensorInfo, int32_t *count) const;
+    int32_t SuspendSensors(int32_t pid) const;
+    int32_t ResumeSensors(int32_t pid) const;
+    int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count) const;
 
 private:
     int32_t CreateSensorDataChannel() const;

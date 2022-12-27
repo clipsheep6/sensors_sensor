@@ -16,6 +16,7 @@
 #include <cinttypes>
 #include <gtest/gtest.h>
 #include <thread>
+#include <unistd.h>
 
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -457,6 +458,38 @@ HWTEST_F(SensorAgentTest, SensorNativeApiTest_004, TestSize.Level1)
     user.callback = SensorDataCallbackImpl;
     int32_t ret = SetMode(sensorId, &user, SENSOR_DEFAULT_MODE);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(SensorAgentTest, SuspendSensorsTest_001, TestSize.Level1)
+{
+    SEN_HILOGI("SuspendSensorsTest_001 in");
+    int32_t ret = SuspendSensors(1526);
+    sleep(10);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(SensorAgentTest, ResumeSensorsTest_001, TestSize.Level1)
+{
+    SEN_HILOGI("ResumeSensorsTest_001 in");
+    int32_t ret = ResumeSensors(1526);
+    sleep(5);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(SensorAgentTest, GetAppSensorsTest_001, TestSize.Level1)
+{
+    SEN_HILOGI("GetAppSensorsTest_001 in");
+    AppSensorInfo *appSensorInfos {nullptr};
+    int32_t count { 0 };
+    int32_t ret = GetAppSensors(&appSensorInfos, &count);
+    SEN_HILOGI("count:%{public}d", count);
+    if (appSensorInfos != nullptr) {
+        SEN_HILOGI("free appSensorInfos");
+        free(appSensorInfos);
+        appSensorInfos = nullptr;
+    }
+    ASSERT_EQ(ret, 0);
+    ASSERT_NE(count, 0);
 }
 }  // namespace Sensors
 }  // namespace OHOS

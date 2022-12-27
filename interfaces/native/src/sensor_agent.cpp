@@ -147,3 +147,48 @@ int32_t SetMode(int32_t sensorId, const SensorUser *user, int32_t mode)
     }
     return proxy->SetMode(sensorId, user, mode);
 }
+
+int32_t SuspendSensors(int32_t pid)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->SuspendSensors(pid);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t ResumeSensors(int32_t pid)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->ResumeSensors(pid);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->GetAppSensors(appSensorInfos, count);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("GetAppSensors failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}

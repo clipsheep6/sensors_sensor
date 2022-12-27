@@ -44,6 +44,7 @@ ohos_shared_library("libsensor_native") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "access_token:libaccesstoken_sdk",
   ]
 
   part_name = "sensor"

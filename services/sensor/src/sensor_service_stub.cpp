@@ -23,6 +23,7 @@
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
+#include "accesstoken_kit.h"
 #include "permission_util.h"
 #include "sensor_client_proxy.h"
 #include "sensors_errors.h"
@@ -30,7 +31,7 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-
+using namespace Security::AccessToken;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorServiceStub" };
 }  // namespace
@@ -43,6 +44,9 @@ SensorServiceStub::SensorServiceStub()
     baseFuncs_[GET_SENSOR_LIST] = &SensorServiceStub::GetAllSensorsInner;
     baseFuncs_[TRANSFER_DATA_CHANNEL] = &SensorServiceStub::CreateDataChannelInner;
     baseFuncs_[DESTROY_SENSOR_CHANNEL] = &SensorServiceStub::DestroyDataChannelInner;
+    baseFuncs_[SUSPEND_SENSORS] = &SensorServiceStub::SuspendSensorsInner;
+    baseFuncs_[RESUME_SENSORS] = &SensorServiceStub::ResumeSensorsInner;
+    baseFuncs_[GET_APP_SENSOR_LIST] = &SensorServiceStub::GetAppSensorListInner;
 }
 
 SensorServiceStub::~SensorServiceStub()
@@ -152,6 +156,59 @@ ErrCode SensorServiceStub::DestroyDataChannelInner(MessageParcel &data, MessageP
     sptr<IRemoteObject> sensorClient = data.ReadRemoteObject();
     CHKPR(sensorClient, OBJECT_NULL);
     return DestroySensorChannel(sensorClient);
+}
+
+ErrCode SensorServiceStub::SuspendSensorsInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID());
+    if (tokenType != ATokenTypeEnum::TOKEN_NATIVE) {
+        SEN_HILOGE("tokenType is not TOKEN_NATIVE, tokenType:%{public}d", tokenType);
+        // return PERMISSION_DENIED;
+    }
+    (void)reply;
+    int32_t pid;
+    if (!data.ReadInt32(pid)) {
+        SEN_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return SuspendSensors(pid);
+}
+
+ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID());
+    if (tokenType != ATokenTypeEnum::TOKEN_NATIVE) {
+        SEN_HILOGE("tokenType is not TOKEN_NATIVE, tokenType:%{public}d", tokenType);
+        // return PERMISSION_DENIED;
+    }
+    (void)reply;
+    int32_t pid;
+    if (!data.ReadInt32(pid)) {
+        SEN_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return ResumeSensors(pid);
+}
+
+ErrCode SensorServiceStub::GetAppSensorListInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID());
+    if (tokenType != ATokenTypeEnum::TOKEN_NATIVE) {
+        SEN_HILOGE("tokenType is not TOKEN_NATIVE, tokenType:%{public}d", tokenType);
+        // return PERMISSION_DENIED;
+    }
+    (void)data;
+    std::vector<AppSensor> appSensors = GetAppSensorList();
+    int32_t appSensorCount = int32_t { appSensors.size() };
+    reply.WriteInt32(appSensorCount);
+    for (int32_t i = 0; i < appSensorCount; i++) {
+        bool flag = appSensors[i].Marshalling(reply);
+        if (!flag) {
+            SEN_HILOGE("appSensor %{public}d failed", i);
+            return ERROR;
+        }
+    }
+    return NO_ERROR;
 }
 }  // namespace Sensors
 }  // namespace OHOS
