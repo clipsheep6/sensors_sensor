@@ -463,16 +463,8 @@ HWTEST_F(SensorAgentTest, SensorNativeApiTest_004, TestSize.Level1)
 HWTEST_F(SensorAgentTest, SuspendSensorsTest_001, TestSize.Level1)
 {
     SEN_HILOGI("SuspendSensorsTest_001 in");
-    int32_t ret = SuspendSensors(1526);
+    int32_t ret = SuspendSensors(1534);
     sleep(10);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
-}
-
-HWTEST_F(SensorAgentTest, ResumeSensorsTest_001, TestSize.Level1)
-{
-    SEN_HILOGI("ResumeSensorsTest_001 in");
-    int32_t ret = ResumeSensors(1526);
-    sleep(5);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -482,9 +474,33 @@ HWTEST_F(SensorAgentTest, GetAppSensorsTest_001, TestSize.Level1)
     AppSensorInfo *appSensorInfos {nullptr};
     int32_t count { 0 };
     int32_t ret = GetAppSensors(&appSensorInfos, &count);
-    SEN_HILOGI("count:%{public}d", count);
+    SEN_HILOGI("Test_001 count:%{public}d", count);
     if (appSensorInfos != nullptr) {
-        SEN_HILOGI("free appSensorInfos");
+        SEN_HILOGI("Test_001 free memory");
+        free(appSensorInfos);
+        appSensorInfos = nullptr;
+    }
+    ASSERT_NE(ret, 0);
+    ASSERT_EQ(count, 0);
+}
+
+HWTEST_F(SensorAgentTest, ResumeSensorsTest_001, TestSize.Level1)
+{
+    SEN_HILOGI("ResumeSensorsTest_001 in");
+    int32_t ret = ResumeSensors(1534);
+    sleep(5);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(SensorAgentTest, GetAppSensorsTest_002, TestSize.Level1)
+{
+    SEN_HILOGI("GetAppSensorsTest_002 in");
+    AppSensorInfo *appSensorInfos {nullptr};
+    int32_t count { 0 };
+    int32_t ret = GetAppSensors(&appSensorInfos, &count);
+    SEN_HILOGI("Test_002 count:%{public}d", count);
+    if (appSensorInfos != nullptr) {
+        SEN_HILOGI("Test_002 free memory");
         free(appSensorInfos);
         appSensorInfos = nullptr;
     }
