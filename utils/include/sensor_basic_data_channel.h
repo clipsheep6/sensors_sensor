@@ -49,6 +49,7 @@ private:
     bool isActive_;
     std::mutex statusLock_;
     std::unordered_map<uint32_t, SensorData> dataCacheBuf_;
+    std::mutex destroyMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

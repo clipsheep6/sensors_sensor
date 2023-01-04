@@ -187,6 +187,7 @@ int32_t SensorBasicDataChannel::GetReceiveDataFd() const
 
 int32_t SensorBasicDataChannel::DestroySensorBasicChannel()
 {
+    std::lock_guard<std::mutex> destroyLock(destroyMutex_);
     if (sendFd_ >= 0) {
         close(sendFd_);
         sendFd_ = -1;
