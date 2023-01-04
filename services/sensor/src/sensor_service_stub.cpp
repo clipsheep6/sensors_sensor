@@ -137,10 +137,21 @@ ErrCode SensorServiceStub::CreateDataChannelInner(MessageParcel &data, MessagePa
     (void)reply;
     sptr<SensorBasicDataChannel> sensorChannel = new (std::nothrow) SensorBasicDataChannel();
     CHKPR(sensorChannel, OBJECT_NULL);
-    auto ret = sensorChannel->CreateSensorBasicChannel(data);
-    if (ret != ERR_OK) {
-        SEN_HILOGE("CreateSensorBasicChannel ret:%{public}d", ret);
-        return OBJECT_NULL;
+    int32_t sendFd = sensorChannel->GetSendDataFd();
+    if (sendFd != -1) {
+        SEN_HILOGD("sendFd already created, sendFd:%{public}d", sendFd);
+    } else {
+        int32_t tmpFd = data.ReadFileDescriptor();
+        if (tmpFd < 0) {
+            SEN_HILOGE("read FileDescriptor is failed");
+            return OBJECT_NULL;
+        }
+        sendFd = dup(tmpFd);
+        if (sendFd < 0) {
+            SEN_HILOGE("dup FileDescriptor is failed");
+            return OBJECT_NULL;
+        }
+        sensorChannel->SetSendDataFd(sendFd);
     }
     sptr<IRemoteObject> sensorClient = data.ReadRemoteObject();
     CHKPR(sensorClient, OBJECT_NULL);

@@ -31,14 +31,13 @@ public:
     SensorBasicDataChannel();
     virtual ~SensorBasicDataChannel();
     int32_t CreateSensorBasicChannel();
-    int32_t CreateSensorBasicChannel(MessageParcel &data);
     int32_t DestroySensorBasicChannel();
     int32_t GetSendDataFd() const;
+    void SetSendDataFd(int32_t sendFd);
     int32_t GetReceiveDataFd() const;
     int32_t SendToBinder(MessageParcel &data);
     void CloseSendFd();
     int32_t SendData(const void *vaddr, size_t size);
-    int32_t ReceiveData(void *vaddr, size_t size);
     bool GetSensorStatus() const;
     void SetSensorStatus(bool isActive);
     const std::unordered_map<uint32_t, SensorData> &GetDataCacheBuf() const;
