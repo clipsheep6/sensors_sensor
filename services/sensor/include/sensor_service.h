@@ -26,6 +26,7 @@
 #include "client_info.h"
 #include "death_recipient_template.h"
 #include "sensor_data_event.h"
+#include "i_sensor_callback.h"
 #include "sensor_hdi_connection.h"
 #include "sensor_manager.h"
 #include "sensor_service_stub.h"
@@ -57,6 +58,7 @@ public:
     ErrCode SuspendSensors(int32_t pid) override;
     ErrCode ResumeSensors(int32_t pid) override;
     std::vector<AppSensor> GetAppSensorList() override;
+    ErrCode RegisterCallback(sptr<ISensorCallback> callback) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);

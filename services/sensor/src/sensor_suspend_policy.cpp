@@ -41,7 +41,7 @@ bool SensorSuspendPolicy::CheckFreezingSensor(uint32_t sensorId)
 ErrCode SensorSuspendPolicy::DoSuspend(int32_t pid)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> suspendLock(suspendMutex_);
+    std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
     auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
     if (pidSensorInfoIt != pidSensorInfoMap_.end()) {
         SEN_HILOGE("pid sensors already suspend, not need suspend again, pid: %{public}d", pid);
@@ -96,7 +96,7 @@ ErrCode SensorSuspendPolicy::DisableSensor(uint32_t sensorId, int32_t pid)
 ErrCode SensorSuspendPolicy::DoResume(int32_t pid)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> suspendLock(suspendMutex_);
+    std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
     auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
     if (pidSensorInfoIt == pidSensorInfoMap_.end()) {
         SEN_HILOGE("pid not have suspend sensors, pid: %{public}d", pid);
@@ -175,6 +175,48 @@ ErrCode SensorSuspendPolicy::RestoreSensorInfo(uint32_t sensorId, int32_t pid, i
         return ENABLE_SENSOR_ERR;
     }
     return ret;
+}
+
+std::vector<AppSensor> SensorSuspendPolicy::GetAppSensorList()
+{
+    return clientInfo_.GetAppSensorList();
+}
+
+ErrCode SensorSuspendPolicy::AddCallback(sptr<ISensorCallback> callback)
+{
+    CALL_LOG_ENTER;
+    if (callback == nullptr) {
+        SEN_HILOGE("callback is nullptr");
+        return ERROR;
+    }
+    auto object = callback->AsObject();
+    if (object == nullptr) {
+        SEN_HILOGE("callback->AsObject() is nullptr");
+        return ERROR;
+    }
+    std::lock_guard<std::mutex> callbackLock(callbackMutex_);
+    callbackList_.emplace_back(callback);
+    // object->AddDeathRecipient();
+    return ERR_OK;
+}
+
+void SensorSuspendPolicy::ExecuteCallbackAsync(AppThreadInfo &appThreadInfo, uint32_t sensorId,
+                                               int64_t samplingPeriodNs, int64_t maxReportDelayNs)
+{
+    CALL_LOG_ENTER;
+    AppSensorInfo appSensorInfo;
+    appSensorInfo.appThreadInfo = appThreadInfo;
+    appSensorInfo.sensorId = sensorId;
+    appSensorInfo.samplingPeriodNs = samplingPeriodNs;
+    appSensorInfo.maxReportDelayNs = maxReportDelayNs;
+
+    std::lock_guard<std::mutex> callbackLock(callbackMutex_);
+    for (auto it = callbackList_.begin(); it != callbackList_.end(); ++it) {
+        auto callback = *it;
+        if (callback != nullptr) {
+            callback->OnSensorChanged(appSensorInfo);
+        }
+    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

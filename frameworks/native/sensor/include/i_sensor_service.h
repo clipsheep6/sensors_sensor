@@ -22,6 +22,7 @@
 #include "iremote_broker.h"
 
 #include "i_sensor_client.h"
+#include "i_sensor_callback.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor.h"
 #include "app_sensor.h"
@@ -43,6 +44,7 @@ public:
     virtual ErrCode SuspendSensors(int32_t pid) = 0;
     virtual ErrCode ResumeSensors(int32_t pid) = 0;
     virtual std::vector<AppSensor> GetAppSensorList() = 0;
+    virtual ErrCode RegisterCallback(sptr<ISensorCallback> callback) = 0;
     enum {
         ENABLE_SENSOR = 0,
         DISABLE_SENSOR,
@@ -54,6 +56,7 @@ public:
         SUSPEND_SENSORS,
         RESUME_SENSORS,
         GET_APP_SENSOR_LIST,
+        REGISTER_CALLBACK,
     };
 };
 }  // namespace Sensors

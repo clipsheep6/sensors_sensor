@@ -23,6 +23,7 @@ ohos_shared_library("libsensor") {
     "./include",
     "//base/sensors/sensor/utils/include",
     "//foundation/arkui/napi/interfaces/inner_api/napi",
+    "//base/sensors/sensor/frameworks/native/sensor/include",
   ]
   defines = [
     "APP_LOG_TAG = \"sensorJs\"",

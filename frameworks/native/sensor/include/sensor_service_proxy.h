@@ -38,6 +38,7 @@ public:
     ErrCode SuspendSensors(int32_t pid) override;
     ErrCode ResumeSensors(int32_t pid) override;
     std::vector<AppSensor> GetAppSensorList() override;
+    ErrCode RegisterCallback(sptr<ISensorCallback> callback) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorServiceProxy);

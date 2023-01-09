@@ -192,3 +192,18 @@ int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count)
     }
     return ret;
 }
+
+int32_t RegisterCallback(OHOS::sptr<OHOS::Sensors::ISensorCallback> callback)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->RegisterCallback(callback);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Register sensor callback failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}

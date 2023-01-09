@@ -277,5 +277,29 @@ std::vector<AppSensor> SensorServiceProxy::GetAppSensorList()
     }
     return appSensors;
 }
+
+ErrCode SensorServiceProxy::RegisterCallback(sptr<ISensorCallback> callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteRemoteObject(callback->AsObject())) {
+        SEN_HILOGE("write callback failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    int32_t ret = remote->SendRequest(ISensorService::REGISTER_CALLBACK, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "RegisterCallback", "ERROR_CODE", ret);
+        SEN_HILOGE("failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
 }  // namespace Sensors
 }  // namespace OHOS

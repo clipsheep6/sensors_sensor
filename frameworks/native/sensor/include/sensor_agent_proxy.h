@@ -22,6 +22,7 @@
 
 #include "refbase.h"
 
+#include "i_sensor_callback.h"
 #include "sensor_agent_type.h"
 #include "sensor_data_channel.h"
 
@@ -47,6 +48,7 @@ public:
     int32_t SuspendSensors(int32_t pid) const;
     int32_t ResumeSensors(int32_t pid) const;
     int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count) const;
+    int32_t RegisterCallback(sptr<ISensorCallback> callback) const;
 
 private:
     int32_t CreateSensorDataChannel() const;

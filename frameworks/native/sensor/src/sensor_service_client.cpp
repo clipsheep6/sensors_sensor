@@ -272,5 +272,20 @@ std::vector<AppSensor> SensorServiceClient::GetAppSensorList()
     FinishTrace(HITRACE_TAG_SENSORS);
     return appSensorList;
 }
+
+int32_t SensorServiceClient::RegisterCallback(sptr<ISensorCallback> callback)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "RegisterCallback");
+    ret = sensorServer_->RegisterCallback(callback);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

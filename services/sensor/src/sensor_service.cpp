@@ -249,6 +249,11 @@ ErrCode SensorService::EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
         return ENABLE_SENSOR_ERR;
     }
     ReportSensorSysEvent(sensorId, true, pid);
+
+    int32_t uid = clientInfo_.GetUidByPid(pid);
+    AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
+    AppThreadInfo appThreadInfo(pid, uid, tokenId);
+    SuspendPolicy->ExecuteCallbackAsync(appThreadInfo, sensorId, samplingPeriodNs, maxReportDelayNs);
     return ret;
 }
 
@@ -438,7 +443,13 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
 std::vector<AppSensor> SensorService::GetAppSensorList()
 {
     CALL_LOG_ENTER;
-    return clientInfo_.GetAppSensorList();
+    return SuspendPolicy->GetAppSensorList();
+}
+
+ErrCode SensorService::RegisterCallback(sptr<ISensorCallback> callback)
+{
+    CALL_LOG_ENTER;
+    return SuspendPolicy->AddCallback(callback);
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -22,6 +22,7 @@
 #include "iservice_registry.h"
 #include "singleton.h"
 
+#include "i_sensor_callback.h"
 #include "sensor_agent_type.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor_basic_info.h"
@@ -46,6 +47,7 @@ public:
     int32_t SuspendSensors(int32_t pid);
     int32_t ResumeSensors(int32_t pid);
     std::vector<AppSensor> GetAppSensorList();
+    int32_t RegisterCallback(sptr<ISensorCallback> callback);
 
 private:
     int32_t InitServiceClient();

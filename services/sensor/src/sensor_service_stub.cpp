@@ -47,6 +47,7 @@ SensorServiceStub::SensorServiceStub()
     baseFuncs_[SUSPEND_SENSORS] = &SensorServiceStub::SuspendSensorsInner;
     baseFuncs_[RESUME_SENSORS] = &SensorServiceStub::ResumeSensorsInner;
     baseFuncs_[GET_APP_SENSOR_LIST] = &SensorServiceStub::GetAppSensorListInner;
+    baseFuncs_[REGISTER_CALLBACK] = &SensorServiceStub::RegisterCallbackInner;
 }
 
 SensorServiceStub::~SensorServiceStub()
@@ -209,6 +210,27 @@ ErrCode SensorServiceStub::GetAppSensorListInner(MessageParcel &data, MessagePar
         }
     }
     return NO_ERROR;
+}
+
+ErrCode SensorServiceStub::RegisterCallbackInner(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID());
+    if (tokenType != ATokenTypeEnum::TOKEN_NATIVE) {
+        SEN_HILOGE("tokenType is not TOKEN_NATIVE, tokenType:%{public}d", tokenType);
+        // return PERMISSION_DENIED;
+    }
+    (void)reply;
+    sptr<IRemoteObject> obj = data.ReadRemoteObject();
+    if (obj == nullptr) {
+        SEN_HILOGE("data ReadRemoteObject() is nullptr");
+        return ERROR;
+    }
+    sptr<ISensorCallback> callback = iface_cast<ISensorCallback>(obj);
+    if (callback == nullptr) {
+        SEN_HILOGE("obj iface_cast ISensorCallback failed");
+        return ERROR;
+    }
+    return RegisterCallback(callback);
 }
 }  // namespace Sensors
 }  // namespace OHOS

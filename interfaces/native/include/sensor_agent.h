@@ -39,6 +39,7 @@
 #define SENSOR_AGENT_H
 
 #include "sensor_agent_type.h"
+#include "i_sensor_callback.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -133,6 +134,8 @@ int32_t SuspendSensors(int32_t pid);
 int32_t ResumeSensors(int32_t pid);
 
 int32_t GetAppSensors(AppSensorInfo **appSensorInfos, int32_t *count);
+
+int32_t RegisterCallback(OHOS::sptr<OHOS::Sensors::ISensorCallback> callback);
 
 #ifdef __cplusplus
 #if __cplusplus

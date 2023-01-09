@@ -389,5 +389,16 @@ int32_t SensorAgentProxy::GetAppSensors(AppSensorInfo **appSensorInfos, int32_t 
     *count = static_cast<int32_t>(appSensorInfoCount);
     return SUCCESS;
 }
+
+int32_t SensorAgentProxy::RegisterCallback(sptr<ISensorCallback> callback) const
+{
+    CALL_LOG_ENTER;
+    CHKPR(callback, OHOS::Sensors::ERROR);
+    int32_t ret = SenClient.RegisterCallback(callback);
+    if (ret != 0) {
+        SEN_HILOGE("Register sensor callback failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS
