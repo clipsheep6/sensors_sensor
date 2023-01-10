@@ -64,11 +64,8 @@ std::unique_ptr<AppSensor> AppSensor::Unmarshalling(Parcel &parcel)
 
 bool AppSensor::ReadFromParcel(Parcel &parcel)
 {
-    if ((!parcel.ReadInt32(pid)) ||
-        (!parcel.ReadInt32(uid)) ||
-        (!parcel.ReadUint32(tokenId)) ||
-        (!parcel.ReadUint32(sensorId)) ||
-        (!parcel.ReadInt64(samplingPeriodNs)) ||
+    if ((!parcel.ReadInt32(pid)) || (!parcel.ReadInt32(uid)) || (!parcel.ReadUint32(tokenId)) ||
+        (!parcel.ReadUint32(sensorId)) || (!parcel.ReadInt64(samplingPeriodNs)) ||
         (!parcel.ReadInt64(maxReportDelayNs))) {
         return false;
     }
