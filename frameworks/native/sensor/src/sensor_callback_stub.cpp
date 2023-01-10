@@ -44,11 +44,8 @@ int32_t SensorCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
         uint32_t sensorId;
         int64_t samplingPeriodNs;
         int64_t maxReportDelayNs;
-        if ((!data.ReadInt32(pid)) ||
-            (!data.ReadInt32(uid)) ||
-            (!data.ReadUint32(tokenId)) ||
-            (!data.ReadUint32(sensorId)) ||
-            (!data.ReadInt64(samplingPeriodNs)) ||
+        if ((!data.ReadInt32(pid)) || (!data.ReadInt32(uid)) || (!data.ReadUint32(tokenId)) ||
+            (!data.ReadUint32(sensorId)) || (!data.ReadInt64(samplingPeriodNs)) ||
             (!data.ReadInt64(maxReportDelayNs))) {
             SEN_HILOGE("Parcel read failed");
             return ERROR;

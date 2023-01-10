@@ -17,6 +17,7 @@
 #define SENSOR_SUSPEND_POLICY_H
 
 #include <mutex>
+#include <set>
 #include <vector>
 #include <unordered_map>
 
@@ -55,7 +56,7 @@ private:
     std::mutex pidSensorInfoMutex_;
     std::unordered_map<int32_t, std::unordered_map<uint32_t, SensorBasicInfo>> pidSensorInfoMap_;
     std::mutex callbackMutex_;
-    std::vector<sptr<ISensorCallback>> callbackList_;
+    std::set<sptr<ISensorCallback>> callbackSet_;
 };
 #define SuspendPolicy DelayedSingleton<SensorSuspendPolicy>::GetInstance()
 }  // namespace Sensors

@@ -195,8 +195,7 @@ ErrCode SensorSuspendPolicy::AddCallback(sptr<ISensorCallback> callback)
         return ERROR;
     }
     std::lock_guard<std::mutex> callbackLock(callbackMutex_);
-    callbackList_.emplace_back(callback);
-    // object->AddDeathRecipient();
+    callbackSet_.emplace(callback);
     return ERR_OK;
 }
 
@@ -209,9 +208,8 @@ void SensorSuspendPolicy::ExecuteCallbackAsync(AppThreadInfo &appThreadInfo, uin
     appSensorInfo.sensorId = sensorId;
     appSensorInfo.samplingPeriodNs = samplingPeriodNs;
     appSensorInfo.maxReportDelayNs = maxReportDelayNs;
-
     std::lock_guard<std::mutex> callbackLock(callbackMutex_);
-    for (auto it = callbackList_.begin(); it != callbackList_.end(); ++it) {
+    for (auto it = callbackSet_.begin(); it != callbackSet_.end(); ++it) {
         auto callback = *it;
         if (callback != nullptr) {
             callback->OnSensorChanged(appSensorInfo);

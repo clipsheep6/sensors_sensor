@@ -249,7 +249,6 @@ ErrCode SensorService::EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
         return ENABLE_SENSOR_ERR;
     }
     ReportSensorSysEvent(sensorId, true, pid);
-
     int32_t uid = clientInfo_.GetUidByPid(pid);
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     AppThreadInfo appThreadInfo(pid, uid, tokenId);
