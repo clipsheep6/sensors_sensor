@@ -21,6 +21,7 @@ ohos_shared_library("libsensor_utils") {
     "src/sensor_basic_data_channel.cpp",
     "src/sensor_basic_info.cpp",
     "src/sensor_channel_info.cpp",
+    "src/app_sensor.cpp",
   ]
 
   include_dirs = [

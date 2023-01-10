@@ -26,6 +26,7 @@
 #include "securec.h"
 #include "sensor.h"
 #include "sensor_dump.h"
+#include "sensor_suspend_policy.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
@@ -248,6 +249,10 @@ ErrCode SensorService::EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
         return ENABLE_SENSOR_ERR;
     }
     ReportSensorSysEvent(sensorId, true, pid);
+    int32_t uid = clientInfo_.GetUidByPid(pid);
+    AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
+    AppThreadInfo appThreadInfo(pid, uid, tokenId);
+    SuspendPolicy->ExecuteCallbackAsync(appThreadInfo, sensorId, samplingPeriodNs, maxReportDelayNs);
     return ret;
 }
 
@@ -325,7 +330,6 @@ ErrCode SensorService::DestroySensorChannel(sptr<IRemoteObject> sensorClient)
     const int32_t clientPid = GetCallingPid();
     if (clientPid < 0) {
         SEN_HILOGE("clientPid is invalid, clientPid:%{public}d", clientPid);
-        
         return CLIENT_PID_INVALID_ERR;
     }
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
@@ -403,6 +407,48 @@ int32_t SensorService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     });
     sensorDump.ParseCommand(fd, argList, sensors_, clientInfo_);
     return ERR_OK;
+}
+
+ErrCode SensorService::SuspendSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = SuspendPolicy->DoSuspend(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Suspend pid sensors is failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorService::ResumeSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = SuspendPolicy->DoResume(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Resume pid sensors is failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+std::vector<AppSensor> SensorService::GetAppSensorList()
+{
+    CALL_LOG_ENTER;
+    return SuspendPolicy->GetAppSensorList();
+}
+
+ErrCode SensorService::RegisterCallback(sptr<ISensorCallback> callback)
+{
+    CALL_LOG_ENTER;
+    return SuspendPolicy->AddCallback(callback);
 }
 }  // namespace Sensors
 }  // namespace OHOS

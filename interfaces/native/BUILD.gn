@@ -44,6 +44,7 @@ ohos_shared_library("sensor_interface_native") {
     "src/geomagnetic_field.cpp",
     "src/sensor_agent.cpp",
     "src/sensor_algorithm.cpp",
+    "$SUBSYSTEM_DIR/frameworks/native/sensor/src/sensor_callback_stub.cpp",
   ]
 
   configs = [ ":sensor_private_config" ]
@@ -57,6 +58,8 @@ ohos_shared_library("sensor_interface_native") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "access_token:libaccesstoken_sdk",
+    "ipc:ipc_core",
   ]
   part_name = "sensor"
   subsystem_name = "sensors"

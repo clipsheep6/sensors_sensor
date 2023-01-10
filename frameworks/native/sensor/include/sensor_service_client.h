@@ -22,12 +22,14 @@
 #include "iservice_registry.h"
 #include "singleton.h"
 
+#include "i_sensor_callback.h"
 #include "sensor_agent_type.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor_basic_info.h"
 #include "sensor_client_stub.h"
 #include "sensor_data_channel.h"
 #include "sensor.h"
+#include "app_sensor.h"
 #include "sensor_service_proxy.h"
 
 
@@ -42,6 +44,10 @@ public:
     int32_t DestroyDataChannel();
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     bool IsValid(uint32_t sensorId);
+    int32_t SuspendSensors(int32_t pid);
+    int32_t ResumeSensors(int32_t pid);
+    std::vector<AppSensor> GetAppSensorList();
+    int32_t RegisterCallback(sptr<ISensorCallback> callback);
 
 private:
     int32_t InitServiceClient();

@@ -39,6 +39,10 @@ private:
     ErrCode GetAllSensorsInner(MessageParcel &data, MessageParcel &reply);
     ErrCode CreateDataChannelInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DestroyDataChannelInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode SuspendSensorsInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode ResumeSensorsInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetAppSensorListInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode RegisterCallbackInner(MessageParcel &data, MessageParcel &reply);
     std::unordered_map<uint32_t, SensorBaseFunc> baseFuncs_;
 };
 }  // namespace Sensors

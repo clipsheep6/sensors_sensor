@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-#include "sensor_suspend_policy.h"
-
 #include "sensor.h"
-#include "sensor_service.h"
-#include "system_ability_definition.h"
+#include "sensors_errors.h"
+#include "sensor_suspend_policy.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -27,18 +25,54 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorSuspendPolicy" };
 constexpr uint32_t INVALID_SENSOR_ID = -1;
 constexpr int64_t MAX_EVENT_COUNT = 1000;
-constexpr int64_t DEFAULT_SAMPLING_RATE = 200000000;
-constexpr int64_t DEFAULT_REPORT_DELAY = 0;
 constexpr uint32_t STEP_COUNTER_ID = 524544;
 constexpr uint32_t STEP_DETECTOR_ID = 590080;
 }  // namespace
 
-SensorSuspendPolicy::~SensorSuspendPolicy()
-{}
+SensorSuspendPolicy::SensorSuspendPolicy() {}
+
+SensorSuspendPolicy::~SensorSuspendPolicy() {}
 
 bool SensorSuspendPolicy::CheckFreezingSensor(uint32_t sensorId)
 {
     return ((sensorId == STEP_COUNTER_ID) || (sensorId == STEP_DETECTOR_ID));
+}
+
+ErrCode SensorSuspendPolicy::DoSuspend(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
+    auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
+    if (pidSensorInfoIt != pidSensorInfoMap_.end()) {
+        SEN_HILOGE("pid sensors already suspend, not need suspend again, pid: %{public}d", pid);
+        return ERROR;
+    }
+    std::vector<uint32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
+    if (sensorIdList.empty()) {
+        SEN_HILOGE("pid sensorId list is empty, pid: %{public}d", pid);
+        return ERROR;
+    }
+    bool suspendAllSensors = true;
+    std::unordered_map<uint32_t, SensorBasicInfo> SensorInfoMap;
+    for (auto &sensorId : sensorIdList) {
+        if (CheckFreezingSensor(sensorId)) {
+            continue;
+        }
+        auto sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
+        SensorInfoMap.emplace(std::make_pair(sensorId, sensorInfo));
+        auto ret = DisableSensor(sensorId, pid);
+        if (ret != ERR_OK) {
+            SEN_HILOGE("Disable Sensor is failed. sensorId: %{public}u, pid: %{public}d, ret: %{public}d",
+                       sensorId, pid, ret);
+            suspendAllSensors = false;
+        }
+    }
+    pidSensorInfoMap_.emplace(std::make_pair(pid, SensorInfoMap));
+    if (!suspendAllSensors) {
+        SEN_HILOGE("some sensor disable failed");
+        return DISABLE_SENSOR_ERR;
+    }
+    return ERR_OK;
 }
 
 ErrCode SensorSuspendPolicy::DisableSensor(uint32_t sensorId, int32_t pid)
@@ -52,50 +86,41 @@ ErrCode SensorSuspendPolicy::DisableSensor(uint32_t sensorId, int32_t pid)
         SEN_HILOGW("other client is using this sensor now, cannot disable");
         return ERR_OK;
     }
-    if (interface_.DisableSensor(sensorId) != ERR_OK) {
+    if (sensorHdiConnection_.DisableSensor(sensorId) != ERR_OK) {
         SEN_HILOGE("DisableSensor is failed");
         return DISABLE_SENSOR_ERR;
     }
     return sensorManager_.AfterDisableSensor(sensorId);
 }
 
-void SensorSuspendPolicy::DoSuspend(const std::shared_ptr<ResourceSchedule::SuspendAppInfo> &info)
+ErrCode SensorSuspendPolicy::DoResume(int32_t pid)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> suspendLock(suspendMutex_);
-    auto &list = info->GetAppIPCInfoList();
-    for (const auto &appInfo : list) {
-        std::vector<uint32_t> sensorIdList = clientInfo_.GetSensorIdByPid(appInfo.pid);
-        if (sensorIdList.empty()) {
-            continue;
-        }
-        pidSensorIdMap_.emplace(std::make_pair(appInfo.pid, sensorIdList));
-        for (auto &sensorId : sensorIdList) {
-            if (CheckFreezingSensor(sensorId)) {
-                continue;
-            }
-            auto sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, appInfo.pid);
-            sensorIdInfoMap_.emplace(std::make_pair(sensorId, sensorInfo));
-            DisableSensor(sensorId, appInfo.pid);
+    std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
+    auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
+    if (pidSensorInfoIt == pidSensorInfoMap_.end()) {
+        SEN_HILOGE("pid not have suspend sensors, pid: %{public}d", pid);
+        return ERROR;
+    }
+    bool resumeAllSensors = true;
+    std::unordered_map<uint32_t, SensorBasicInfo> SensorInfoMap = pidSensorInfoIt->second;
+    for (auto &it : SensorInfoMap) {
+        uint32_t sensorId = it.first;
+        int64_t samplePeriod = it.second.GetSamplingPeriodNs();
+        int64_t maxReportDelay = it.second.GetMaxReportDelayNs();
+        auto ret = EnableSensor(sensorId, pid, samplePeriod, maxReportDelay);
+        if (ret != ERR_OK) {
+            SEN_HILOGE("Enable Sensor is failed. sensorId: %{public}u, pid: %{public}d, ret: %{public}d",
+                       sensorId, pid, ret);
+            resumeAllSensors = false;
         }
     }
-}
-
-ErrCode SensorSuspendPolicy::SaveSubscriber(uint32_t sensorId, int64_t samplingPeriodNs,
-    int64_t maxReportDelayNs, int32_t pid)
-{
-    auto ret = sensorManager_.SaveSubscriber(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
-    if (ret != ERR_OK) {
-        SEN_HILOGE("SaveSubscriber is failed");
-        return ret;
-    }
-    sensorManager_.StartDataReportThread();
-    if (!sensorManager_.SetBestSensorParams(sensorId, samplingPeriodNs, maxReportDelayNs)) {
-        SEN_HILOGE("SetBestSensorParams is failed");
-        clientInfo_.RemoveSubscriber(sensorId, pid);
+    if (!resumeAllSensors) {
+        SEN_HILOGE("some sensor enable failed");
         return ENABLE_SENSOR_ERR;
     }
-    return ret;
+    pidSensorInfoMap_.erase(pidSensorInfoIt);
+    return ERR_OK;
 }
 
 ErrCode SensorSuspendPolicy::EnableSensor(uint32_t sensorId, int32_t pid, int64_t samplingPeriodNs,
@@ -107,73 +132,89 @@ ErrCode SensorSuspendPolicy::EnableSensor(uint32_t sensorId, int32_t pid, int64_
         SEN_HILOGE("sensorId is 0 or maxReportDelayNs exceed the maximum value");
         return ERR_NO_INIT;
     }
-    if (clientInfo_.GetSensorState(sensorId) == SENSOR_ENABLED) {
-        SEN_HILOGW("sensor has been enabled already");
-        auto ret = SaveSubscriber(sensorId, samplingPeriodNs, maxReportDelayNs, pid);
+    if (clientInfo_.GetSensorState(sensorId)) {
+        SEN_HILOGW("sensor has been enabled already, sensorId: %{public}d", sensorId);
+        auto ret = RestoreSensorInfo(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
         if (ret != ERR_OK) {
-            SEN_HILOGE("SaveSubscriber is failed");
+            SEN_HILOGE("RestoreSensorInfo is failed, ret: %{public}d", ret);
             return ret;
         }
         uint32_t flag = sensorManager_.GetSensorFlag(sensorId);
         ret = flushInfo_.FlushProcess(sensorId, flag, pid, true);
         if (ret != ERR_OK) {
-            SEN_HILOGW("ret:%{public}d", ret);
+            SEN_HILOGE("FlushProcess is failed, ret: %{public}d", ret);
         }
         return ERR_OK;
     }
-    auto ret = SaveSubscriber(sensorId, samplingPeriodNs, maxReportDelayNs, pid);
+    auto ret = RestoreSensorInfo(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
     if (ret != ERR_OK) {
-        SEN_HILOGE("SaveSubscriber is failed");
+        SEN_HILOGE("RestoreSensorInfo is failed, ret: %{public}d", ret);
         return ret;
     }
-    ret = interface_.EnableSensor(sensorId);
+    ret = sensorHdiConnection_.EnableSensor(sensorId);
     if (ret != ERR_OK) {
-        SEN_HILOGE("EnableSensor is failed");
+        SEN_HILOGE("EnableSensor is failed, ret: %{public}d", ret);
+        clientInfo_.RemoveSubscriber(sensorId, pid);
+        return ENABLE_SENSOR_ERR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorSuspendPolicy::RestoreSensorInfo(uint32_t sensorId, int32_t pid, int64_t samplingPeriodNs,
+                                               int64_t maxReportDelayNs)
+{
+    auto ret = sensorManager_.SaveSubscriber(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("RestoreSensorInfo is failed, ret: %{public}d", ret);
+        return ret;
+    }
+    sensorManager_.StartDataReportThread();
+    if (!sensorManager_.SetBestSensorParams(sensorId, samplingPeriodNs, maxReportDelayNs)) {
+        SEN_HILOGE("SetBestSensorParams is failed");
         clientInfo_.RemoveSubscriber(sensorId, pid);
         return ENABLE_SENSOR_ERR;
     }
     return ret;
 }
 
-std::vector<uint32_t> SensorSuspendPolicy::GetSensorIdByPid(int32_t pid)
+std::vector<AppSensor> SensorSuspendPolicy::GetAppSensorList()
 {
-    SEN_HILOGD("pid:%{public}d", pid);
-    auto it = pidSensorIdMap_.find(pid);
-    if (it != pidSensorIdMap_.end()) {
-        SEN_HILOGD("pid:%{public}d found", pid);
-        return it->second;
-    }
-    SEN_HILOGD("pid:%{public}d not found", pid);
-    return {};
+    return clientInfo_.GetAppSensorList();
 }
 
-void SensorSuspendPolicy::DoActive(const std::shared_ptr<ResourceSchedule::SuspendAppInfo> &info)
+ErrCode SensorSuspendPolicy::AddCallback(sptr<ISensorCallback> callback)
 {
     CALL_LOG_ENTER;
-    int64_t samplePeriod = DEFAULT_SAMPLING_RATE;
-    int64_t maxReportDelay = DEFAULT_REPORT_DELAY;
-    std::vector<uint32_t> sensorIdList;
-    std::lock_guard<std::mutex> suspendLock(suspendMutex_);
-    auto &list = info->GetAppIPCInfoList();
-    for (const auto &appInfo : list) {
-        sensorIdList = GetSensorIdByPid(appInfo.pid);
-        for (auto &sensorId : sensorIdList) {
-            if (CheckFreezingSensor(sensorId)) {
-                continue;
-            }
-            auto it = sensorIdInfoMap_.find(sensorId);
-            if (it != sensorIdInfoMap_.end()) {
-                samplePeriod = it->second.GetSamplingPeriodNs();
-                maxReportDelay = it->second.GetMaxReportDelayNs();
-            }
-            auto ret = EnableSensor(sensorId, appInfo.pid, samplePeriod, maxReportDelay);
-            if (ret != ERR_OK) {
-                SEN_HILOGE("sensorId:%{public}u,pid:%{public}d,ret:%{public}d", sensorId, appInfo.pid, ret);
-            }
+    if (callback == nullptr) {
+        SEN_HILOGE("callback is nullptr");
+        return ERROR;
+    }
+    auto object = callback->AsObject();
+    if (object == nullptr) {
+        SEN_HILOGE("callback->AsObject() is nullptr");
+        return ERROR;
+    }
+    std::lock_guard<std::mutex> callbackLock(callbackMutex_);
+    callbackSet_.emplace(callback);
+    return ERR_OK;
+}
+
+void SensorSuspendPolicy::ExecuteCallbackAsync(AppThreadInfo &appThreadInfo, uint32_t sensorId,
+                                               int64_t samplingPeriodNs, int64_t maxReportDelayNs)
+{
+    CALL_LOG_ENTER;
+    AppSensorInfo appSensorInfo;
+    appSensorInfo.appThreadInfo = appThreadInfo;
+    appSensorInfo.sensorId = sensorId;
+    appSensorInfo.samplingPeriodNs = samplingPeriodNs;
+    appSensorInfo.maxReportDelayNs = maxReportDelayNs;
+    std::lock_guard<std::mutex> callbackLock(callbackMutex_);
+    for (auto it = callbackSet_.begin(); it != callbackSet_.end(); ++it) {
+        auto callback = *it;
+        if (callback != nullptr) {
+            callback->OnSensorChanged(appSensorInfo);
         }
     }
-    pidSensorIdMap_.clear();
-    sensorIdInfoMap_.clear();
 }
 }  // namespace Sensors
 }  // namespace OHOS

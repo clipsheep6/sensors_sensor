@@ -33,6 +33,7 @@
 #include "sensor_basic_info.h"
 #include "sensor_channel_info.h"
 #include "sensor_data_event.h"
+#include "app_sensor.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -74,6 +75,7 @@ public:
     void ClearDataQueue(int32_t sensorId);
     int32_t GetUidByPid(int32_t pid);
     AccessTokenID GetTokenIdByPid(int32_t pid);
+    std::vector<AppSensor> GetAppSensorList();
 
 private:
     DISALLOW_COPY_AND_MOVE(ClientInfo);
