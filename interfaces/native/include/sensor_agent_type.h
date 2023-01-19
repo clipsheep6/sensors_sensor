@@ -395,6 +395,14 @@ typedef struct WearDetectionData {
     float value;
 } WearDetectionData;
 
+typedef struct AppSensorInfo {
+    int32_t pid;        /**< PID */
+    uint32_t sensorId;  /**< Sensor ID */
+    bool isActive;      /**< Sensor status */
+    int64_t samplingPeriodNs;  /**< Sample period, in ns */
+    int64_t maxReportDelayNs;  /**< Maximum Report Delay, in ns */
+} AppSensorInfo;
+
 #ifdef __cplusplus
 #if __cplusplus
 }
