@@ -224,5 +224,68 @@ void SensorServiceClient::DeleteSensorInfoItem(uint32_t sensorId)
     }
     return;
 }
+
+int32_t SensorServiceClient::SuspendSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "SuspendSensors");
+    ret = sensorServer_->SuspendSensors(pid);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
+int32_t SensorServiceClient::ResumeSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "ResumeSensors");
+    ret = sensorServer_->ResumeSensors(pid);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
+std::vector<AppSensor> SensorServiceClient::GetAppSensorList(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return {};
+    }
+    if (sensorServer_ == nullptr) {
+        SEN_HILOGE("sensorServer_ is nullptr");
+        return {};
+    }
+    StartTrace(HITRACE_TAG_SENSORS, "GetAppSensorList");
+    std::vector<AppSensor> appSensorList = sensorServer_->GetAppSensorList(pid);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return appSensorList;
+}
+
+int32_t SensorServiceClient::RegisterCallback(sptr<ISensorStatusCallback> callback)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "RegisterCallback");
+    ret = sensorServer_->RegisterCallback(callback);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

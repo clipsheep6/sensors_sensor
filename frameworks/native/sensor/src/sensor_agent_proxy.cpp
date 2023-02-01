@@ -331,5 +331,78 @@ int32_t SensorAgentProxy::GetAllSensors(SensorInfo **sensorInfo, int32_t *count)
     *count = sensorInfoCount_;
     return SUCCESS;
 }
+
+int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.SuspendSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.ResumeSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        return PARAMETER_ERROR;
+    }
+    CHKPR(appSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(count, OHOS::Sensors::ERROR);
+    std::vector<AppSensor> appSensorList = SenClient.GetAppSensorList(pid);
+    if (appSensorList.empty()) {
+        SEN_HILOGE("get pid app sensor lists failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    size_t appSensorInfoCount = appSensorList.size();
+    if (appSensorInfoCount > MAX_SENSOR_LIST_SIZE) {
+        SEN_HILOGE("The number of app sensors exceeds the maximum value");
+        return ERROR;
+    }
+    AppSensorInfo *appSensor = (AppSensorInfo *)malloc(sizeof(AppSensorInfo) * appSensorInfoCount);
+    CHKPR(appSensor, ERROR);
+    for (size_t i = 0; i < appSensorInfoCount; ++i) {
+        AppSensorInfo *curAppSensor = appSensor + i;
+        curAppSensor->pid = appSensorList[i].pid;
+        curAppSensor->sensorId = appSensorList[i].sensorId;
+        curAppSensor->isActive = appSensorList[i].isActive;
+        curAppSensor->samplingPeriodNs = appSensorList[i].samplingPeriodNs;
+        curAppSensor->maxReportDelayNs = appSensorList[i].maxReportDelayNs;
+    }
+    *appSensorInfos = appSensor;
+    *count = static_cast<int32_t>(appSensorInfoCount);
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::RegisterCallback(sptr<ISensorStatusCallback> callback) const
+{
+    CALL_LOG_ENTER;
+    CHKPR(callback, OHOS::Sensors::ERROR);
+    int32_t ret = SenClient.RegisterCallback(callback);
+    if (ret != 0) {
+        SEN_HILOGE("Register sensor callback failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

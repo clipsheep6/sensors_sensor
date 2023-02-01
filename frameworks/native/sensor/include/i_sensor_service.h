@@ -21,7 +21,9 @@
 #include "errors.h"
 #include "iremote_broker.h"
 
+#include "app_sensor.h"
 #include "i_sensor_client.h"
+#include "i_sensor_status_callback.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor.h"
 
@@ -39,6 +41,10 @@ public:
     virtual ErrCode TransferDataChannel(const sptr<SensorBasicDataChannel> &sensorBasicDataChannel,
                                         const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) = 0;
+    virtual ErrCode SuspendSensors(int32_t pid) = 0;
+    virtual ErrCode ResumeSensors(int32_t pid) = 0;
+    virtual std::vector<AppSensor> GetAppSensorList(int32_t pid) = 0;
+    virtual ErrCode RegisterCallback(sptr<ISensorStatusCallback> callback) = 0;
     enum {
         ENABLE_SENSOR = 0,
         DISABLE_SENSOR,
@@ -47,6 +53,10 @@ public:
         GET_SENSOR_LIST,
         TRANSFER_DATA_CHANNEL,
         DESTROY_SENSOR_CHANNEL,
+        SUSPEND_SENSORS,
+        RESUME_SENSORS,
+        GET_APP_SENSOR_LIST,
+        REGISTER_CALLBACK,
     };
 };
 }  // namespace Sensors
