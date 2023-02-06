@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,6 +14,8 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+
+SUBSYSTEM_DIR = "//base/sensors"
 module_output_path = "sensors/sensor"
 
 ohos_fuzztest("SensorAgentFuzzTest") {
@@ -25,6 +27,7 @@ ohos_fuzztest("SensorAgentFuzzTest") {
   include_dirs = [
     "//base/sensors/sensor/interfaces/native/test/fuzztest/sensoragent_fuzzer",
     "//base/sensors/sensor/interfaces/native/include",
+    "$SUBSYSTEM_DIR/sensor/frameworks/native/sensor/include",
   ]
 
   cflags = [
