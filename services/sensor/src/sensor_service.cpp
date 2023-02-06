@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,10 +77,10 @@ void SensorService::OnStart()
     }
     sensorDataProcesser_ = new (std::nothrow) SensorDataProcesser(sensorMap_);
     CHKPV(sensorDataProcesser_);
-    if (!InitSensorPolicy()) {
-        SEN_HILOGE("Init sensor policy error");
+    if (!InitSensorSuspendPolicy()) {
+        SEN_HILOGE("Init sensor suspend policy error");
+        return;
     }
-
     if (!SystemAbility::Publish(this)) {
         SEN_HILOGE("publish SensorService error");
         return;
@@ -131,8 +131,12 @@ bool SensorService::InitSensorList()
     return true;
 }
 
-bool SensorService::InitSensorPolicy()
+bool SensorService::InitSensorSuspendPolicy()
 {
+    if(!suspendPolicy_.InitDeathRecipient()) {
+        SEN_HILOGE("SuspendPolicy init death recipient failed");
+        return false;
+    }
     return true;
 }
 
@@ -233,6 +237,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
             SEN_HILOGE("ret : %{public}d", ret);
         }
         ReportOnChangeData(sensorId);
+        suspendPolicy_.ExecuteCallbackAsync(pid, sensorId, true, samplingPeriodNs, maxReportDelayNs);
         return ERR_OK;
     }
     auto ret = SaveSubscriber(sensorId, samplingPeriodNs, maxReportDelayNs);
@@ -248,6 +253,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
         return ENABLE_SENSOR_ERR;
     }
     ReportSensorSysEvent(sensorId, true, pid);
+    suspendPolicy_.ExecuteCallbackAsync(pid, sensorId, true, samplingPeriodNs, maxReportDelayNs);
     return ret;
 }
 
@@ -262,10 +268,14 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
         SEN_HILOGE("pid is invalid, pid:%{public}d", pid);
         return CLIENT_PID_INVALID_ERR;
     }
+    SensorBasicInfo sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
+    int64_t samplingPeriodNs = sensorInfo.GetSamplingPeriodNs();
+    int64_t maxReportDelayNs = sensorInfo.GetMaxReportDelayNs();
     ReportSensorSysEvent(sensorId, false, pid);
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
     if (sensorManager_.IsOtherClientUsingSensor(sensorId, pid)) {
         SEN_HILOGW("other client is using this sensor now, cannot disable");
+        suspendPolicy_.ExecuteCallbackAsync(pid, sensorId, false, samplingPeriodNs, maxReportDelayNs);
         return ERR_OK;
     }
     if (sensorHdiConnection_.DisableSensor(sensorId) != ERR_OK) {
@@ -275,6 +285,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
     int32_t uid = clientInfo_.GetUidByPid(pid);
     clientInfo_.DestroyCmd(uid);
     clientInfo_.ClearDataQueue(sensorId);
+    suspendPolicy_.ExecuteCallbackAsync(pid, sensorId, false, samplingPeriodNs, maxReportDelayNs);
     return sensorManager_.AfterDisableSensor(sensorId);
 }
 
@@ -325,7 +336,6 @@ ErrCode SensorService::DestroySensorChannel(sptr<IRemoteObject> sensorClient)
     const int32_t clientPid = GetCallingPid();
     if (clientPid < 0) {
         SEN_HILOGE("clientPid is invalid, clientPid:%{public}d", clientPid);
-        
         return CLIENT_PID_INVALID_ERR;
     }
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
@@ -402,6 +412,63 @@ int32_t SensorService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return Str16ToStr8(arg);
     });
     sensorDump.ParseCommand(fd, argList, sensors_, clientInfo_);
+    return ERR_OK;
+}
+
+ErrCode SensorService::SuspendSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = suspendPolicy_.DoSuspend(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Suspend pid sensors failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorService::ResumeSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = suspendPolicy_.DoResume(pid);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Resume pid sensors failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorService::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        return CLIENT_PID_INVALID_ERR;
+    }
+    int32_t ret = suspendPolicy_.GetAppSensorList(pid, appSensorList);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Get pid sensor list failed, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode SensorService::RegisterCallback(sptr<ISensorStatusCallback> callback)
+{
+    CALL_LOG_ENTER;
+    CHKPR(callback, ERROR);
+    int32_t ret = suspendPolicy_.AddCallback(callback);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Register callback failed");
+        return ERROR;
+    }
     return ERR_OK;
 }
 }  // namespace Sensors

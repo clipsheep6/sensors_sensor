@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,12 +23,14 @@
 #include "nocopyable.h"
 #include "system_ability.h"
 
+#include "i_sensor_status_callback.h"
 #include "client_info.h"
 #include "death_recipient_template.h"
 #include "sensor_data_event.h"
 #include "sensor_hdi_connection.h"
 #include "sensor_manager.h"
 #include "sensor_service_stub.h"
+#include "sensor_suspend_policy.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -54,6 +56,10 @@ public:
                                 const sptr<IRemoteObject> &sensorClient) override;
     ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
+    ErrCode SuspendSensors(int32_t pid) override;
+    ErrCode ResumeSensors(int32_t pid) override;
+    ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) override;
+    ErrCode RegisterCallback(sptr<ISensorStatusCallback> callback) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);
@@ -62,7 +68,7 @@ private:
     bool InitInterface();
     bool InitDataCallback();
     bool InitSensorList();
-    bool InitSensorPolicy();
+    bool InitSensorSuspendPolicy();
     void ReportOnChangeData(int32_t sensorId);
     void ReportSensorSysEvent(int32_t sensorId, bool enable, int32_t pid);
     ErrCode DisableSensor(int32_t sensorId, int32_t pid);
@@ -76,6 +82,7 @@ private:
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
     SensorManager &sensorManager_ = SensorManager::GetInstance();
     FlushInfoRecord &flushInfo_ = FlushInfoRecord::GetInstance();
+    SensorSuspendPolicy &suspendPolicy_ = SensorSuspendPolicy::GetInstance();
     sptr<SensorDataProcesser> sensorDataProcesser_ = nullptr;
     sptr<ReportDataCallback> reportDataCallback_ = nullptr;
     std::mutex uidLock_;
