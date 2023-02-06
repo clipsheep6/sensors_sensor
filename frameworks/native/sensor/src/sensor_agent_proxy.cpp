@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@
 #include <cstring>
 
 #include "securec.h"
-#include "sensor_catalog.h"
 #include "sensor_service_client.h"
 #include "sensors_errors.h"
 
@@ -39,6 +38,8 @@ std::recursive_mutex SensorAgentProxy::subscribeMutex_;
 std::mutex SensorAgentProxy::chanelMutex_;
 std::mutex sensorInfoMutex_;
 SensorInfo *sensorInfos_ = nullptr;
+std::mutex appSensorInfoMutex_;
+AppSensorInfo *appSensorInfo_ = nullptr;
 int32_t sensorInfoCount_ = 0;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_subscribeMap;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_unsubscribeMap;
@@ -267,6 +268,10 @@ int32_t SensorAgentProxy::SetMode(int32_t sensorId, const SensorUser *user, int3
 
 void SensorAgentProxy::ClearSensorInfos() const
 {
+    if (appSensorInfo_ != nullptr) {
+        free(appSensorInfo_);
+        appSensorInfo_ = nullptr;
+    }
     CHKPV(sensorInfos_);
     free(sensorInfos_);
     sensorInfos_ = nullptr;
@@ -336,7 +341,7 @@ int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid, %{public}d", pid);
         return PARAMETER_ERROR;
     }
     int32_t ret = SenClient.SuspendSensors(pid);
@@ -350,7 +355,7 @@ int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid, %{public}d", pid);
         return PARAMETER_ERROR;
     }
     int32_t ret = SenClient.ResumeSensors(pid);
@@ -364,32 +369,42 @@ int32_t SensorAgentProxy::GetAppSensors(int32_t pid, AppSensorInfo **appSensorIn
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid, %{public}d", pid);
         return PARAMETER_ERROR;
     }
     CHKPR(appSensorInfos, OHOS::Sensors::ERROR);
     CHKPR(count, OHOS::Sensors::ERROR);
-    std::vector<AppSensor> appSensorList = SenClient.GetAppSensorList(pid);
+    std::lock_guard<std::mutex> appSensorInfoLock(appSensorInfoMutex_);
+    if (appSensorInfo_ != nullptr) {
+        free(appSensorInfo_);
+        appSensorInfo_ = nullptr;
+    }
+    std::vector<AppSensor> appSensorList;
+    int32_t ret = SenClient.GetAppSensorList(pid, appSensorList);
+    if (ret != 0) {
+        SEN_HILOGE("Get app sensor list failed, ret:%{public}d", ret);
+        return ERROR;
+    }
     if (appSensorList.empty()) {
-        SEN_HILOGE("get pid app sensor lists failed, pid:%{public}d", pid);
+        SEN_HILOGE("App sensor list is empty, pid:%{public}d", pid);
         return ERROR;
     }
     size_t appSensorInfoCount = appSensorList.size();
     if (appSensorInfoCount > MAX_SENSOR_LIST_SIZE) {
-        SEN_HILOGE("The number of app sensors exceeds the maximum value");
+        SEN_HILOGE("The number of app sensors exceeds the maximum value, count:%{public}d", appSensorInfoCount);
         return ERROR;
     }
-    AppSensorInfo *appSensor = (AppSensorInfo *)malloc(sizeof(AppSensorInfo) * appSensorInfoCount);
-    CHKPR(appSensor, ERROR);
+    appSensorInfo_ = (AppSensorInfo *)malloc(sizeof(AppSensorInfo) * appSensorInfoCount);
+    CHKPR(appSensorInfo_, ERROR);
     for (size_t i = 0; i < appSensorInfoCount; ++i) {
-        AppSensorInfo *curAppSensor = appSensor + i;
+        AppSensorInfo *curAppSensor = appSensorInfo_ + i;
         curAppSensor->pid = appSensorList[i].pid;
         curAppSensor->sensorId = appSensorList[i].sensorId;
         curAppSensor->isActive = appSensorList[i].isActive;
         curAppSensor->samplingPeriodNs = appSensorList[i].samplingPeriodNs;
         curAppSensor->maxReportDelayNs = appSensorList[i].maxReportDelayNs;
     }
-    *appSensorInfos = appSensor;
+    *appSensorInfos = appSensorInfo_;
     *count = static_cast<int32_t>(appSensorInfoCount);
     return SUCCESS;
 }

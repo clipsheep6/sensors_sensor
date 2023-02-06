@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,7 +73,7 @@ int32_t SensorServiceClient::InitServiceClient()
     return SENSOR_NATIVE_GET_SERVICE_ERR;
 }
 
-bool SensorServiceClient::IsValid(uint32_t sensorId)
+bool SensorServiceClient::IsValid(int32_t sensorId)
 {
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
@@ -92,7 +92,7 @@ bool SensorServiceClient::IsValid(uint32_t sensorId)
     return false;
 }
 
-int32_t SensorServiceClient::EnableSensor(uint32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
+int32_t SensorServiceClient::EnableSensor(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -110,7 +110,7 @@ int32_t SensorServiceClient::EnableSensor(uint32_t sensorId, int64_t samplingPer
     return ret;
 }
 
-int32_t SensorServiceClient::DisableSensor(uint32_t sensorId)
+int32_t SensorServiceClient::DisableSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -202,7 +202,7 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
     }
 }
 
-void SensorServiceClient::UpdateSensorInfoMap(uint32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
+void SensorServiceClient::UpdateSensorInfoMap(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> mapLock(mapMutex_);
@@ -214,7 +214,7 @@ void SensorServiceClient::UpdateSensorInfoMap(uint32_t sensorId, int64_t samplin
     return;
 }
 
-void SensorServiceClient::DeleteSensorInfoItem(uint32_t sensorId)
+void SensorServiceClient::DeleteSensorInfoItem(int32_t sensorId)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> mapLock(mapMutex_);
@@ -254,23 +254,19 @@ int32_t SensorServiceClient::ResumeSensors(int32_t pid)
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
-
-std::vector<AppSensor> SensorServiceClient::GetAppSensorList(int32_t pid)
+int32_t SensorServiceClient::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
-        return {};
+        return ret;
     }
-    if (sensorServer_ == nullptr) {
-        SEN_HILOGE("sensorServer_ is nullptr");
-        return {};
-    }
+    CHKPR(sensorServer_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "GetAppSensorList");
-    std::vector<AppSensor> appSensorList = sensorServer_->GetAppSensorList(pid);
+    ret = sensorServer_->GetAppSensorList(pid, appSensorList);
     FinishTrace(HITRACE_TAG_SENSORS);
-    return appSensorList;
+    return ret;
 }
 
 int32_t SensorServiceClient::RegisterCallback(sptr<ISensorStatusCallback> callback)

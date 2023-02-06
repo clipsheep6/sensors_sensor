@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,21 +38,21 @@ namespace Sensors {
 class SensorServiceClient : public Singleton<SensorServiceClient> {
 public:
     std::vector<Sensor> GetSensorList();
-    int32_t EnableSensor(uint32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
-    int32_t DisableSensor(uint32_t sensorId);
+    int32_t EnableSensor(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
+    int32_t DisableSensor(int32_t sensorId);
     int32_t TransferDataChannel(sptr<SensorDataChannel> sensorDataChannel);
     int32_t DestroyDataChannel();
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
-    bool IsValid(uint32_t sensorId);
+    bool IsValid(int32_t sensorId);
     int32_t SuspendSensors(int32_t pid);
     int32_t ResumeSensors(int32_t pid);
-    std::vector<AppSensor> GetAppSensorList(int32_t pid);
+    int32_t GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList);
     int32_t RegisterCallback(sptr<ISensorStatusCallback> callback);
 
 private:
     int32_t InitServiceClient();
-    void UpdateSensorInfoMap(uint32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
-    void DeleteSensorInfoItem(uint32_t sensorId);
+    void UpdateSensorInfoMap(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
+    void DeleteSensorInfoItem(int32_t sensorId);
     std::mutex clientMutex_;
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_;
     sptr<ISensorService> sensorServer_;
@@ -60,7 +60,7 @@ private:
     sptr<SensorDataChannel> dataChannel_;
     sptr<SensorClientStub> sensorClientStub_;
     std::mutex mapMutex_;
-    std::map<uint32_t, SensorBasicInfo> sensorInfoMap_;
+    std::map<int32_t, SensorBasicInfo> sensorInfoMap_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

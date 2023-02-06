@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,16 +34,16 @@ public:
     ISensorService() = default;
     virtual ~ISensorService() = default;
     DECLARE_INTERFACE_DESCRIPTOR(u"ISensorService");
-    virtual ErrCode EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs,
+    virtual ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs,
                                  int64_t maxReportDelayNs) = 0;
-    virtual ErrCode DisableSensor(uint32_t sensorId) = 0;
+    virtual ErrCode DisableSensor(int32_t sensorId) = 0;
     virtual std::vector<Sensor> GetSensorList() = 0;
     virtual ErrCode TransferDataChannel(const sptr<SensorBasicDataChannel> &sensorBasicDataChannel,
                                         const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) = 0;
     virtual ErrCode SuspendSensors(int32_t pid) = 0;
     virtual ErrCode ResumeSensors(int32_t pid) = 0;
-    virtual std::vector<AppSensor> GetAppSensorList(int32_t pid) = 0;
+    virtual ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) = 0;
     virtual ErrCode RegisterCallback(sptr<ISensorStatusCallback> callback) = 0;
     enum {
         ENABLE_SENSOR = 0,

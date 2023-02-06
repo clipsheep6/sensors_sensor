@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,15 +29,15 @@ class SensorServiceProxy : public IRemoteProxy<ISensorService> {
 public:
     explicit SensorServiceProxy(const sptr<IRemoteObject> &impl);
     virtual ~SensorServiceProxy() = default;
-    ErrCode EnableSensor(uint32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs) override;
-    ErrCode DisableSensor(uint32_t sensorId) override;
+    ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs) override;
+    ErrCode DisableSensor(int32_t sensorId) override;
     std::vector<Sensor> GetSensorList() override;
     ErrCode TransferDataChannel(const sptr<SensorBasicDataChannel> &sensorBasicDataChannel,
                                 const sptr<IRemoteObject> &sensorClient) override;
     ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) override;
     ErrCode SuspendSensors(int32_t pid) override;
     ErrCode ResumeSensors(int32_t pid) override;
-    std::vector<AppSensor> GetAppSensorList(int32_t pid) override;
+    ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) override;
     ErrCode RegisterCallback(sptr<ISensorStatusCallback> callback) override;
 
 private:
