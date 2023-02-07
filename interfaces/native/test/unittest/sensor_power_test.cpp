@@ -69,7 +69,7 @@ void SensorPowerTest::SetUpTestCase()
         .processName = "SensorPowerTest",
         .aplStr = "system_core",
     };
-    uint64_t tokenId = GetAccessTokenId(&infoInstance);;
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
     int res = SetSelfTokenID(tokenId);
     ASSERT_EQ(res, 0);
     AccessTokenKit::ReloadNativeTokenInfo();
