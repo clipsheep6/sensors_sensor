@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -44,6 +44,7 @@ ohos_shared_library("sensor_interface_native") {
     "src/geomagnetic_field.cpp",
     "src/sensor_agent.cpp",
     "src/sensor_algorithm.cpp",
+    "src/sensor_status_callback_stub.cpp",
   ]
 
   configs = [ ":sensor_private_config" ]
@@ -57,6 +58,7 @@ ohos_shared_library("sensor_interface_native") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
   part_name = "sensor"
   subsystem_name = "sensors"

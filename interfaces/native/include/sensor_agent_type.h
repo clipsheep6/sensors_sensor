@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -394,6 +394,14 @@ typedef struct HeartRateData {
 typedef struct WearDetectionData {
     float value;
 } WearDetectionData;
+
+typedef struct AppSensorInfo {
+    int32_t pid;        /**< PID */
+    int32_t sensorId;  /**< Sensor ID */
+    bool isActive;      /**< Whether the process enable the sensor */
+    int64_t samplingPeriodNs;  /**< Sample period, in ns */
+    int64_t maxReportDelayNs;  /**< Maximum Report Delay, in ns */
+} AppSensorInfo;
 
 #ifdef __cplusplus
 #if __cplusplus
