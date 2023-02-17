@@ -16,7 +16,7 @@
     <process>sensors</process>
     <systemability>
         <name>3601</name>
-        <libpath>libsensor_service.z.so</libpath>
+        <libpath>platformsdk/libsensor_service.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
