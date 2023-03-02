@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 #include "sensor_data_channel.h"
 
 #include "errors.h"
+
+#include "client_info_file_descriptor_listener.h"
 #include "sensor_file_descriptor_listener.h"
 #include "sensors_errors.h"
-
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
-std::shared_ptr<SensorEventHandler> SensorDataChannel::eventHandler_;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataChannel" };
@@ -58,14 +58,21 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
     }
     auto listener = std::make_shared<SensorFileDescriptorListener>();
     listener->SetChannel(this);
-    auto myRunner = AppExecFwk::EventRunner::Create(true);
-    CHKPR(myRunner, ERROR);
-    eventHandler_ = std::make_shared<SensorEventHandler>(myRunner);
+    if (eventHandler_ == nullptr) {
+        auto myRunner = AppExecFwk::EventRunner::Create(true);
+        CHKPR(myRunner, ERROR);
+        eventHandler_ = std::make_shared<SensorEventHandler>(myRunner);
+    }
     int32_t receiveFd = GetReceiveDataFd();
     auto inResult = eventHandler_->AddFileDescriptorListener(receiveFd,
         AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
     if (inResult != 0) {
         SEN_HILOGE("AddFileDescriptorListener fail");
+        return ERROR;
+    }
+    auto pairRet = listenedFdSet_.insert(receiveFd);
+    if (!pairRet.second) {
+        SEN_HILOGE("ListenedFdSet insert fd fail");
         return ERROR;
     }
     return ERR_OK;
@@ -75,14 +82,65 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
 {
     std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
     CHKPL(eventHandler_);
-    eventHandler_ = nullptr;
-    // destroy sensor basic channelx
+    int32_t receiveFd = GetReceiveDataFd();
+    eventHandler_->RemoveFileDescriptorListener(receiveFd);
+    auto it = listenedFdSet_.find(receiveFd);
+    if (it != listenedFdSet_.end()) {
+        listenedFdSet_.erase(it);
+    }
+    if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
+        eventHandler_ = nullptr;
+        SEN_HILOGI("Set eventHandler_ nullptr");
+    }
     return DestroySensorBasicChannel();
 }
 
 SensorDataChannel::~SensorDataChannel()
 {
     DestroySensorDataChannel();
+}
+
+int32_t SensorDataChannel::AddFdListener(int32_t fd, ReceiveMessageFun receiveMessage, DisconnectFun disconnect)
+{
+    receiveMessage_ = receiveMessage;
+    disconnect_ = disconnect;
+    std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
+    if (eventHandler_ == nullptr) {
+        auto myRunner = AppExecFwk::EventRunner::Create(true);
+        CHKPR(myRunner, ERROR);
+        eventHandler_ = std::make_shared<SensorEventHandler>(myRunner);
+    }
+    auto listener = std::make_shared<ClientInfoFileDescriptorListener>();
+    listener->SetChannel(this);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
+    if (errCode != ERR_OK) {
+        SEN_HILOGE("Add fd listener failed, fd:%{public}d, errCode:%{public}u", fd, errCode);
+        return ERROR;
+    }
+    auto pairRet = listenedFdSet_.insert(fd);
+    if (!pairRet.second) {
+        SEN_HILOGE("ListenedFdSet insert fd fail");
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t SensorDataChannel::DelFdListener(int32_t fd)
+{
+    std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
+    CHKPL(eventHandler_);
+    eventHandler_->RemoveFileDescriptorListener(fd);
+    auto it = listenedFdSet_.find(fd);
+    if (it == listenedFdSet_.end()) {
+        SEN_HILOGE("ListenedFdSet not find fd, fd:%{public}d", fd);
+        return ERROR;
+    }
+    listenedFdSet_.erase(it);
+    if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
+        eventHandler_ = nullptr;
+        SEN_HILOGI("Set eventHandler_ nullptr");
+    }
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

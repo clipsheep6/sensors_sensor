@@ -684,5 +684,50 @@ void ClientInfo::ClearDataQueue(int32_t sensorId)
         dumpQueue_.erase(it);
     }
 }
+
+int32_t ClientInfo::AddClientInfoCallbackPid(int32_t pid)
+{
+    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
+    auto pairRet = clientInfoCallbackPidSet_.insert(pid);
+    if (!pairRet.second) {
+        SEN_HILOGE("ClientInfoCallbackPidSet_ insert pid fail, pid:%{public}d", pid);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t ClientInfo::DelClientInfoCallbackPid(int32_t pid)
+{
+    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
+    auto it = clientInfoCallbackPidSet_.find(pid);
+    if (it == clientInfoCallbackPidSet_.end()) {
+        SEN_HILOGE("ClientInfoCallbackPidSet_ not find pid, pid:%{public}d", pid);
+        return ERROR;
+    }
+    clientInfoCallbackPidSet_.erase(it);
+    return ERR_OK;
+}
+
+std::unordered_set<int32_t> ClientInfo::GetClientInfoCallbackPidSet()
+{
+    return clientInfoCallbackPidSet_;
+}
+
+bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
+{
+    std::lock_guard<std::mutex> channelLock(channelMutex_);
+    auto channelIt = channelMap_.find(pid);
+    if (channelIt != channelMap_.end()) {
+        SEN_HILOGI("pid exist in channelMap, pid:%{public}d", pid);
+        return false;
+    }
+    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
+    auto pidIt = clientInfoCallbackPidSet_.find(pid);
+    if (pidIt != clientInfoCallbackPidSet_.end()) {
+        SEN_HILOGI("pid exist in clientInfoCallbackPidSet, pid:%{public}d", pid);
+        return false;
+    }
+    return true;
+}
 }  // namespace Sensors
 }  // namespace OHOS

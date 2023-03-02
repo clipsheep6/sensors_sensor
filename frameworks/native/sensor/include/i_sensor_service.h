@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "errors.h"
 #include "iremote_broker.h"
 
+#include "app_sensor.h"
 #include "i_sensor_client.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor.h"
@@ -39,6 +40,13 @@ public:
     virtual ErrCode TransferDataChannel(const sptr<SensorBasicDataChannel> &sensorBasicDataChannel,
                                         const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) = 0;
+    virtual ErrCode SuspendSensors(int32_t pid) = 0;
+    virtual ErrCode ResumeSensors(int32_t pid) = 0;
+    virtual ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) = 0;
+    virtual ErrCode CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient) = 0;
+    virtual ErrCode DestroySocketChannel(const sptr<IRemoteObject> &sensorClient) = 0;
+    virtual ErrCode EnableClientInfoCallback() = 0;
+    virtual ErrCode DisableClientInfoCallback() = 0;
     enum {
         ENABLE_SENSOR = 0,
         DISABLE_SENSOR,
@@ -47,6 +55,13 @@ public:
         GET_SENSOR_LIST,
         TRANSFER_DATA_CHANNEL,
         DESTROY_SENSOR_CHANNEL,
+        SUSPEND_SENSORS,
+        RESUME_SENSORS,
+        GET_APP_SENSOR_LIST,
+        CREATE_SOCKET_CHANNEL,
+        DESTROY_SOCKET_CHANNEL,
+        ENABLE_CLIENT_INFO_CALLBACK,
+        DISABLE_CLIENT_INFO_CALLBACK,
     };
 };
 }  // namespace Sensors
