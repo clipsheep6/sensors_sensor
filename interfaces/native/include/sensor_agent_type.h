@@ -403,7 +403,7 @@ typedef struct SubscribeSensorInfo {
     int64_t maxReportDelayNs = -1;  /**< Maximum Report Delay, in ns */
 } SubscribeSensorInfo;
 
-typedef void (*ClientInfoCallback)(SubscribeSensorInfo *subscribeSensorInfo);
+typedef void (*ClientInfoCallback)(SubscribeSensorInfo &subscribeSensorInfo);
 
 #ifdef __cplusplus
 #if __cplusplus

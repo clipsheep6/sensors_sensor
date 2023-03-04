@@ -93,7 +93,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     ErrCode SaveSubscriber(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
 
-    std::atomic_bool IsReportClientInfo_ = false;
+    std::atomic_bool isReportClientInfo_ = false;
     void ReportClientInfo(int32_t sensorId, bool isActive, int32_t pid);
 };
 }  // namespace Sensors

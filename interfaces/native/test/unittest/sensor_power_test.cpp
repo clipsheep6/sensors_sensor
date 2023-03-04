@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include <gtest/gtest.h>
 #include <thread>
 
@@ -90,28 +91,20 @@ void SensorDataCallbackImpl(SensorEvent *event)
         event[0].sensorTypeId, event[0].version, event[0].dataLen, *(sensorData));
 }
 
-void ClientInfoCallbackImpl(SubscribeSensorInfo *subscribeSensorInfo)
+void ClientInfoCallbackImpl(SubscribeSensorInfo &subscribeSensorInfo)
 {
-    if (subscribeSensorInfo == nullptr) {
-        SEN_HILOGE("subscribeSensorInfo is null");
-        return;
-    }
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
-               "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-               subscribeSensorInfo->pid, subscribeSensorInfo->sensorId, subscribeSensorInfo->isActive,
-               subscribeSensorInfo->samplingPeriodNs, subscribeSensorInfo->maxReportDelayNs);
+               "samplingPeriodNs:%{public}" PRId64 ", maxReportDelayNs:%{public}" PRId64 "",
+               subscribeSensorInfo.pid, subscribeSensorInfo.sensorId, subscribeSensorInfo.isActive,
+               subscribeSensorInfo.samplingPeriodNs, subscribeSensorInfo.maxReportDelayNs);
 }
 
-void ClientInfoCallbackImpl2(SubscribeSensorInfo *subscribeSensorInfo)
+void ClientInfoCallbackImpl2(SubscribeSensorInfo &subscribeSensorInfo)
 {
-    if (subscribeSensorInfo == nullptr) {
-        SEN_HILOGE("subscribeSensorInfo is null");
-        return;
-    }
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
-               "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-               subscribeSensorInfo->pid, subscribeSensorInfo->sensorId, subscribeSensorInfo->isActive,
-               subscribeSensorInfo->samplingPeriodNs, subscribeSensorInfo->maxReportDelayNs);
+               "samplingPeriodNs:%{public}" PRId64 ", maxReportDelayNs:%{public}" PRId64 "",
+               subscribeSensorInfo.pid, subscribeSensorInfo.sensorId, subscribeSensorInfo.isActive,
+               subscribeSensorInfo.samplingPeriodNs, subscribeSensorInfo.maxReportDelayNs);
 }
 
 HWTEST_F(SensorPowerTest, SuspendSensorsTest_001, TestSize.Level1)
@@ -179,7 +172,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_001, TestSize.Level1)
     for (int32_t i = 0; i < count; ++i) {
         SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
-                   "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
+                   "samplingPeriodNs:%{public}" PRId64 ", maxReportDelayNs:%{public}" PRId64 "",
                     i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
                     curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }
@@ -224,7 +217,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_002, TestSize.Level1)
     for (int32_t i = 0; i < count; ++i) {
         SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
-                   "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
+                   "samplingPeriodNs:%{public}" PRId64 ", maxReportDelayNs:%{public}" PRId64 "",
                     i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
                     curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }
@@ -269,7 +262,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_003, TestSize.Level1)
     for (int32_t i = 0; i < count; ++i) {
         SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
-                   "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
+                   "samplingPeriodNs:%{public}" PRId64 ", maxReportDelayNs:%{public}" PRId64 "",
                     i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
                     curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }

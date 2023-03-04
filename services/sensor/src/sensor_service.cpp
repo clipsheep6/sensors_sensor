@@ -235,7 +235,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
             SEN_HILOGE("ret : %{public}d", ret);
         }
         ReportOnChangeData(sensorId);
-        if (IsReportClientInfo_) {
+        if (isReportClientInfo_) {
             ReportClientInfo(sensorId, true, pid);
         }
         return ERR_OK;
@@ -253,7 +253,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
         return ENABLE_SENSOR_ERR;
     }
     ReportSensorSysEvent(sensorId, true, pid);
-    if (IsReportClientInfo_) {
+    if (isReportClientInfo_) {
         ReportClientInfo(sensorId, true, pid);
     }
     return ret;
@@ -274,7 +274,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
     if (sensorManager_.IsOtherClientUsingSensor(sensorId, pid)) {
         SEN_HILOGW("other client is using this sensor now, cannot disable");
-        if (IsReportClientInfo_) {
+        if (isReportClientInfo_) {
             ReportClientInfo(sensorId, false, pid);
         }
         return ERR_OK;
@@ -286,7 +286,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
     int32_t uid = clientInfo_.GetUidByPid(pid);
     clientInfo_.DestroyCmd(uid);
     clientInfo_.ClearDataQueue(sensorId);
-    if (IsReportClientInfo_) {
+    if (isReportClientInfo_) {
         ReportClientInfo(sensorId, false, pid);
     }
     return sensorManager_.AfterDisableSensor(sensorId);
@@ -504,7 +504,7 @@ ErrCode SensorService::DestroySocketChannel(const sptr<IRemoteObject> &sensorCli
 ErrCode SensorService::EnableClientInfoCallback()
 {
     CALL_LOG_ENTER;
-    IsReportClientInfo_ = true;
+    isReportClientInfo_ = true;
     int32_t pid = GetCallingPid();
     return clientInfo_.AddClientInfoCallbackPid(pid);
 }
@@ -512,7 +512,7 @@ ErrCode SensorService::EnableClientInfoCallback()
 ErrCode SensorService::DisableClientInfoCallback()
 {
     CALL_LOG_ENTER;
-    IsReportClientInfo_ = false;
+    isReportClientInfo_ = false;
     int32_t pid = GetCallingPid();
     return clientInfo_.DelClientInfoCallbackPid(pid);
 }

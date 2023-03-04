@@ -293,15 +293,10 @@ int32_t SensorServiceClient::RegisterClientInfoCallback(ClientInfoCallback callb
         StartTrace(HITRACE_TAG_SENSORS, "CreateSocketChannel");
         ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
         FinishTrace(HITRACE_TAG_SENSORS);
-        if (ret != ERR_OK) {
+        if (!(ret == ERR_OK && clientFd >= 0)) {
             Close();
             SEN_HILOGE("Create socket channel failed");
             return ret;
-        }
-        if (clientFd < 0) {
-            Close();
-            SEN_HILOGE("socketFd is invalid");
-            return ERROR;
         }
         fd_ = clientFd;
         dataChannel_ = sensorDataChannel;
@@ -335,7 +330,6 @@ int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback cal
     if (!clientInfoCallbackSet_.empty()) {
         return ERR_OK;
     }
-    Disconnect();
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -349,6 +343,7 @@ int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback cal
         SEN_HILOGE("Disable clientInfo callback failed");
         return ret;
     }
+    Disconnect();
     StartTrace(HITRACE_TAG_SENSORS, "DestroySocketChannel");
     ret = sensorServer_->DestroySocketChannel(sensorClientStub_);
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -389,7 +384,7 @@ void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     for (auto callback : clientInfoCallbackSet_) {
         if (callback != nullptr) {
-            callback(&subscribeSensorInfo);
+            callback(subscribeSensorInfo);
         }
     }
 }
@@ -400,6 +395,7 @@ void SensorServiceClient::Disconnect()
     if (fd_ < 0) {
         return;
     }
+    CHKPV(dataChannel_);
     int32_t ret = dataChannel_->DelFdListener(fd_);
     if (ret != ERR_OK) {
         SEN_HILOGE("Delete fd listener failed");
@@ -415,14 +411,9 @@ void SensorServiceClient::ReregisterClientInfoCallback()
     StartTrace(HITRACE_TAG_SENSORS, "CreateSocketChannel");
     int32_t ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
     FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != ERR_OK) {
+    if (!(ret == ERR_OK && clientFd >= 0)) {
         Close();
         SEN_HILOGE("Create socket channel failed");
-        return;
-    }
-    if (clientFd < 0) {
-        Close();
-        SEN_HILOGE("socketFd is invalid");
         return;
     }
     fd_ = clientFd;

@@ -392,7 +392,7 @@ int32_t SensorAgentProxy::GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **s
     }
     size_t subscribeInfoCount = subscribeInfoList.size();
     if (subscribeInfoCount > MAX_SENSOR_LIST_SIZE) {
-        SEN_HILOGE("The number of subscribe info exceeds the maximum value, count:%{public}d", subscribeInfoCount);
+        SEN_HILOGE("The number of subscribe info exceeds the maximum value, count:%{public}zu", subscribeInfoCount);
         return ERROR;
     }
     subscribeSensorInfos_ = (SubscribeSensorInfo *)malloc(sizeof(SubscribeSensorInfo) * subscribeInfoCount);

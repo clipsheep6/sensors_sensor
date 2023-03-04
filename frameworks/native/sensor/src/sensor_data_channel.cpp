@@ -88,7 +88,7 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
     if (it != listenedFdSet_.end()) {
         listenedFdSet_.erase(it);
     }
-    if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
+    if (listenedFdSet_.empty() && eventHandler_ != nullptr) {
         eventHandler_ = nullptr;
         SEN_HILOGD("Set eventHandler_ nullptr");
     }
@@ -136,7 +136,7 @@ int32_t SensorDataChannel::DelFdListener(int32_t fd)
         return ERROR;
     }
     listenedFdSet_.erase(it);
-    if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
+    if (listenedFdSet_.empty() && eventHandler_ != nullptr) {
         eventHandler_ = nullptr;
         SEN_HILOGD("Set eventHandler_ nullptr");
     }
