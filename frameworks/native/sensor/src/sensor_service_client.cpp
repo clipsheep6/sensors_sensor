@@ -264,7 +264,7 @@ int32_t SensorServiceClient::ResumeSensors(int32_t pid)
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
-int32_t SensorServiceClient::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+int32_t SensorServiceClient::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -273,8 +273,8 @@ int32_t SensorServiceClient::GetAppSensorList(int32_t pid, std::vector<AppSensor
         return ret;
     }
     CHKPR(sensorServer_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "GetAppSensorList");
-    ret = sensorServer_->GetAppSensorList(pid, appSensorList);
+    StartTrace(HITRACE_TAG_SENSORS, "GetSubscribeInfoList");
+    ret = sensorServer_->GetSubscribeInfoList(pid, subscribeInfoList);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
@@ -379,9 +379,9 @@ void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
     if (id != MessageId::CLIENT_INFO) {
         return;
     }
-    AppSensorInfo appSensorInfo;
-    pkt >> appSensorInfo.pid >> appSensorInfo.sensorId >> appSensorInfo.isActive >>
-        appSensorInfo.samplingPeriodNs >> appSensorInfo.maxReportDelayNs;
+    SubscribeSensorInfo subscribeSensorInfo;
+    pkt >> subscribeSensorInfo.pid >> subscribeSensorInfo.sensorId >> subscribeSensorInfo.isActive >>
+        subscribeSensorInfo.samplingPeriodNs >> subscribeSensorInfo.maxReportDelayNs;
     if (pkt.ChkRWError()) {
         SEN_HILOGE("Packet read type failed");
         return;
@@ -389,7 +389,7 @@ void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     for (auto callback : clientInfoCallbackSet_) {
         if (callback != nullptr) {
-            callback(&appSensorInfo);
+            callback(&subscribeSensorInfo);
         }
     }
 }

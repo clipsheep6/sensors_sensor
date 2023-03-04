@@ -13,8 +13,6 @@
 
 import("//build/ohos.gni")
 
-SUBSYSTEM_DIR = "//base/sensors"
-
 ohos_shared_library("libsensor_ipc") {
   sources = [
     "src/circle_stream_buffer.cpp",
@@ -27,13 +25,8 @@ ohos_shared_library("libsensor_ipc") {
 
   include_dirs = [
     "include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//drivers/peripheral/sensor/interfaces/include",
-    "$SUBSYSTEM_DIR/sensor/utils/common/include",
+    "./../common/include",
   ]
-
-  deps = [ "$SUBSYSTEM_DIR/sensor/utils/common:libsensor_utils" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

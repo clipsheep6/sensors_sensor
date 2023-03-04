@@ -16,6 +16,7 @@
 #include "sensor_suspend_policy.h"
 
 #include "sensor.h"
+#include "sensor_agent_type.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -192,38 +193,46 @@ ErrCode SensorSuspendPolicy::RestoreSensorInfo(int32_t sensorId, int32_t pid, in
     return ret;
 }
 
-ErrCode SensorSuspendPolicy::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+ErrCode SensorSuspendPolicy::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
     for (auto &sensorId : sensorIdList) {
         auto sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
-        SensorStatus sensorStatus(sensorId, true, sensorInfo.GetSamplingPeriodNs(),
-                                  sensorInfo.GetMaxReportDelayNs());
-        AppSensor appSensor(pid, sensorStatus);
-        appSensorList.push_back(appSensor);
+        SubscribeSensorInfo subscribeSensorInfo;
+        subscribeSensorInfo.pid = pid;
+        subscribeSensorInfo.sensorId = sensorId;
+        subscribeSensorInfo.isActive = true;
+        subscribeSensorInfo.samplingPeriodNs = sensorInfo.GetSamplingPeriodNs();
+        subscribeSensorInfo.maxReportDelayNs = sensorInfo.GetMaxReportDelayNs();
+        SubscribeInfo subscribeInfo(subscribeSensorInfo);
+        subscribeInfoList.push_back(subscribeInfo);
     }
     std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
     auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
     if (pidSensorInfoIt != pidSensorInfoMap_.end()) {
         std::unordered_map<int32_t, SensorBasicInfo> SensorInfoMap = pidSensorInfoIt->second;
         for (auto &sensorInfo : SensorInfoMap) {
-            SensorStatus sensorStatus(sensorInfo.first, false, sensorInfo.second.GetSamplingPeriodNs(),
-                                      sensorInfo.second.GetMaxReportDelayNs());
-            AppSensor appSensor(pid, sensorStatus);
-            appSensorList.push_back(appSensor);
+            SubscribeSensorInfo subscribeSensorInfo;
+            subscribeSensorInfo.pid = pid;
+            subscribeSensorInfo.sensorId = sensorInfo.first;
+            subscribeSensorInfo.isActive = false;
+            subscribeSensorInfo.samplingPeriodNs = sensorInfo.second.GetSamplingPeriodNs();
+            subscribeSensorInfo.maxReportDelayNs = sensorInfo.second.GetMaxReportDelayNs();
+            SubscribeInfo subscribeInfo(subscribeSensorInfo);
+            subscribeInfoList.push_back(subscribeInfo);
         }
     }
     return ERR_OK;
 }
 
-void SensorSuspendPolicy::ReportClientInfo(int32_t pid, const SensorStatus sensorStatus, 
+void SensorSuspendPolicy::ReportClientInfo(SubscribeSensorInfo subscribeSensorInfo,
                                            const std::vector<SessionPtr> &sessionList)
 {
     CALL_LOG_ENTER;
     NetPacket pkt(MessageId::CLIENT_INFO);
-    pkt << pid << sensorStatus.sensorId << sensorStatus.isActive << sensorStatus.samplingPeriodNs <<
-        sensorStatus.maxReportDelayNs;
+    pkt << subscribeSensorInfo.pid << subscribeSensorInfo.sensorId << subscribeSensorInfo.isActive <<
+        subscribeSensorInfo.samplingPeriodNs << subscribeSensorInfo.maxReportDelayNs;
     if (pkt.ChkRWError()) {
         SEN_HILOGE("Packet write data failed");
         return;

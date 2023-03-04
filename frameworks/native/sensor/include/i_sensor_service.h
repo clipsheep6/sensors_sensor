@@ -21,10 +21,10 @@
 #include "errors.h"
 #include "iremote_broker.h"
 
-#include "app_sensor.h"
 #include "i_sensor_client.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor.h"
+#include "subscribe_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -42,7 +42,7 @@ public:
     virtual ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) = 0;
     virtual ErrCode SuspendSensors(int32_t pid) = 0;
     virtual ErrCode ResumeSensors(int32_t pid) = 0;
-    virtual ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) = 0;
+    virtual ErrCode GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList) = 0;
     virtual ErrCode CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode DestroySocketChannel(const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode EnableClientInfoCallback() = 0;
@@ -57,7 +57,7 @@ public:
         DESTROY_SENSOR_CHANNEL,
         SUSPEND_SENSORS,
         RESUME_SENSORS,
-        GET_APP_SENSOR_LIST,
+        GET_SUBSCRIBE_INFO_LIST,
         CREATE_SOCKET_CHANNEL,
         DESTROY_SOCKET_CHANNEL,
         ENABLE_CLIENT_INFO_CALLBACK,

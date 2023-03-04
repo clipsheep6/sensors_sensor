@@ -23,7 +23,6 @@
 #include "iservice_registry.h"
 #include "singleton.h"
 
-#include "app_sensor.h"
 #include "sensor_agent_type.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor_basic_info.h"
@@ -32,6 +31,7 @@
 #include "sensor.h"
 #include "sensor_service_proxy.h"
 #include "stream_socket.h"
+#include "subscribe_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -47,7 +47,7 @@ public:
     bool IsValid(int32_t sensorId);
     int32_t SuspendSensors(int32_t pid);
     int32_t ResumeSensors(int32_t pid);
-    int32_t GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList);
+    int32_t GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList);
 
     int32_t RegisterClientInfoCallback(ClientInfoCallback callback, sptr<SensorDataChannel> sensorDataChannel);
     int32_t UnregisterClientInfoCallback(ClientInfoCallback callback);

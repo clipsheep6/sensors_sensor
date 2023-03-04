@@ -27,6 +27,7 @@
 #include "securec.h"
 #include "sensor.h"
 #include "sensor_dump.h"
+#include "sensor_agent_type.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
@@ -459,16 +460,16 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
     return ERR_OK;
 }
 
-ErrCode SensorService::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+ErrCode SensorService::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
         SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
         return CLIENT_PID_INVALID_ERR;
     }
-    int32_t ret = suspendPolicy_.GetAppSensorList(pid, appSensorList);
+    int32_t ret = suspendPolicy_.GetSubscribeInfoList(pid, subscribeInfoList);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Get pid sensor list failed, pid:%{public}d", pid);
+        SEN_HILOGE("Get subscribe info list failed, pid:%{public}d", pid);
         return ERROR;
     }
     return ERR_OK;
@@ -528,9 +529,13 @@ void SensorService::ReportClientInfo(int32_t sensorId, bool isActive, int32_t pi
         }
     }
     SensorBasicInfo sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
-    SensorStatus sensorStatus(sensorId, isActive, sensorInfo.GetSamplingPeriodNs(),
-                              sensorInfo.GetMaxReportDelayNs());
-    suspendPolicy_.ReportClientInfo(pid, sensorStatus, sessionList);
+    SubscribeSensorInfo subscribeSensorInfo;
+    subscribeSensorInfo.pid = pid;
+    subscribeSensorInfo.sensorId = sensorId;
+    subscribeSensorInfo.isActive = isActive;
+    subscribeSensorInfo.samplingPeriodNs = sensorInfo.GetSamplingPeriodNs();
+    subscribeSensorInfo.maxReportDelayNs = sensorInfo.GetMaxReportDelayNs();
+    suspendPolicy_.ReportClientInfo(subscribeSensorInfo, sessionList);
 }
 }  // namespace Sensors
 }  // namespace OHOS

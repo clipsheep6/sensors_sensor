@@ -44,7 +44,7 @@ SensorServiceStub::SensorServiceStub()
     baseFuncs_[DESTROY_SENSOR_CHANNEL] = &SensorServiceStub::DestroyDataChannelInner;
     baseFuncs_[SUSPEND_SENSORS] = &SensorServiceStub::SuspendSensorsInner;
     baseFuncs_[RESUME_SENSORS] = &SensorServiceStub::ResumeSensorsInner;
-    baseFuncs_[GET_APP_SENSOR_LIST] = &SensorServiceStub::GetAppSensorListInner;
+    baseFuncs_[GET_SUBSCRIBE_INFO_LIST] = &SensorServiceStub::GetSubscribeInfoListInner;
     baseFuncs_[CREATE_SOCKET_CHANNEL] = &SensorServiceStub::CreateSocketChannelInner;
     baseFuncs_[DESTROY_SOCKET_CHANNEL] = &SensorServiceStub::DestroySocketChannelInner;
     baseFuncs_[ENABLE_CLIENT_INFO_CALLBACK] = &SensorServiceStub::EnableClientInfoCallbackInner;
@@ -192,7 +192,7 @@ ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel
     return ResumeSensors(pid);
 }
 
-ErrCode SensorServiceStub::GetAppSensorListInner(MessageParcel &data, MessageParcel &reply)
+ErrCode SensorServiceStub::GetSubscribeInfoListInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
@@ -204,13 +204,13 @@ ErrCode SensorServiceStub::GetAppSensorListInner(MessageParcel &data, MessagePar
         SEN_HILOGE("Parcel read failed");
         return ERROR;
     }
-    std::vector<AppSensor> appSensors;
-    GetAppSensorList(pid, appSensors);
-    int32_t appSensorCount = int32_t { appSensors.size() };
-    reply.WriteInt32(appSensorCount);
-    for (int32_t i = 0; i < appSensorCount; i++) {
-        if (!appSensors[i].Marshalling(reply)) {
-            SEN_HILOGE("AppSensor %{public}d failed", i);
+    std::vector<SubscribeInfo> subscribeInfoList;
+    GetSubscribeInfoList(pid, subscribeInfoList);
+    int32_t subscribeInfoCount = int32_t { subscribeInfoList.size() };
+    reply.WriteInt32(subscribeInfoCount);
+    for (int32_t i = 0; i < subscribeInfoCount; i++) {
+        if (!subscribeInfoList[i].Marshalling(reply)) {
+            SEN_HILOGE("SubscribeInfo %{public}d failed", i);
             return ERROR;
         }
     }

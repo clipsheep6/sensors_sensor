@@ -90,28 +90,28 @@ void SensorDataCallbackImpl(SensorEvent *event)
         event[0].sensorTypeId, event[0].version, event[0].dataLen, *(sensorData));
 }
 
-void ClientInfoCallbackImpl(AppSensorInfo *appSensorInfo)
+void ClientInfoCallbackImpl(SubscribeSensorInfo *subscribeSensorInfo)
 {
-    if (appSensorInfo == nullptr) {
-        SEN_HILOGE("appSensorInfo is null");
+    if (subscribeSensorInfo == nullptr) {
+        SEN_HILOGE("subscribeSensorInfo is null");
         return;
     }
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
                "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-               appSensorInfo->pid, appSensorInfo->sensorId, appSensorInfo->isActive,
-               appSensorInfo->samplingPeriodNs, appSensorInfo->maxReportDelayNs);
+               subscribeSensorInfo->pid, subscribeSensorInfo->sensorId, subscribeSensorInfo->isActive,
+               subscribeSensorInfo->samplingPeriodNs, subscribeSensorInfo->maxReportDelayNs);
 }
 
-void ClientInfoCallbackImpl2(AppSensorInfo *appSensorInfo)
+void ClientInfoCallbackImpl2(SubscribeSensorInfo *subscribeSensorInfo)
 {
-    if (appSensorInfo == nullptr) {
-        SEN_HILOGE("appSensorInfo is null");
+    if (subscribeSensorInfo == nullptr) {
+        SEN_HILOGE("subscribeSensorInfo is null");
         return;
     }
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
                "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-               appSensorInfo->pid, appSensorInfo->sensorId, appSensorInfo->isActive,
-               appSensorInfo->samplingPeriodNs, appSensorInfo->maxReportDelayNs);
+               subscribeSensorInfo->pid, subscribeSensorInfo->sensorId, subscribeSensorInfo->isActive,
+               subscribeSensorInfo->samplingPeriodNs, subscribeSensorInfo->maxReportDelayNs);
 }
 
 HWTEST_F(SensorPowerTest, SuspendSensorsTest_001, TestSize.Level1)
@@ -130,13 +130,13 @@ HWTEST_F(SensorPowerTest, ResumeSensorsTest_001, TestSize.Level1)
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 
-HWTEST_F(SensorPowerTest, GetAppSensorsTest_001, TestSize.Level1)
+HWTEST_F(SensorPowerTest, GetSubscribeInfosTest_001, TestSize.Level1)
 {
     // 查询接口异常用例
-    SEN_HILOGI("GetAppSensorsTest_001 in");
-    AppSensorInfo *appSensorInfos {nullptr};
+    SEN_HILOGI("GetSubscribeInfosTest_001 in");
+    SubscribeSensorInfo *subscribeSensorInfo {nullptr};
     int32_t count { 0 };
-    int32_t ret = GetAppSensors(invalidValue, &appSensorInfos, &count);
+    int32_t ret = GetSubscribeInfos(invalidValue, &subscribeSensorInfo, &count);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -173,15 +173,15 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_001, TestSize.Level1)
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    AppSensorInfo *appSensorInfos {nullptr};
+    SubscribeSensorInfo *subscribeSensorInfo {nullptr};
     int32_t count { 0 };
-    ret = GetAppSensors(process_pid, &appSensorInfos, &count);
+    ret = GetSubscribeInfos(process_pid, &subscribeSensorInfo, &count);
     for (int32_t i = 0; i < count; ++i) {
-        AppSensorInfo *curAppSensor = appSensorInfos + i;
+        SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
                    "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-                    i, curAppSensor->pid, curAppSensor->sensorId, curAppSensor->isActive,
-                    curAppSensor->samplingPeriodNs, curAppSensor->maxReportDelayNs);
+                    i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
+                    curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
@@ -218,15 +218,15 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_002, TestSize.Level1)
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-    AppSensorInfo *appSensorInfos {nullptr};
+    SubscribeSensorInfo *subscribeSensorInfo {nullptr};
     int32_t count { 0 };
-    ret = GetAppSensors(process_pid, &appSensorInfos, &count);
+    ret = GetSubscribeInfos(process_pid, &subscribeSensorInfo, &count);
     for (int32_t i = 0; i < count; ++i) {
-        AppSensorInfo *curAppSensor = appSensorInfos + i;
+        SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
                    "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-                    i, curAppSensor->pid, curAppSensor->sensorId, curAppSensor->isActive,
-                    curAppSensor->samplingPeriodNs, curAppSensor->maxReportDelayNs);
+                    i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
+                    curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
@@ -263,15 +263,15 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_003, TestSize.Level1)
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    AppSensorInfo *appSensorInfos {nullptr};
+    SubscribeSensorInfo *subscribeSensorInfo {nullptr};
     int32_t count { 0 };
-    ret = GetAppSensors(process_pid, &appSensorInfos, &count);
+    ret = GetSubscribeInfos(process_pid, &subscribeSensorInfo, &count);
     for (int32_t i = 0; i < count; ++i) {
-        AppSensorInfo *curAppSensor = appSensorInfos + i;
+        SubscribeSensorInfo *curSubscribeSensorInfo = subscribeSensorInfo + i;
         SEN_HILOGI("i:%{public}d, pid:%{public}d, sensorId:%{public}d, isActive:%{public}d, "
                    "samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-                    i, curAppSensor->pid, curAppSensor->sensorId, curAppSensor->isActive,
-                    curAppSensor->samplingPeriodNs, curAppSensor->maxReportDelayNs);
+                    i, curSubscribeSensorInfo->pid, curSubscribeSensorInfo->sensorId, curSubscribeSensorInfo->isActive,
+                    curSubscribeSensorInfo->samplingPeriodNs, curSubscribeSensorInfo->maxReportDelayNs);
     }
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 

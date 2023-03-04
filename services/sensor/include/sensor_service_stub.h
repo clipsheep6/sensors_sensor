@@ -41,7 +41,7 @@ private:
     ErrCode DestroyDataChannelInner(MessageParcel &data, MessageParcel &reply);
     ErrCode SuspendSensorsInner(MessageParcel &data, MessageParcel &reply);
     ErrCode ResumeSensorsInner(MessageParcel &data, MessageParcel &reply);
-    ErrCode GetAppSensorListInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode GetSubscribeInfoListInner(MessageParcel &data, MessageParcel &reply);
     ErrCode CreateSocketChannelInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DestroySocketChannelInner(MessageParcel &data, MessageParcel &reply);
     ErrCode EnableClientInfoCallbackInner(MessageParcel &data, MessageParcel &reply);

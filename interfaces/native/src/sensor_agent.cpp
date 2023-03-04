@@ -178,18 +178,18 @@ int32_t ResumeSensors(int32_t pid)
     return ret;
 }
 
-int32_t GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count)
+int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count)
 {
-    CHKPR(appSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
     CHKPR(count, OHOS::Sensors::ERROR);
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("Proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->GetAppSensors(pid, appSensorInfos, count);
+    int32_t ret = proxy->GetSubscribeInfos(pid, subscribeSensorInfos, count);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("GetAppSensors failed, ret:%{public}d", ret);
+        SEN_HILOGE("GetSubscribeInfos failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;

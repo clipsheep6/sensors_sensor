@@ -149,13 +149,13 @@ int32_t ResumeSensors(int32_t pid);
  * @brief 查询一个进程订阅的所有传感器的信息
  *
  * @param pid 进程号
- * @param appSensorInfos 返回进程订阅的所有传感器信息
+ * @param subscribeSensorInfos 返回进程订阅的所有传感器信息
  * @param count 返回进程订阅的传感器数量
  * @return 返回0表示成功，否则表示失败
  *
  * @since 10
  */
-int32_t GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count);
+int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count);
 /**
  * @brief 注册传感器订阅信息上报函数
  *

@@ -39,8 +39,8 @@ std::recursive_mutex SensorAgentProxy::subscribeMutex_;
 std::mutex SensorAgentProxy::chanelMutex_;
 std::mutex sensorInfoMutex_;
 SensorInfo *sensorInfos_ = nullptr;
-std::mutex appSensorInfoMutex_;
-AppSensorInfo *appSensorInfo_ = nullptr;
+std::mutex subscribeSensorInfoMutex_;
+SubscribeSensorInfo *subscribeSensorInfos_ = nullptr;
 int32_t sensorInfoCount_ = 0;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_subscribeMap;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_unsubscribeMap;
@@ -269,9 +269,9 @@ int32_t SensorAgentProxy::SetMode(int32_t sensorId, const SensorUser *user, int3
 
 void SensorAgentProxy::ClearSensorInfos() const
 {
-    if (appSensorInfo_ != nullptr) {
-        free(appSensorInfo_);
-        appSensorInfo_ = nullptr;
+    if (subscribeSensorInfos_ != nullptr) {
+        free(subscribeSensorInfos_);
+        subscribeSensorInfos_ = nullptr;
     }
     CHKPV(sensorInfos_);
     free(sensorInfos_);
@@ -366,47 +366,47 @@ int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
     return ret;
 }
 
-int32_t SensorAgentProxy::GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count) const
+int32_t SensorAgentProxy::GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count) const
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
         SEN_HILOGE("Pid is invalid, %{public}d", pid);
         return PARAMETER_ERROR;
     }
-    CHKPR(appSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
     CHKPR(count, OHOS::Sensors::ERROR);
-    std::lock_guard<std::mutex> appSensorInfoLock(appSensorInfoMutex_);
-    if (appSensorInfo_ != nullptr) {
-        free(appSensorInfo_);
-        appSensorInfo_ = nullptr;
+    std::lock_guard<std::mutex> subscribeSensorInfoLock(subscribeSensorInfoMutex_);
+    if (subscribeSensorInfos_ != nullptr) {
+        free(subscribeSensorInfos_);
+        subscribeSensorInfos_ = nullptr;
     }
-    std::vector<AppSensor> appSensorList;
-    int32_t ret = SenClient.GetAppSensorList(pid, appSensorList);
+    std::vector<SubscribeInfo> subscribeInfoList;
+    int32_t ret = SenClient.GetSubscribeInfoList(pid, subscribeInfoList);
     if (ret != 0) {
-        SEN_HILOGE("Get app sensor list failed, ret:%{public}d", ret);
+        SEN_HILOGE("Get subscribe info list failed, ret:%{public}d", ret);
         return ERROR;
     }
-    if (appSensorList.empty()) {
-        SEN_HILOGE("App sensor list is empty, pid:%{public}d", pid);
+    if (subscribeInfoList.empty()) {
+        SEN_HILOGE("Subscribe info list is empty, pid:%{public}d", pid);
         return ERROR;
     }
-    size_t appSensorInfoCount = appSensorList.size();
-    if (appSensorInfoCount > MAX_SENSOR_LIST_SIZE) {
-        SEN_HILOGE("The number of app sensors exceeds the maximum value, count:%{public}d", appSensorInfoCount);
+    size_t subscribeInfoCount = subscribeInfoList.size();
+    if (subscribeInfoCount > MAX_SENSOR_LIST_SIZE) {
+        SEN_HILOGE("The number of subscribe info exceeds the maximum value, count:%{public}d", subscribeInfoCount);
         return ERROR;
     }
-    appSensorInfo_ = (AppSensorInfo *)malloc(sizeof(AppSensorInfo) * appSensorInfoCount);
-    CHKPR(appSensorInfo_, ERROR);
-    for (size_t i = 0; i < appSensorInfoCount; ++i) {
-        AppSensorInfo *curAppSensor = appSensorInfo_ + i;
-        curAppSensor->pid = appSensorList[i].GetPid();
-        curAppSensor->sensorId = appSensorList[i].GetSensorId();
-        curAppSensor->isActive = appSensorList[i].IsActive();
-        curAppSensor->samplingPeriodNs = appSensorList[i].GetSamplingPeriodNs();
-        curAppSensor->maxReportDelayNs = appSensorList[i].GetMaxReportDelayNs();
+    subscribeSensorInfos_ = (SubscribeSensorInfo *)malloc(sizeof(SubscribeSensorInfo) * subscribeInfoCount);
+    CHKPR(subscribeSensorInfos_, ERROR);
+    for (size_t i = 0; i < subscribeInfoCount; ++i) {
+        SubscribeSensorInfo *curSubscribeInfo= subscribeSensorInfos_ + i;
+        curSubscribeInfo->pid = subscribeInfoList[i].GetPid();
+        curSubscribeInfo->sensorId = subscribeInfoList[i].GetSensorId();
+        curSubscribeInfo->isActive = subscribeInfoList[i].IsActive();
+        curSubscribeInfo->samplingPeriodNs = subscribeInfoList[i].GetSamplingPeriodNs();
+        curSubscribeInfo->maxReportDelayNs = subscribeInfoList[i].GetMaxReportDelayNs();
     }
-    *appSensorInfos = appSensorInfo_;
-    *count = static_cast<int32_t>(appSensorInfoCount);
+    *subscribeSensorInfos = subscribeSensorInfos_;
+    *count = static_cast<int32_t>(subscribeInfoCount);
     return SUCCESS;
 }
 

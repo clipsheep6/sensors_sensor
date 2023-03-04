@@ -45,7 +45,7 @@ public:
     int32_t GetAllSensors(SensorInfo **sensorInfo, int32_t *count) const;
     int32_t SuspendSensors(int32_t pid) const;
     int32_t ResumeSensors(int32_t pid) const;
-    int32_t GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count) const;
+    int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count) const;
     int32_t RegisterClientInfoCallback(ClientInfoCallback callback) const;
     int32_t UnregisterClientInfoCallback(ClientInfoCallback callback) const;
 

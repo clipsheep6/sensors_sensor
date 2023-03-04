@@ -22,7 +22,7 @@
 
 #include "nocopyable.h"
 
-#include "app_sensor.h"
+#include "subscribe_info.h"
 #include "client_info.h"
 #include "sensor_agent_type.h"
 #include "sensor_hdi_connection.h"
@@ -36,9 +36,8 @@ class SensorSuspendPolicy : public Singleton<SensorSuspendPolicy>{
 public:
     ErrCode DoSuspend(int32_t pid);
     ErrCode DoResume(int32_t pid);
-    ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList);
-    void ReportClientInfo(int32_t pid, const SensorStatus sensorStatus, 
-                          const std::vector<SessionPtr> &sessionList);
+    ErrCode GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList);
+    void ReportClientInfo(SubscribeSensorInfo subscribeSensorInfo, const std::vector<SessionPtr> &sessionList);
 
 private:
     bool CheckFreezingSensor(int32_t sensorId);
