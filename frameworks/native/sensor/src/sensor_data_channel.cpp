@@ -90,7 +90,7 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
     }
     if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
         eventHandler_ = nullptr;
-        SEN_HILOGI("Set eventHandler_ nullptr");
+        SEN_HILOGD("Set eventHandler_ nullptr");
     }
     return DestroySensorBasicChannel();
 }
@@ -114,7 +114,7 @@ int32_t SensorDataChannel::AddFdListener(int32_t fd, ReceiveMessageFun receiveMe
     listener->SetChannel(this);
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
     if (errCode != ERR_OK) {
-        SEN_HILOGE("Add fd listener failed, fd:%{public}d, errCode:%{public}u", fd, errCode);
+        SEN_HILOGE("Add fd listener failed, errCode:%{public}u", errCode);
         return ERROR;
     }
     auto pairRet = listenedFdSet_.insert(fd);
@@ -132,13 +132,13 @@ int32_t SensorDataChannel::DelFdListener(int32_t fd)
     eventHandler_->RemoveFileDescriptorListener(fd);
     auto it = listenedFdSet_.find(fd);
     if (it == listenedFdSet_.end()) {
-        SEN_HILOGE("ListenedFdSet not find fd, fd:%{public}d", fd);
+        SEN_HILOGE("ListenedFdSet not find fd");
         return ERROR;
     }
     listenedFdSet_.erase(it);
     if (eventHandler_ != nullptr && listenedFdSet_.empty()) {
         eventHandler_ = nullptr;
-        SEN_HILOGI("Set eventHandler_ nullptr");
+        SEN_HILOGD("Set eventHandler_ nullptr");
     }
     return ERR_OK;
 }

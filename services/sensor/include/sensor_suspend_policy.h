@@ -22,13 +22,13 @@
 
 #include "nocopyable.h"
 
-#include "subscribe_info.h"
 #include "client_info.h"
 #include "sensor_agent_type.h"
 #include "sensor_hdi_connection.h"
 #include "sensor_manager.h"
 #include "sensors_errors.h"
 #include "stream_session.h"
+#include "subscribe_info.h"
 
 namespace OHOS {
 namespace Sensors {

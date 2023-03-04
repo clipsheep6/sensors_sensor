@@ -44,13 +44,12 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     if (fd < 0) {
-        SEN_HILOGE("The fd is less than 0");
+        SEN_HILOGE("Fd is invalid");
         return false;
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        SEN_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-            fd, PROTO_SESSION_NOT_FOUND);
+        SEN_HILOGE("Fd not found, The message was discarded. errCode:%{public}d", PROTO_SESSION_NOT_FOUND);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -89,7 +88,7 @@ SessionPtr StreamServer::GetSession(int32_t fd)
     std::lock_guard<std::mutex> sessionLock(sessionMutex_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        SEN_HILOGE("Session not found.fd:%{public}d", fd);
+        SEN_HILOGE("Session not found");
         return nullptr;
     }
     CHKPP(it->second);
@@ -100,7 +99,7 @@ SessionPtr StreamServer::GetSessionByPid(int32_t pid)
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
-        SEN_HILOGE("Session not found.pid:%{public}d", pid);
+        SEN_HILOGE("Session not found");
         return nullptr;
     }
     return GetSession(fd);
@@ -175,7 +174,7 @@ bool StreamServer::AddSession(SessionPtr ses)
     CHKPF(ses);
     auto fd = ses->GetFd();
     if (fd < 0) {
-        SEN_HILOGE("The fd is less than 0");
+        SEN_HILOGE("Fd is Invalid");
         return false;
     }
     auto pid = ses->GetPid();
@@ -188,23 +187,11 @@ bool StreamServer::AddSession(SessionPtr ses)
             PROTO_MAX_SESSON_ALARM, sessionsMap_.size());
         return false;
     }
-
     DelSession(pid);
     std::lock_guard<std::mutex> idxPidLock(idxPidMutex_);
     idxPidMap_[pid] = fd;
     std::lock_guard<std::mutex> sessionLock(sessionMutex_);
     sessionsMap_[fd] = ses;
-
-    SEN_HILOGI("************AddSession()************");
-    SEN_HILOGI("******idxPidMap_ size is %{public}zu******", idxPidMap_.size());
-    for (auto it = idxPidMap_.begin(); it != idxPidMap_.end(); it++) {
-        SEN_HILOGI("******pid:%{public}d, fd:%{public}d******", it->first, it->second);
-    }
-    SEN_HILOGI("******sessionsMap_ size is %{public}zu******", sessionsMap_.size());
-    for (auto it = sessionsMap_.begin(); it != sessionsMap_.end(); it++) {
-        SEN_HILOGI("******fd:%{public}d, programName:%{public}s, moduleType:%{public}d, fd:%{public}d, uid:%{public}d, pid:%{public}d",
-            it->first, it->second->GetProgramName().c_str(), it->second->GetModuleType(), it->second->GetFd(), it->second->GetUid(), it->second->GetPid());
-    }
     return true;
 }
 
@@ -226,19 +213,8 @@ void StreamServer::DelSession(int32_t pid)
     if (fd >= 0) {
         auto rf = close(fd);
         if (rf > 0) {
-            SEN_HILOGE("Socket fd close failed, fd:%{public}d, rf:%{public}d", fd, rf);
+            SEN_HILOGE("Socket fd close failed, rf:%{public}d", rf);
         }
-    }
-
-    SEN_HILOGI("************DelSession()************");
-    SEN_HILOGI("******idxPidMap_ size is %{public}zu******", idxPidMap_.size());
-    for (auto it = idxPidMap_.begin(); it != idxPidMap_.end(); it++) {
-        SEN_HILOGI("******pid:%{public}d, fd:%{public}d******", it->first, it->second);
-    }
-    SEN_HILOGI("******sessionsMap_ size is %{public}zu******", sessionsMap_.size());
-    for (auto it = sessionsMap_.begin(); it != sessionsMap_.end(); it++) {
-        SEN_HILOGI("******fd:%{public}d, programName:%{public}s, moduleType:%{public}d, fd:%{public}d, uid:%{public}d, pid:%{public}d",
-            it->first, it->second->GetProgramName().c_str(), it->second->GetModuleType(), it->second->GetFd(), it->second->GetUid(), it->second->GetPid());
     }
 }
 }  // namespace Sensors

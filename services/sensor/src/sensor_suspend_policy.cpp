@@ -41,10 +41,10 @@ ErrCode SensorSuspendPolicy::DoSuspend(int32_t pid)
     auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
     if (pidSensorInfoIt != pidSensorInfoMap_.end()) {
         if (sensorIdList.empty()) {
-            SEN_HILOGI("Pid already suspend, all sensors suspend success, not need suspend again, pid: %{public}d", pid);
+            SEN_HILOGD("Pid already suspend, all sensors suspend success, not need suspend again");
             return ERR_OK;
         } else {
-            SEN_HILOGI("Pid already suspend, some sensors suspend failed, suspend these sensors again, pid: %{public}d", pid);
+            SEN_HILOGD("Pid already suspend, some sensors suspend failed, suspend these sensors again");
             std::unordered_map<int32_t, SensorBasicInfo> SensorInfoMap = pidSensorInfoIt->second;
             if (!DisableSensorList(SensorInfoMap, sensorIdList, pid)) {
                 SEN_HILOGE("Some sensor disable failed");
@@ -54,7 +54,7 @@ ErrCode SensorSuspendPolicy::DoSuspend(int32_t pid)
         }
     }
     if (sensorIdList.empty()) {
-        SEN_HILOGE("Pid sensorId list is empty, pid: %{public}d", pid);
+        SEN_HILOGE("Pid sensorId list is empty");
         return ERROR;
     }
     std::unordered_map<int32_t, SensorBasicInfo> SensorInfoMap;
@@ -78,8 +78,7 @@ bool SensorSuspendPolicy::DisableSensorList(std::unordered_map<int32_t, SensorBa
         }
         auto ret = DisableSensor(SensorInfoMap, sensorId, pid);
         if (ret != ERR_OK) {
-            SEN_HILOGE("Disable Sensor is failed. sensorId: %{public}u, pid: %{public}d, ret: %{public}d",
-                       sensorId, pid, ret);
+            SEN_HILOGE("Disable Sensor is failed. sensorId:%{public}d, ret:%{public}d", sensorId, ret);
             suspendAllSensors = false;
         }
     }
@@ -114,7 +113,7 @@ ErrCode SensorSuspendPolicy::DoResume(int32_t pid)
     std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
     auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
     if (pidSensorInfoIt == pidSensorInfoMap_.end()) {
-        SEN_HILOGE("Pid not have suspend sensors, pid: %{public}d", pid);
+        SEN_HILOGE("Pid not have suspend sensors");
         return ERROR;
     }
     bool resumeAllSensors = true;
@@ -125,8 +124,7 @@ ErrCode SensorSuspendPolicy::DoResume(int32_t pid)
         int64_t maxReportDelayNs = sensorIt->second.GetMaxReportDelayNs();
         auto ret = EnableSensor(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
         if (ret != ERR_OK) {
-            SEN_HILOGE("Enable Sensor is failed. sensorId: %{public}u, pid: %{public}d, ret: %{public}d",
-                       sensorId, pid, ret);
+            SEN_HILOGE("Enable Sensor is failed. sensorId:%{public}d, ret:%{public}d", sensorId, ret);
             resumeAllSensors = false;
             ++sensorIt;
         } else {
@@ -151,14 +149,11 @@ ErrCode SensorSuspendPolicy::EnableSensor(int32_t sensorId, int32_t pid, int64_t
         return ERR_NO_INIT;
     }
     if (clientInfo_.GetSensorState(sensorId)) {
-        SEN_HILOGW("Sensor has been enabled already, sensorId: %{public}d", sensorId);
+        SEN_HILOGD("Sensor has been enabled already, sensorId: %{public}d", sensorId);
         auto ret = RestoreSensorInfo(sensorId, pid, samplingPeriodNs, maxReportDelayNs);
         if (ret != ERR_OK) {
             SEN_HILOGE("RestoreSensorInfo is failed, ret: %{public}d", ret);
             return ret;
-        }
-        if (ret != ERR_OK) {
-            SEN_HILOGE("FlushProcess is failed, ret: %{public}d", ret);
         }
         return ERR_OK;
     }
@@ -239,7 +234,7 @@ void SensorSuspendPolicy::ReportClientInfo(SubscribeSensorInfo subscribeSensorIn
     }
     for (auto sess : sessionList) {
         if (!sess->SendMsg(pkt)) {
-            SEN_HILOGE("Packet send failed, pid:%{public}d", sess->GetPid());
+            SEN_HILOGE("Packet send failed");
             continue;
         }
     }

@@ -303,7 +303,7 @@ ErrCode SensorServiceProxy::CreateSocketChannel(int32_t &clientFd, const sptr<IR
     }
     clientFd = reply.ReadFileDescriptor();
     if (clientFd < 0) {
-        SEN_HILOGE("Read file descriptor failed, fd: %{public}d", clientFd);
+        SEN_HILOGE("Read file descriptor failed");
         return ERROR;
     }
     return static_cast<ErrCode>(ret);

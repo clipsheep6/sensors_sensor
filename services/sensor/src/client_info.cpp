@@ -690,7 +690,7 @@ int32_t ClientInfo::AddClientInfoCallbackPid(int32_t pid)
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     auto pairRet = clientInfoCallbackPidSet_.insert(pid);
     if (!pairRet.second) {
-        SEN_HILOGE("ClientInfoCallbackPidSet_ insert pid fail, pid:%{public}d", pid);
+        SEN_HILOGE("ClientInfoCallbackPidSet_ insert pid fail");
         return ERROR;
     }
     return ERR_OK;
@@ -701,7 +701,7 @@ int32_t ClientInfo::DelClientInfoCallbackPid(int32_t pid)
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     auto it = clientInfoCallbackPidSet_.find(pid);
     if (it == clientInfoCallbackPidSet_.end()) {
-        SEN_HILOGE("ClientInfoCallbackPidSet_ not find pid, pid:%{public}d", pid);
+        SEN_HILOGE("ClientInfoCallbackPidSet_ not find pid");
         return ERROR;
     }
     clientInfoCallbackPidSet_.erase(it);
@@ -718,13 +718,13 @@ bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
     std::lock_guard<std::mutex> channelLock(channelMutex_);
     auto channelIt = channelMap_.find(pid);
     if (channelIt != channelMap_.end()) {
-        SEN_HILOGI("pid exist in channelMap, pid:%{public}d", pid);
+        SEN_HILOGD("pid exist in channelMap");
         return false;
     }
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     auto pidIt = clientInfoCallbackPidSet_.find(pid);
     if (pidIt != clientInfoCallbackPidSet_.end()) {
-        SEN_HILOGI("pid exist in clientInfoCallbackPidSet, pid:%{public}d", pid);
+        SEN_HILOGD("pid exist in clientInfoCallbackPidSet");
         return false;
     }
     return true;

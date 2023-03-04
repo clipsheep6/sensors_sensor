@@ -206,7 +206,7 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
     }
 
     if (!isConnected_) {
-        SEN_HILOGI("Previous socket channel status is false, not need retry creat socket channel");
+        SEN_HILOGD("Previous socket channel status is false, not need retry creat socket channel");
         return;
     }
     ReregisterClientInfoCallback();
@@ -442,7 +442,6 @@ void SensorServiceClient::ReregisterClientInfoCallback()
         return;
     }
     isConnected_ = true;
-    SEN_HILOGI("Client Retry Register Client Info Callback Success");
 }
 }  // namespace Sensors
 }  // namespace OHOS

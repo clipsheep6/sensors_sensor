@@ -35,7 +35,7 @@ void ClientInfoFileDescriptorListener::SetChannel(SensorDataChannel *channel)
 void ClientInfoFileDescriptorListener::OnReadable(int32_t fd)
 {
     if (fd < 0) {
-        SEN_HILOGE("Invalid fd:%{public}d", fd);
+        SEN_HILOGE("Invalid fd");
         return;
     }
     char szBuf[PROTO_MAX_PACKET_BUF_SIZE] = {};
@@ -65,7 +65,7 @@ void ClientInfoFileDescriptorListener::OnReadable(int32_t fd)
 void ClientInfoFileDescriptorListener::OnShutdown(int32_t fd)
 {
     if (fd < 0) {
-        SEN_HILOGE("Invalid fd:%{public}d", fd);
+        SEN_HILOGE("Invalid fd");
     }
     channel_->disconnect_();
 }
@@ -73,7 +73,7 @@ void ClientInfoFileDescriptorListener::OnShutdown(int32_t fd)
 void ClientInfoFileDescriptorListener::OnException(int32_t fd)
 {
     if (fd < 0) {
-        SEN_HILOGE("Invalid fd:%{public}d", fd);
+        SEN_HILOGE("Invalid fd");
     }
     channel_->disconnect_();
 }

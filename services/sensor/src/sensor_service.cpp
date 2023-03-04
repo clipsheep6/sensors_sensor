@@ -26,8 +26,8 @@
 #include "permission_util.h"
 #include "securec.h"
 #include "sensor.h"
-#include "sensor_dump.h"
 #include "sensor_agent_type.h"
+#include "sensor_dump.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
@@ -393,11 +393,11 @@ void SensorService::UnregisterClientDeathRecipient(sptr<IRemoteObject> sensorCli
     CALL_LOG_ENTER;
     int32_t pid = clientInfo_.FindClientPid(sensorClient);
     if (pid == INVALID_PID) {
-        SEN_HILOGE("pid is -1");
+        SEN_HILOGE("Pid is invalid");
         return;
     }
     if (!clientInfo_.IsUnregisterClientDeathRecipient(pid)) {
-        SEN_HILOGI("Client call other service, not need unregister client death recipient, pid:%{public}d", pid);
+        SEN_HILOGD("Client call other service, not need unregister client death recipient");
         return;
     }
     sptr<ISensorClient> client = iface_cast<ISensorClient>(sensorClient);
@@ -434,12 +434,12 @@ ErrCode SensorService::SuspendSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
     int32_t ret = suspendPolicy_.DoSuspend(pid);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Suspend pid sensors failed, pid:%{public}d", pid);
+        SEN_HILOGE("Suspend pid sensors failed");
         return ERROR;
     }
     return ERR_OK;
@@ -449,12 +449,12 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
     int32_t ret = suspendPolicy_.DoResume(pid);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Resume pid sensors failed, pid:%{public}d", pid);
+        SEN_HILOGE("Resume pid sensors failed");
         return ERROR;
     }
     return ERR_OK;
@@ -464,12 +464,12 @@ ErrCode SensorService::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeIn
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, pid:%{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
     int32_t ret = suspendPolicy_.GetSubscribeInfoList(pid, subscribeInfoList);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Get subscribe info list failed, pid:%{public}d", pid);
+        SEN_HILOGE("Get subscribe info list failed");
         return ERROR;
     }
     return ERR_OK;

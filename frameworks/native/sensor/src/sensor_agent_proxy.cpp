@@ -342,7 +342,7 @@ int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return PARAMETER_ERROR;
     }
     int32_t ret = SenClient.SuspendSensors(pid);
@@ -356,7 +356,7 @@ int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return PARAMETER_ERROR;
     }
     int32_t ret = SenClient.ResumeSensors(pid);
@@ -370,7 +370,7 @@ int32_t SensorAgentProxy::GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **s
 {
     CALL_LOG_ENTER;
     if (pid < 0) {
-        SEN_HILOGE("Pid is invalid, %{public}d", pid);
+        SEN_HILOGE("Pid is invalid");
         return PARAMETER_ERROR;
     }
     CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
@@ -387,7 +387,7 @@ int32_t SensorAgentProxy::GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **s
         return ERROR;
     }
     if (subscribeInfoList.empty()) {
-        SEN_HILOGE("Subscribe info list is empty, pid:%{public}d", pid);
+        SEN_HILOGE("Subscribe info list is empty");
         return ERROR;
     }
     size_t subscribeInfoCount = subscribeInfoList.size();
