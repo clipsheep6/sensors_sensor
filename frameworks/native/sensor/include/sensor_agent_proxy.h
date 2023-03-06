@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 
 #include "refbase.h"
 
+#include "i_sensor_status_callback.h"
 #include "sensor_agent_type.h"
 #include "sensor_data_channel.h"
 
@@ -43,6 +44,10 @@ public:
     int32_t SetMode(int32_t sensorId, const SensorUser *user, int32_t mode) const;
     int32_t SetOption(int32_t sensorId, const SensorUser *user, int32_t option) const;
     int32_t GetAllSensors(SensorInfo **sensorInfo, int32_t *count) const;
+    int32_t SuspendSensors(int32_t pid) const;
+    int32_t ResumeSensors(int32_t pid) const;
+    int32_t GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count) const;
+    int32_t RegisterCallback(sptr<ISensorStatusCallback> callback) const;
 
 private:
     int32_t CreateSensorDataChannel() const;

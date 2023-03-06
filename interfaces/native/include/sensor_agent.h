@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@
 #ifndef SENSOR_AGENT_H
 #define SENSOR_AGENT_H
 
+#include "i_sensor_status_callback.h"
 #include "sensor_agent_type.h"
 
 #ifdef __cplusplus
@@ -127,6 +128,44 @@ int32_t DeactivateSensor(int32_t sensorTypeId, const SensorUser *user);
  * @since 5
  */
 int32_t SetMode(int32_t sensorTypeId, const SensorUser *user, int32_t mode);
+/**
+ * @brief 休眠一个进程订阅的所有传感器
+ *
+ * @param pid 进程号
+ * @return 返回0表示成功，否则表示失败
+ *
+ * @since 10
+ */
+int32_t SuspendSensors(int32_t pid);
+/**
+ * @brief 唤醒一个进程订阅的所有传感器
+ *
+ * @param pid 进程号
+ * @return 返回0表示成功，否则表示失败
+ *
+ * @since 10
+ */
+int32_t ResumeSensors(int32_t pid);
+/**
+ * @brief 查询一个进程订阅的所有传感器的信息
+ *
+ * @param pid 进程号
+ * @param appSensorInfos 返回进程订阅的所有传感器信息
+ * @param count 返回进程订阅的传感器数量
+ * @return 返回0表示成功，否则表示失败
+ *
+ * @since 10
+ */
+int32_t GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count);
+/**
+ * @brief 订阅传感器变更，当传感器发生变化时上报传感器信息
+ *
+ * @param callback 传感器变更回调对象
+ * @return 返回0表示成功，否则表示失败
+ *
+ * @since 10
+ */
+int32_t RegisterCallback(OHOS::sptr<OHOS::Sensors::ISensorStatusCallback> callback);
 
 #ifdef __cplusplus
 #if __cplusplus

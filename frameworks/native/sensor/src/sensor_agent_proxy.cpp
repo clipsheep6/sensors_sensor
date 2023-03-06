@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -328,6 +328,26 @@ int32_t SensorAgentProxy::GetAllSensors(SensorInfo **sensorInfo, int32_t *count)
     }
     *sensorInfo = sensorInfos_;
     *count = sensorInfoCount_;
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
+{
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
+{
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::GetAppSensors(int32_t pid, AppSensorInfo **appSensorInfos, int32_t *count) const
+{
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::RegisterCallback(sptr<ISensorStatusCallback> callback) const
+{
     return SUCCESS;
 }
 }  // namespace Sensors
