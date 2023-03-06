@@ -209,7 +209,8 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
         SEN_HILOGD("Previous socket channel status is false, not need retry creat socket channel");
         return;
     }
-    ReregisterClientInfoCallback();
+    Disconnect();
+    CreateSocketChannel();
 }
 
 void SensorServiceClient::UpdateSensorInfoMap(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay)
@@ -282,40 +283,15 @@ int32_t SensorServiceClient::GetSubscribeInfoList(int32_t pid, std::vector<Subsc
 int32_t SensorServiceClient::RegisterClientInfoCallback(ClientInfoCallback callback, sptr<SensorDataChannel> sensorDataChannel)
 {
     CALL_LOG_ENTER;
+
     if (!isConnected_) {
-        int32_t ret = InitServiceClient();
-        if (ret != ERR_OK) {
-            SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
-            return ret;
-        }
-        CHKPR(sensorServer_, ERROR);
-        int32_t clientFd = -1;
-        StartTrace(HITRACE_TAG_SENSORS, "CreateSocketChannel");
-        ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
-        FinishTrace(HITRACE_TAG_SENSORS);
-        if (!(ret == ERR_OK && clientFd >= 0)) {
-            Close();
-            SEN_HILOGE("Create socket channel failed");
-            return ret;
-        }
-        fd_ = clientFd;
+        CHKPR(sensorDataChannel, INVALID_POINTER);
         dataChannel_ = sensorDataChannel;
-        if (dataChannel_->AddFdListener(fd_,
-            std::bind(&SensorServiceClient::ReceiveMessage, this, std::placeholders::_1, std::placeholders::_2),
-            std::bind(&SensorServiceClient::Disconnect, this)) != ERR_OK) {
-            Close();
-            SEN_HILOGE("Add fd listener failed");
-            return ERROR;
-        }
-        StartTrace(HITRACE_TAG_SENSORS, "EnableClientInfoCallback");
-        ret = sensorServer_->EnableClientInfoCallback();
-        FinishTrace(HITRACE_TAG_SENSORS);
+        int32_t ret = CreateSocketChannel();
         if (ret != ERR_OK) {
-            SEN_HILOGE("Enable clientInfo callback failed");
-            Disconnect();
+            SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
             return ret;
         }
-        isConnected_ = true;
     }
     std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
     clientInfoCallbackSet_.insert(callback);
@@ -340,7 +316,7 @@ int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback cal
     ret = sensorServer_->DisableClientInfoCallback();
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Disable clientInfo callback failed");
+        SEN_HILOGE("Disable clientInfo callback failed, ret:%{public}d", ret);
         return ret;
     }
     Disconnect();
@@ -348,7 +324,7 @@ int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback cal
     ret = sensorServer_->DestroySocketChannel(sensorClientStub_);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Destroy socket channel failed");
+        SEN_HILOGE("Destroy socket channel failed, ret:%{public}d", ret);
         return ret;
     }
     isConnected_ = false;
@@ -372,6 +348,7 @@ void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
 {
     auto id = pkt.GetMsgId();
     if (id != MessageId::CLIENT_INFO) {
+        SEN_HILOGE("NetPacke message id is not CLIENT_INFO");
         return;
     }
     SubscribeSensorInfo subscribeSensorInfo;
@@ -398,23 +375,28 @@ void SensorServiceClient::Disconnect()
     CHKPV(dataChannel_);
     int32_t ret = dataChannel_->DelFdListener(fd_);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Delete fd listener failed");
+        SEN_HILOGE("Delete fd listener failed, ret:%{public}d", ret);
     }
     Close();
 }
 
-void SensorServiceClient::ReregisterClientInfoCallback()
+int32_t SensorServiceClient::CreateSocketChannel()
 {
     CALL_LOG_ENTER;
-    Disconnect();
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
     int32_t clientFd = -1;
     StartTrace(HITRACE_TAG_SENSORS, "CreateSocketChannel");
-    int32_t ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
+    ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (!(ret == ERR_OK && clientFd >= 0)) {
         Close();
-        SEN_HILOGE("Create socket channel failed");
-        return;
+        SEN_HILOGE("Create socket channel failed, ret:%{public}d", ret);
+        return ret;
     }
     fd_ = clientFd;
     if (dataChannel_->AddFdListener(fd_,
@@ -422,17 +404,18 @@ void SensorServiceClient::ReregisterClientInfoCallback()
         std::bind(&SensorServiceClient::Disconnect, this)) != ERR_OK) {
         Close();
         SEN_HILOGE("Add fd listener failed");
-        return;
+        return ERROR;
     }
     StartTrace(HITRACE_TAG_SENSORS, "EnableClientInfoCallback");
     ret = sensorServer_->EnableClientInfoCallback();
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Enable clientInfo callback failed");
+        SEN_HILOGE("Enable clientInfo callback failed, ret:%{public}d", ret);
         Disconnect();
-        return;
+        return ret;
     }
     isConnected_ = true;
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

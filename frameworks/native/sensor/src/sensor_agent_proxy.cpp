@@ -416,7 +416,7 @@ int32_t SensorAgentProxy::RegisterClientInfoCallback(ClientInfoCallback callback
     CHKPR(dataChannel_, INVALID_POINTER);
     int32_t ret = SenClient.RegisterClientInfoCallback(callback, dataChannel_);
     if (ret != ERR_OK) {
-        SEN_HILOGE("RegisterClientInfoCallback failed");
+        SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
     }
     return SUCCESS;
 }
@@ -426,7 +426,7 @@ int32_t SensorAgentProxy::UnregisterClientInfoCallback(ClientInfoCallback callba
     CHKPR(callback, OHOS::Sensors::ERROR);
     int32_t ret = SenClient.UnregisterClientInfoCallback(callback);
     if (ret != ERR_OK) {
-        SEN_HILOGE("UnregisterClientInfoCallback failed");
+        SEN_HILOGE("Unregister client info callback failed, ret:%{public}d, ret", ret);
     }
     return SUCCESS;
 }

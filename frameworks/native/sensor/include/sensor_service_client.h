@@ -68,8 +68,8 @@ private:
     std::mutex mapMutex_;
     std::map<int32_t, SensorBasicInfo> sensorInfoMap_;
 
+    int32_t CreateSocketChannel();
     void HandleNetPacke(NetPacket &pkt);
-    void ReregisterClientInfoCallback();
     std::atomic_bool isConnected_ = false;
     CircleStreamBuffer circBuf_;
 

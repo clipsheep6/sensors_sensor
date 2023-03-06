@@ -189,7 +189,7 @@ int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfo
     }
     int32_t ret = proxy->GetSubscribeInfos(pid, subscribeSensorInfos, count);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("GetSubscribeInfos failed, ret:%{public}d", ret);
+        SEN_HILOGE("Get subscribe Infos failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
@@ -204,7 +204,7 @@ int32_t RegisterClientInfoCallback(ClientInfoCallback callback)
     }
     int32_t ret = proxy->RegisterClientInfoCallback(callback);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("RegisterClientInfoCallback failed");
+        SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
@@ -219,7 +219,7 @@ int32_t UnregisterClientInfoCallback(ClientInfoCallback callback)
     }
     int32_t ret = proxy->UnregisterClientInfoCallback(callback);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("UnregisterClientInfoCallback failed");
+        SEN_HILOGE("Unregister client info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;

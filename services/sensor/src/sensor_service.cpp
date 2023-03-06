@@ -439,7 +439,7 @@ ErrCode SensorService::SuspendSensors(int32_t pid)
     }
     int32_t ret = suspendPolicy_.DoSuspend(pid);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Suspend pid sensors failed");
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
         return ERROR;
     }
     return ERR_OK;
@@ -454,7 +454,7 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
     }
     int32_t ret = suspendPolicy_.DoResume(pid);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Resume pid sensors failed");
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
         return ERROR;
     }
     return ERR_OK;
@@ -469,7 +469,7 @@ ErrCode SensorService::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeIn
     }
     int32_t ret = suspendPolicy_.GetSubscribeInfoList(pid, subscribeInfoList);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Get subscribe info list failed");
+        SEN_HILOGE("Get subscribe info list failed, ret:%{public}d", ret);
         return ERROR;
     }
     return ERR_OK;
@@ -485,7 +485,7 @@ ErrCode SensorService::CreateSocketChannel(int32_t &clientFd, const sptr<IRemote
     clientFd = -1;
     int32_t ret = AddSocketPairInfo(uid, pid, tokenType, serverFd, std::ref(clientFd));
     if (ret != ERR_OK) {
-        SEN_HILOGE("AddSocketPairInfo failed");
+        SEN_HILOGE("Add socket pair info failed, ret:%{public}d", ret);
         return ERROR;
     }
     RegisterClientDeathRecipient(sensorClient, pid);
