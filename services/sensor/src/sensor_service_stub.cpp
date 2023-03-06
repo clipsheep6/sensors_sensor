@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,6 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorServiceStub" };
 }  // namespace
@@ -43,6 +42,10 @@ SensorServiceStub::SensorServiceStub()
     baseFuncs_[GET_SENSOR_LIST] = &SensorServiceStub::GetAllSensorsInner;
     baseFuncs_[TRANSFER_DATA_CHANNEL] = &SensorServiceStub::CreateDataChannelInner;
     baseFuncs_[DESTROY_SENSOR_CHANNEL] = &SensorServiceStub::DestroyDataChannelInner;
+    baseFuncs_[SUSPEND_SENSORS] = &SensorServiceStub::SuspendSensorsInner;
+    baseFuncs_[RESUME_SENSORS] = &SensorServiceStub::ResumeSensorsInner;
+    baseFuncs_[GET_APP_SENSOR_LIST] = &SensorServiceStub::GetAppSensorListInner;
+    baseFuncs_[REGISTER_CALLBACK] = &SensorServiceStub::RegisterCallbackInner;
 }
 
 SensorServiceStub::~SensorServiceStub()
@@ -152,6 +155,85 @@ ErrCode SensorServiceStub::DestroyDataChannelInner(MessageParcel &data, MessageP
     sptr<IRemoteObject> sensorClient = data.ReadRemoteObject();
     CHKPR(sensorClient, OBJECT_NULL);
     return DestroySensorChannel(sensorClient);
+}
+
+ErrCode SensorServiceStub::SuspendSensorsInner(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+        SEN_HILOGE("TokenType is not TOKEN_NATIVE");
+        return PERMISSION_DENIED;
+    }
+    (void)reply;
+    int32_t pid;
+    if (!data.ReadInt32(pid)) {
+        SEN_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return SuspendSensors(pid);
+}
+
+ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+        SEN_HILOGE("TokenType is not TOKEN_NATIVE");
+        return PERMISSION_DENIED;
+    }
+    (void)reply;
+    int32_t pid;
+    if (!data.ReadInt32(pid)) {
+        SEN_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return ResumeSensors(pid);
+}
+
+ErrCode SensorServiceStub::GetAppSensorListInner(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+        SEN_HILOGE("TokenType is not TOKEN_NATIVE");
+        return PERMISSION_DENIED;
+    }
+    int32_t pid;
+    if (!data.ReadInt32(pid)) {
+        SEN_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    std::vector<AppSensor> appSensors;
+    GetAppSensorList(pid, appSensors);
+    int32_t appSensorCount = int32_t { appSensors.size() };
+    reply.WriteInt32(appSensorCount);
+    for (int32_t i = 0; i < appSensorCount; i++) {
+        bool flag = appSensors[i].Marshalling(reply);
+        if (!flag) {
+            SEN_HILOGE("AppSensor %{public}d failed", i);
+            return ERROR;
+        }
+    }
+    return NO_ERROR;
+}
+
+ErrCode SensorServiceStub::RegisterCallbackInner(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+        SEN_HILOGE("TokenType is not TOKEN_NATIVE");
+        return PERMISSION_DENIED;
+    }
+    (void)reply;
+    sptr<IRemoteObject> obj = data.ReadRemoteObject();
+    if (obj == nullptr) {
+        SEN_HILOGE("Data ReadRemoteObject() is nullptr");
+        return ERROR;
+    }
+    sptr<ISensorStatusCallback> callback = iface_cast<ISensorStatusCallback>(obj);
+    if (callback == nullptr) {
+        SEN_HILOGE("Obj iface_cast ISensorStatusCallback failed");
+        return ERROR;
+    }
+    return RegisterCallback(callback);
 }
 }  // namespace Sensors
 }  // namespace OHOS
