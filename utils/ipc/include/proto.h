@@ -40,7 +40,7 @@ static const int32_t PROTO_ONCE_PROCESS_NETPACKET_LIMIT = 100;
 
 enum class MessageId : int32_t {
     INVALID,
-    CLIENT_INFO,
+    ACTIVE_INFO,
 };
 }  // namespace Sensors
 }  // namespace OHOS

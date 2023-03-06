@@ -205,7 +205,7 @@ void SensorSuspendPolicy::ReportActiveInfo(ActiveInfo activeInfo,
                                            const std::vector<SessionPtr> &sessionList)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MessageId::CLIENT_INFO);
+    NetPacket pkt(MessageId::ACTIVE_INFO);
     pkt << activeInfo.GetPid() << activeInfo.GetSensorId() <<
         activeInfo.GetSamplingPeriodNs() << activeInfo.GetMaxReportDelayNs();
     if (pkt.ChkRWError()) {

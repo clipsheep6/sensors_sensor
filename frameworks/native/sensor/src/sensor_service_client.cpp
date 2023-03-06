@@ -346,8 +346,8 @@ void SensorServiceClient::ReceiveMessage(const char *buf, size_t size)
 void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
 {
     auto id = pkt.GetMsgId();
-    if (id != MessageId::CLIENT_INFO) {
-        SEN_HILOGE("NetPacke message id is not CLIENT_INFO");
+    if (id != MessageId::ACTIVE_INFO) {
+        SEN_HILOGE("NetPacke message id is not ACTIVE_INFO");
         return;
     }
     SensorActiveInfo sensorActiveInfo;
