@@ -386,8 +386,8 @@ int32_t SensorAgentProxy::GetSensorActiveInfos(int32_t pid, SensorActiveInfo **s
         return ret;
     }
     if (activeInfoList.empty()) {
-        SEN_HILOGE("Active info list is empty");
-        return ERROR;
+        SEN_HILOGD("Active info list is empty");
+        return ERR_OK;
     }
     size_t activeInfoCount = activeInfoList.size();
     if (activeInfoCount > MAX_SENSOR_LIST_SIZE) {
