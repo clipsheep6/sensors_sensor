@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,10 @@ public:
     ErrCode TransferDataChannel(const sptr<SensorBasicDataChannel> &sensorBasicDataChannel,
                                 const sptr<IRemoteObject> &sensorClient) override;
     ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) override;
+    ErrCode SuspendSensors(int32_t pid) override;
+    ErrCode ResumeSensors(int32_t pid) override;
+    ErrCode GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList) override;
+    ErrCode RegisterCallback(sptr<ISensorStatusCallback> callback) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorServiceProxy);

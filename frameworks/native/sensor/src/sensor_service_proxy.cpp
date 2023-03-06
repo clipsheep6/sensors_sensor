@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -187,6 +187,117 @@ ErrCode SensorServiceProxy::DestroySensorChannel(sptr<IRemoteObject> sensorClien
         HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "DestroySensorChannel", "ERROR_CODE", ret);
         SEN_HILOGE("failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
+
+ErrCode SensorServiceProxy::SuspendSensors(int32_t pid)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(pid)) {
+        SEN_HILOGE("Write pid failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(ISensorService::SUSPEND_SENSORS, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "SuspendSensors", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
+
+ErrCode SensorServiceProxy::ResumeSensors(int32_t pid)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(pid)) {
+        SEN_HILOGE("Write pid failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(ISensorService::RESUME_SENSORS, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "ResumeSensors", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
+
+ErrCode SensorServiceProxy::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(pid)) {
+        SEN_HILOGE("Write pid failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(ISensorService::GET_APP_SENSOR_LIST, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetAppSensorList", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
+        return static_cast<ErrCode>(ret);
+    }
+    int32_t appSensorCount;
+    if (!reply.ReadInt32(appSensorCount)) {
+        SEN_HILOGE("Parcel read appSensorCount failed");
+        return READ_MSG_ERR;
+    }
+    AppSensor appSensor;
+    for (int32_t i = 0; i < appSensorCount; ++i) {
+        auto tmpAppSensor = appSensor.Unmarshalling(reply);
+        if (tmpAppSensor == nullptr) {
+            SEN_HILOGE("Current appSensor is nullptr, i:%{public}d", i);
+            continue;
+        }
+        appSensorList.push_back(*tmpAppSensor);
+    }
+    return static_cast<ErrCode>(ret);
+}
+
+ErrCode SensorServiceProxy::RegisterCallback(sptr<ISensorStatusCallback> callback)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteRemoteObject(callback->AsObject())) {
+        SEN_HILOGE("Write callback failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(ISensorService::REGISTER_CALLBACK, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "RegisterCallback", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
     }
     return static_cast<ErrCode>(ret);
 }

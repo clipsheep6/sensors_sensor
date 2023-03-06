@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,8 @@
 #include "iservice_registry.h"
 #include "singleton.h"
 
+#include "app_sensor.h"
+#include "i_sensor_status_callback.h"
 #include "sensor_agent_type.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor_basic_info.h"
@@ -42,6 +44,10 @@ public:
     int32_t DestroyDataChannel();
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     bool IsValid(int32_t sensorId);
+    int32_t SuspendSensors(int32_t pid);
+    int32_t ResumeSensors(int32_t pid);
+    int32_t GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList);
+    int32_t RegisterCallback(sptr<ISensorStatusCallback> callback);
 
 private:
     int32_t InitServiceClient();

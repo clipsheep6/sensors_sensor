@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -223,6 +223,65 @@ void SensorServiceClient::DeleteSensorInfoItem(int32_t sensorId)
         sensorInfoMap_.erase(it);
     }
     return;
+}
+
+int32_t SensorServiceClient::SuspendSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "SuspendSensors");
+    ret = sensorServer_->SuspendSensors(pid);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
+int32_t SensorServiceClient::ResumeSensors(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "ResumeSensors");
+    ret = sensorServer_->ResumeSensors(pid);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+int32_t SensorServiceClient::GetAppSensorList(int32_t pid, std::vector<AppSensor> &appSensorList)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "GetAppSensorList");
+    ret = sensorServer_->GetAppSensorList(pid, appSensorList);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
+int32_t SensorServiceClient::RegisterCallback(sptr<ISensorStatusCallback> callback)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "RegisterCallback");
+    ret = sensorServer_->RegisterCallback(callback);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
 }
 }  // namespace Sensors
 }  // namespace OHOS
