@@ -28,16 +28,16 @@
 #include "sensor_manager.h"
 #include "sensors_errors.h"
 #include "stream_session.h"
-#include "subscribe_info.h"
+#include "active_info.h"
 
 namespace OHOS {
 namespace Sensors {
 class SensorSuspendPolicy : public Singleton<SensorSuspendPolicy>{
 public:
-    ErrCode DoSuspend(int32_t pid);
-    ErrCode DoResume(int32_t pid);
-    ErrCode GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList);
-    void ReportClientInfo(SubscribeSensorInfo subscribeSensorInfo, const std::vector<SessionPtr> &sessionList);
+    ErrCode SuspendSensors(int32_t pid);
+    ErrCode ResumeSensors(int32_t pid);
+    ErrCode GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList);
+    void ReportActiveInfo(ActiveInfo activeInfo, const std::vector<SessionPtr> &sessionList);
 
 private:
     bool CheckFreezingSensor(int32_t sensorId);

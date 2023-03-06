@@ -685,32 +685,32 @@ void ClientInfo::ClearDataQueue(int32_t sensorId)
     }
 }
 
-int32_t ClientInfo::AddClientInfoCallbackPid(int32_t pid)
+int32_t ClientInfo::AddActiveInfoCBPid(int32_t pid)
 {
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    auto pairRet = clientInfoCallbackPidSet_.insert(pid);
+    std::lock_guard<std::mutex> activeInfoCBPidLock(activeInfoCBPidMutex_);
+    auto pairRet = activeInfoCBPidSet_.insert(pid);
     if (!pairRet.second) {
-        SEN_HILOGE("ClientInfoCallbackPidSet_ insert pid fail");
+        SEN_HILOGE("ActiveInfoCBPidSet insert pid fail");
         return ERROR;
     }
     return ERR_OK;
 }
 
-int32_t ClientInfo::DelClientInfoCallbackPid(int32_t pid)
+int32_t ClientInfo::DelActiveInfoCBPid(int32_t pid)
 {
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    auto it = clientInfoCallbackPidSet_.find(pid);
-    if (it == clientInfoCallbackPidSet_.end()) {
-        SEN_HILOGE("ClientInfoCallbackPidSet_ not find pid");
+    std::lock_guard<std::mutex> activeInfoCBPidLock(activeInfoCBPidMutex_);
+    auto it = activeInfoCBPidSet_.find(pid);
+    if (it == activeInfoCBPidSet_.end()) {
+        SEN_HILOGE("ActiveInfoCBPidSet not find pid");
         return ERROR;
     }
-    clientInfoCallbackPidSet_.erase(it);
+    activeInfoCBPidSet_.erase(it);
     return ERR_OK;
 }
 
-std::unordered_set<int32_t> ClientInfo::GetClientInfoCallbackPidSet()
+std::unordered_set<int32_t> ClientInfo::GetActiveInfoCBPid()
 {
-    return clientInfoCallbackPidSet_;
+    return activeInfoCBPidSet_;
 }
 
 bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
@@ -721,10 +721,10 @@ bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
         SEN_HILOGD("pid exist in channelMap");
         return false;
     }
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    auto pidIt = clientInfoCallbackPidSet_.find(pid);
-    if (pidIt != clientInfoCallbackPidSet_.end()) {
-        SEN_HILOGD("pid exist in clientInfoCallbackPidSet");
+    std::lock_guard<std::mutex> activeInfoCBPidLock(activeInfoCBPidMutex_);
+    auto pidIt = activeInfoCBPidSet_.find(pid);
+    if (pidIt != activeInfoCBPidSet_.end()) {
+        SEN_HILOGD("pid exist in activeInfoCBPidSet");
         return false;
     }
     return true;

@@ -23,6 +23,7 @@
 #include "iservice_registry.h"
 #include "singleton.h"
 
+#include "active_info.h"
 #include "sensor_agent_type.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor_basic_info.h"
@@ -31,7 +32,6 @@
 #include "sensor.h"
 #include "sensor_service_proxy.h"
 #include "stream_socket.h"
-#include "subscribe_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -47,11 +47,9 @@ public:
     bool IsValid(int32_t sensorId);
     int32_t SuspendSensors(int32_t pid);
     int32_t ResumeSensors(int32_t pid);
-    int32_t GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList);
-
-    int32_t RegisterClientInfoCallback(ClientInfoCallback callback, sptr<SensorDataChannel> sensorDataChannel);
-    int32_t UnregisterClientInfoCallback(ClientInfoCallback callback);
-
+    int32_t GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList);
+    int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel);
+    int32_t UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback);
     void ReceiveMessage(const char *buf, size_t size);
     void Disconnect();
 
@@ -73,8 +71,8 @@ private:
     std::atomic_bool isConnected_ = false;
     CircleStreamBuffer circBuf_;
 
-    std::mutex clientInfoCallbackMutex_;
-    std::set<ClientInfoCallback> clientInfoCallbackSet_;
+    std::mutex activeInfoCBMutex_;
+    std::set<SensorActiveInfoCB> activeInfoCBSet_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

@@ -21,10 +21,10 @@
 #include "errors.h"
 #include "iremote_broker.h"
 
+#include "active_info.h"
 #include "i_sensor_client.h"
 #include "sensor_basic_data_channel.h"
 #include "sensor.h"
-#include "subscribe_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -42,11 +42,11 @@ public:
     virtual ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) = 0;
     virtual ErrCode SuspendSensors(int32_t pid) = 0;
     virtual ErrCode ResumeSensors(int32_t pid) = 0;
-    virtual ErrCode GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList) = 0;
+    virtual ErrCode GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList) = 0;
     virtual ErrCode CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode DestroySocketChannel(const sptr<IRemoteObject> &sensorClient) = 0;
-    virtual ErrCode EnableClientInfoCallback() = 0;
-    virtual ErrCode DisableClientInfoCallback() = 0;
+    virtual ErrCode EnableActiveInfoCB() = 0;
+    virtual ErrCode DisableActiveInfoCB() = 0;
     enum {
         ENABLE_SENSOR = 0,
         DISABLE_SENSOR,
@@ -57,11 +57,11 @@ public:
         DESTROY_SENSOR_CHANNEL,
         SUSPEND_SENSORS,
         RESUME_SENSORS,
-        GET_SUBSCRIBE_INFO_LIST,
+        GET_ACTIVE_INFO_LIST,
         CREATE_SOCKET_CHANNEL,
         DESTROY_SOCKET_CHANNEL,
-        ENABLE_CLIENT_INFO_CALLBACK,
-        DISABLE_CLIENT_INFO_CALLBACK,
+        ENABLE_ACTIVE_INFO_CB,
+        DISABLE_ACTIVE_INFO_CB,
     };
 };
 }  // namespace Sensors

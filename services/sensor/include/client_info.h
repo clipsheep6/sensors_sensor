@@ -76,9 +76,9 @@ public:
     int32_t GetUidByPid(int32_t pid);
     AccessTokenID GetTokenIdByPid(int32_t pid);
 
-    int32_t AddClientInfoCallbackPid(int32_t pid);
-    int32_t DelClientInfoCallbackPid(int32_t pid);
-    std::unordered_set<int32_t> GetClientInfoCallbackPidSet();
+    int32_t AddActiveInfoCBPid(int32_t pid);
+    int32_t DelActiveInfoCBPid(int32_t pid);
+    std::unordered_set<int32_t> GetActiveInfoCBPid();
     bool IsUnregisterClientDeathRecipient(int32_t pid);
 
 private:
@@ -99,8 +99,8 @@ private:
     std::unordered_map<int32_t, std::unordered_map<int32_t, std::vector<int32_t>>> cmdMap_;
     std::unordered_map<int32_t, std::queue<SensorData>> dumpQueue_;
 
-    std::mutex clientInfoCallbackMutex_;
-    std::unordered_set<int32_t> clientInfoCallbackPidSet_;
+    std::mutex activeInfoCBPidMutex_;
+    std::unordered_set<int32_t> activeInfoCBPidSet_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

@@ -33,7 +33,7 @@ bool SensorSuspendPolicy::CheckFreezingSensor(int32_t sensorId)
     return ((sensorId == SENSOR_TYPE_ID_PEDOMETER_DETECTION) || (sensorId == SENSOR_TYPE_ID_PEDOMETER));
 }
 
-ErrCode SensorSuspendPolicy::DoSuspend(int32_t pid)
+ErrCode SensorSuspendPolicy::SuspendSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
@@ -107,7 +107,7 @@ ErrCode SensorSuspendPolicy::DisableSensor(std::unordered_map<int32_t, SensorBas
     return sensorManager_.AfterDisableSensor(sensorId);
 }
 
-ErrCode SensorSuspendPolicy::DoResume(int32_t pid)
+ErrCode SensorSuspendPolicy::ResumeSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
@@ -188,46 +188,26 @@ ErrCode SensorSuspendPolicy::RestoreSensorInfo(int32_t sensorId, int32_t pid, in
     return ret;
 }
 
-ErrCode SensorSuspendPolicy::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
+ErrCode SensorSuspendPolicy::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
     for (auto &sensorId : sensorIdList) {
         auto sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
-        SubscribeSensorInfo subscribeSensorInfo;
-        subscribeSensorInfo.pid = pid;
-        subscribeSensorInfo.sensorId = sensorId;
-        subscribeSensorInfo.isActive = true;
-        subscribeSensorInfo.samplingPeriodNs = sensorInfo.GetSamplingPeriodNs();
-        subscribeSensorInfo.maxReportDelayNs = sensorInfo.GetMaxReportDelayNs();
-        SubscribeInfo subscribeInfo(subscribeSensorInfo);
-        subscribeInfoList.push_back(subscribeInfo);
-    }
-    std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
-    auto pidSensorInfoIt = pidSensorInfoMap_.find(pid);
-    if (pidSensorInfoIt != pidSensorInfoMap_.end()) {
-        std::unordered_map<int32_t, SensorBasicInfo> SensorInfoMap = pidSensorInfoIt->second;
-        for (auto &sensorInfo : SensorInfoMap) {
-            SubscribeSensorInfo subscribeSensorInfo;
-            subscribeSensorInfo.pid = pid;
-            subscribeSensorInfo.sensorId = sensorInfo.first;
-            subscribeSensorInfo.isActive = false;
-            subscribeSensorInfo.samplingPeriodNs = sensorInfo.second.GetSamplingPeriodNs();
-            subscribeSensorInfo.maxReportDelayNs = sensorInfo.second.GetMaxReportDelayNs();
-            SubscribeInfo subscribeInfo(subscribeSensorInfo);
-            subscribeInfoList.push_back(subscribeInfo);
-        }
+        ActiveInfo activeInfo(pid, sensorId, sensorInfo.GetSamplingPeriodNs(),
+                              sensorInfo.GetMaxReportDelayNs());
+        activeInfoList.push_back(activeInfo);
     }
     return ERR_OK;
 }
 
-void SensorSuspendPolicy::ReportClientInfo(SubscribeSensorInfo subscribeSensorInfo,
+void SensorSuspendPolicy::ReportActiveInfo(ActiveInfo activeInfo,
                                            const std::vector<SessionPtr> &sessionList)
 {
     CALL_LOG_ENTER;
     NetPacket pkt(MessageId::CLIENT_INFO);
-    pkt << subscribeSensorInfo.pid << subscribeSensorInfo.sensorId << subscribeSensorInfo.isActive <<
-        subscribeSensorInfo.samplingPeriodNs << subscribeSensorInfo.maxReportDelayNs;
+    pkt << activeInfo.GetPid() << activeInfo.GetSensorId() <<
+        activeInfo.GetSamplingPeriodNs() << activeInfo.GetMaxReportDelayNs();
     if (pkt.ChkRWError()) {
         SEN_HILOGE("Packet write data failed");
         return;

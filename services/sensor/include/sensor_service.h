@@ -58,11 +58,11 @@ public:
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     ErrCode SuspendSensors(int32_t pid) override;
     ErrCode ResumeSensors(int32_t pid) override;
-    ErrCode GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList) override;
+    ErrCode GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList) override;
     ErrCode CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient) override;
     ErrCode DestroySocketChannel(const sptr<IRemoteObject> &sensorClient) override;
-    ErrCode EnableClientInfoCallback() override;
-    ErrCode DisableClientInfoCallback() override;
+    ErrCode EnableActiveInfoCB() override;
+    ErrCode DisableActiveInfoCB() override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);
@@ -93,8 +93,8 @@ private:
     sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     ErrCode SaveSubscriber(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
 
-    std::atomic_bool isReportClientInfo_ = false;
-    void ReportClientInfo(int32_t sensorId, bool isActive, int32_t pid);
+    std::atomic_bool isReportActiveInfo_ = false;
+    void ReportActiveInfo(int32_t sensorId, int32_t pid);
 };
 }  // namespace Sensors
 }  // namespace OHOS

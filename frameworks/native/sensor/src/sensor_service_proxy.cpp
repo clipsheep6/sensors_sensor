@@ -239,7 +239,7 @@ ErrCode SensorServiceProxy::ResumeSensors(int32_t pid)
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
+ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
@@ -254,26 +254,26 @@ ErrCode SensorServiceProxy::GetSubscribeInfoList(int32_t pid, std::vector<Subscr
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(ISensorService::GET_SUBSCRIBE_INFO_LIST, data, reply, option);
+    int32_t ret = remote->SendRequest(ISensorService::GET_ACTIVE_INFO_LIST, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SENSOR_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetSubscribeInfoList", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetActiveInfoList", "ERROR_CODE", ret);
         SEN_HILOGE("Failed, ret:%{public}d", ret);
         return static_cast<ErrCode>(ret);
     }
-    int32_t subscribeInfoCount;
-    if (!reply.ReadInt32(subscribeInfoCount)) {
-        SEN_HILOGE("Parcel read subscribeInfoCount failed");
+    int32_t activeInfoCount;
+    if (!reply.ReadInt32(activeInfoCount)) {
+        SEN_HILOGE("Parcel read activeInfoCount failed");
         return READ_PARCEL_ERR;
     }
-    SubscribeInfo subscribeInfo;
-    for (int32_t i = 0; i < subscribeInfoCount; ++i) {
-        auto tmpSubscribeInfo = subscribeInfo.Unmarshalling(reply);
-        if (tmpSubscribeInfo == nullptr) {
-            SEN_HILOGE("Current subscribeInfo is nullptr, i:%{public}d", i);
+    ActiveInfo activeInfo;
+    for (int32_t i = 0; i < activeInfoCount; ++i) {
+        auto tmpActiveInfo = activeInfo.Unmarshalling(reply);
+        if (tmpActiveInfo == nullptr) {
+            SEN_HILOGE("Current activeInfo is nullptr, i:%{public}d", i);
             continue;
         }
-        subscribeInfoList.push_back(*tmpSubscribeInfo);
+        activeInfoList.push_back(*tmpActiveInfo);
     }
     return static_cast<ErrCode>(ret);
 }
@@ -334,7 +334,7 @@ ErrCode SensorServiceProxy::DestroySocketChannel(const sptr<IRemoteObject> &sens
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::EnableClientInfoCallback()
+ErrCode SensorServiceProxy::EnableActiveInfoCB()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
@@ -345,16 +345,16 @@ ErrCode SensorServiceProxy::EnableClientInfoCallback()
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(ISensorService::ENABLE_CLIENT_INFO_CALLBACK, data, reply, option);
+    int32_t ret = remote->SendRequest(ISensorService::ENABLE_ACTIVE_INFO_CB, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableClientInfoCallback", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableActiveInfoCB", "ERROR_CODE", ret);
         SEN_HILOGE("failed, ret:%{public}d", ret);
     }
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::DisableClientInfoCallback()
+ErrCode SensorServiceProxy::DisableActiveInfoCB()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
@@ -365,10 +365,10 @@ ErrCode SensorServiceProxy::DisableClientInfoCallback()
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(ISensorService::DISABLE_CLIENT_INFO_CALLBACK, data, reply, option);
+    int32_t ret = remote->SendRequest(ISensorService::DISABLE_ACTIVE_INFO_CB, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "DISABLE_CLIENT_INFO_CALLBACK", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "DisableActiveInfoCB", "ERROR_CODE", ret);
         SEN_HILOGE("failed, ret:%{public}d", ret);
     }
     return static_cast<ErrCode>(ret);

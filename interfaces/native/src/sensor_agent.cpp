@@ -157,7 +157,7 @@ int32_t SuspendSensors(int32_t pid)
     }
     int32_t ret = proxy->SuspendSensors(pid);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+        SEN_HILOGE("Suspend sensors failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
@@ -172,54 +172,54 @@ int32_t ResumeSensors(int32_t pid)
     }
     int32_t ret = proxy->ResumeSensors(pid);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+        SEN_HILOGE("Resume sensors failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
 }
 
-int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count)
+int32_t GetSensorActiveInfos(int32_t pid, SensorActiveInfo **sensorActiveInfos, int32_t *count)
 {
-    CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(sensorActiveInfos, OHOS::Sensors::ERROR);
     CHKPR(count, OHOS::Sensors::ERROR);
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("Proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->GetSubscribeInfos(pid, subscribeSensorInfos, count);
+    int32_t ret = proxy->GetSensorActiveInfos(pid, sensorActiveInfos, count);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Get subscribe Infos failed, ret:%{public}d", ret);
+        SEN_HILOGE("Get sensor active infos failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
 }
 
-int32_t RegisterClientInfoCallback(ClientInfoCallback callback)
+int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback)
 {
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->RegisterClientInfoCallback(callback);
+    int32_t ret = proxy->RegisterSensorActiveInfoCB(callback);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
+        SEN_HILOGE("Register sensor active Info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;
 }
 
-int32_t UnregisterClientInfoCallback(ClientInfoCallback callback)
+int32_t UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback)
 {
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->UnregisterClientInfoCallback(callback);
+    int32_t ret = proxy->UnregisterSensorActiveInfoCB(callback);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Unregister client info callback failed, ret:%{public}d", ret);
+        SEN_HILOGE("Unregister sensor active info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return ret;

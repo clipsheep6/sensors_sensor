@@ -265,7 +265,7 @@ int32_t SensorServiceClient::ResumeSensors(int32_t pid)
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
-int32_t SensorServiceClient::GetSubscribeInfoList(int32_t pid, std::vector<SubscribeInfo> &subscribeInfoList)
+int32_t SensorServiceClient::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -274,36 +274,35 @@ int32_t SensorServiceClient::GetSubscribeInfoList(int32_t pid, std::vector<Subsc
         return ret;
     }
     CHKPR(sensorServer_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "GetSubscribeInfoList");
-    ret = sensorServer_->GetSubscribeInfoList(pid, subscribeInfoList);
+    StartTrace(HITRACE_TAG_SENSORS, "GetActiveInfoList");
+    ret = sensorServer_->GetActiveInfoList(pid, activeInfoList);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
-int32_t SensorServiceClient::RegisterClientInfoCallback(ClientInfoCallback callback, sptr<SensorDataChannel> sensorDataChannel)
+int32_t SensorServiceClient::RegisterSensorActiveInfoCB(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel)
 {
     CALL_LOG_ENTER;
-
     if (!isConnected_) {
         CHKPR(sensorDataChannel, INVALID_POINTER);
         dataChannel_ = sensorDataChannel;
         int32_t ret = CreateSocketChannel();
         if (ret != ERR_OK) {
-            SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
+            SEN_HILOGE("Register sensor active info callback failed, ret:%{public}d", ret);
             return ret;
         }
     }
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    clientInfoCallbackSet_.insert(callback);
+    std::lock_guard<std::mutex> activeInfoCBLock(activeInfoCBMutex_);
+    activeInfoCBSet_.insert(callback);
     return ERR_OK;
 }
 
-int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback callback)
+int32_t SensorServiceClient::UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    clientInfoCallbackSet_.erase(callback);
-    if (!clientInfoCallbackSet_.empty()) {
+    std::lock_guard<std::mutex> activeInfoCBLock(activeInfoCBMutex_);
+    activeInfoCBSet_.erase(callback);
+    if (!activeInfoCBSet_.empty()) {
         return ERR_OK;
     }
     int32_t ret = InitServiceClient();
@@ -312,11 +311,11 @@ int32_t SensorServiceClient::UnregisterClientInfoCallback(ClientInfoCallback cal
         return ret;
     }
     CHKPR(sensorServer_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "DisableClientInfoCallback");
-    ret = sensorServer_->DisableClientInfoCallback();
+    StartTrace(HITRACE_TAG_SENSORS, "DisableActiveInfoCB");
+    ret = sensorServer_->DisableActiveInfoCB();
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Disable clientInfo callback failed, ret:%{public}d", ret);
+        SEN_HILOGE("Disable active info callback failed, ret:%{public}d", ret);
         return ret;
     }
     Disconnect();
@@ -351,17 +350,17 @@ void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
         SEN_HILOGE("NetPacke message id is not CLIENT_INFO");
         return;
     }
-    SubscribeSensorInfo subscribeSensorInfo;
-    pkt >> subscribeSensorInfo.pid >> subscribeSensorInfo.sensorId >> subscribeSensorInfo.isActive >>
-        subscribeSensorInfo.samplingPeriodNs >> subscribeSensorInfo.maxReportDelayNs;
+    SensorActiveInfo sensorActiveInfo;
+    pkt >> sensorActiveInfo.pid >> sensorActiveInfo.sensorId >> sensorActiveInfo.samplingPeriodNs >>
+        sensorActiveInfo.maxReportDelayNs;
     if (pkt.ChkRWError()) {
         SEN_HILOGE("Packet read type failed");
         return;
     }
-    std::lock_guard<std::mutex> clientInfoCallbackLock(clientInfoCallbackMutex_);
-    for (auto callback : clientInfoCallbackSet_) {
+    std::lock_guard<std::mutex> activeInfoCBLock(activeInfoCBMutex_);
+    for (auto callback : activeInfoCBSet_) {
         if (callback != nullptr) {
-            callback(subscribeSensorInfo);
+            callback(sensorActiveInfo);
         }
     }
 }
@@ -406,11 +405,11 @@ int32_t SensorServiceClient::CreateSocketChannel()
         SEN_HILOGE("Add fd listener failed");
         return ERROR;
     }
-    StartTrace(HITRACE_TAG_SENSORS, "EnableClientInfoCallback");
-    ret = sensorServer_->EnableClientInfoCallback();
+    StartTrace(HITRACE_TAG_SENSORS, "EnableActiveInfoCB");
+    ret = sensorServer_->EnableActiveInfoCB();
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        SEN_HILOGE("Enable clientInfo callback failed, ret:%{public}d", ret);
+        SEN_HILOGE("Enable active info callback failed, ret:%{public}d", ret);
         Disconnect();
         return ret;
     }

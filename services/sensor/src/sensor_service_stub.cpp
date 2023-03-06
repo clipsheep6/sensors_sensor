@@ -44,11 +44,11 @@ SensorServiceStub::SensorServiceStub()
     baseFuncs_[DESTROY_SENSOR_CHANNEL] = &SensorServiceStub::DestroyDataChannelInner;
     baseFuncs_[SUSPEND_SENSORS] = &SensorServiceStub::SuspendSensorsInner;
     baseFuncs_[RESUME_SENSORS] = &SensorServiceStub::ResumeSensorsInner;
-    baseFuncs_[GET_SUBSCRIBE_INFO_LIST] = &SensorServiceStub::GetSubscribeInfoListInner;
+    baseFuncs_[GET_ACTIVE_INFO_LIST] = &SensorServiceStub::GetActiveInfoListInner;
     baseFuncs_[CREATE_SOCKET_CHANNEL] = &SensorServiceStub::CreateSocketChannelInner;
     baseFuncs_[DESTROY_SOCKET_CHANNEL] = &SensorServiceStub::DestroySocketChannelInner;
-    baseFuncs_[ENABLE_CLIENT_INFO_CALLBACK] = &SensorServiceStub::EnableClientInfoCallbackInner;
-    baseFuncs_[DISABLE_CLIENT_INFO_CALLBACK] = &SensorServiceStub::DisableClientInfoCallbackInner;
+    baseFuncs_[ENABLE_ACTIVE_INFO_CB] = &SensorServiceStub::EnableActiveInfoCBInner;
+    baseFuncs_[DISABLE_ACTIVE_INFO_CB] = &SensorServiceStub::DisableActiveInfoCBInner;
 }
 
 SensorServiceStub::~SensorServiceStub()
@@ -192,7 +192,7 @@ ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel
     return ResumeSensors(pid);
 }
 
-ErrCode SensorServiceStub::GetSubscribeInfoListInner(MessageParcel &data, MessageParcel &reply)
+ErrCode SensorServiceStub::GetActiveInfoListInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
@@ -204,17 +204,17 @@ ErrCode SensorServiceStub::GetSubscribeInfoListInner(MessageParcel &data, Messag
         SEN_HILOGE("Parcel read failed");
         return ERROR;
     }
-    std::vector<SubscribeInfo> subscribeInfoList;
-    GetSubscribeInfoList(pid, subscribeInfoList);
-    int32_t subscribeInfoCount = int32_t { subscribeInfoList.size() };
-    reply.WriteInt32(subscribeInfoCount);
-    for (int32_t i = 0; i < subscribeInfoCount; i++) {
-        if (!subscribeInfoList[i].Marshalling(reply)) {
-            SEN_HILOGE("SubscribeInfo %{public}d failed", i);
+    std::vector<ActiveInfo> activeInfoList;
+    GetActiveInfoList(pid, activeInfoList);
+    int32_t activeInfoCount = int32_t { activeInfoList.size() };
+    reply.WriteInt32(activeInfoCount);
+    for (int32_t i = 0; i < activeInfoCount; i++) {
+        if (!activeInfoList[i].Marshalling(reply)) {
+            SEN_HILOGE("ActiveInfo %{public}d failed", i);
             return ERROR;
         }
     }
-    return NO_ERROR;
+    return ERR_OK;
 }
 
 ErrCode SensorServiceStub::CreateSocketChannelInner(MessageParcel &data, MessageParcel &reply)
@@ -251,24 +251,24 @@ ErrCode SensorServiceStub::DestroySocketChannelInner(MessageParcel &data, Messag
     return ERR_OK;
 }
 
-ErrCode SensorServiceStub::EnableClientInfoCallbackInner(MessageParcel &data, MessageParcel &reply)
+ErrCode SensorServiceStub::EnableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
-    return EnableClientInfoCallback();
+    return EnableActiveInfoCB();
 }
 
-ErrCode SensorServiceStub::DisableClientInfoCallbackInner(MessageParcel &data, MessageParcel &reply)
+ErrCode SensorServiceStub::DisableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
-    return DisableClientInfoCallback();
+    return DisableActiveInfoCB();
 }
 }  // namespace Sensors
 }  // namespace OHOS
