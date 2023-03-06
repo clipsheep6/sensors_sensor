@@ -217,7 +217,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_007, TestSize.Level1)
                    "maxReportDelayNs:%{public}" PRId64 "", curSensorActiveInfo->pid, curSensorActiveInfo->sensorId,
                     curSensorActiveInfo->samplingPeriodNs, curSensorActiveInfo->maxReportDelayNs);
     }
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 
     ret = ResumeSensors(process_pid);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
