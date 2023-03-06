@@ -70,7 +70,6 @@ private:
     void HandleNetPacke(NetPacket &pkt);
     std::atomic_bool isConnected_ = false;
     CircleStreamBuffer circBuf_;
-
     std::mutex activeInfoCBMutex_;
     std::set<SensorActiveInfoCB> activeInfoCBSet_;
 };

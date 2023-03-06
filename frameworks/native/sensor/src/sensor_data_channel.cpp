@@ -17,14 +17,14 @@
 
 #include "errors.h"
 
-#include "client_info_file_descriptor_listener.h"
+#include "fd_listener.h"
 #include "sensor_file_descriptor_listener.h"
 #include "sensors_errors.h"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
-
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataChannel" };
 }  // namespace
@@ -110,7 +110,7 @@ int32_t SensorDataChannel::AddFdListener(int32_t fd, ReceiveMessageFun receiveMe
         CHKPR(myRunner, ERROR);
         eventHandler_ = std::make_shared<SensorEventHandler>(myRunner);
     }
-    auto listener = std::make_shared<ClientInfoFileDescriptorListener>();
+    auto listener = std::make_shared<FdListener>();
     listener->SetChannel(this);
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, AppExecFwk::FILE_DESCRIPTOR_INPUT_EVENT, listener);
     if (errCode != ERR_OK) {

@@ -718,13 +718,13 @@ bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
     std::lock_guard<std::mutex> channelLock(channelMutex_);
     auto channelIt = channelMap_.find(pid);
     if (channelIt != channelMap_.end()) {
-        SEN_HILOGD("pid exist in channelMap");
+        SEN_HILOGD("Pid exist in channelMap");
         return false;
     }
     std::lock_guard<std::mutex> activeInfoCBPidLock(activeInfoCBPidMutex_);
     auto pidIt = activeInfoCBPidSet_.find(pid);
     if (pidIt != activeInfoCBPidSet_.end()) {
-        SEN_HILOGD("pid exist in activeInfoCBPidSet");
+        SEN_HILOGD("Pid exist in activeInfoCBPidSet");
         return false;
     }
     return true;

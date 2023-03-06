@@ -32,7 +32,6 @@ class SensorDataChannel : public SensorBasicDataChannel {
 public:
     using ReceiveMessageFun = std::function<void(const char*, size_t)>;
     using DisconnectFun = std::function<void()>;
-
     SensorDataChannel() = default;
     ~SensorDataChannel();
     static int32_t HandleEvent(int32_t fd, int32_t events, void *data);
@@ -44,7 +43,6 @@ public:
     int32_t test = 10;
     DataChannelCB dataCB_ = nullptr;
     void *privateData_ = nullptr;
-
     int32_t AddFdListener(int32_t fd, ReceiveMessageFun receiveMessage, DisconnectFun disconnect);
     int32_t DelFdListener(int32_t fd);
     ReceiveMessageFun receiveMessage_;

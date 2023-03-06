@@ -26,7 +26,6 @@
 #include "permission_util.h"
 #include "securec.h"
 #include "sensor.h"
-#include "sensor_agent_type.h"
 #include "sensor_dump.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
@@ -366,7 +365,7 @@ void SensorService::ProcessDeathObserver(const wptr<IRemoteObject> &object)
         }
     }
     DelSession(pid);
-    clientInfo_.DelClientInfoCallbackPid(pid);
+    clientInfo_.DelActiveInfoCBPid(pid);
     clientInfo_.DestroySensorChannel(pid);
     clientInfo_.DestroyClientPid(client);
     clientInfo_.DestroyCmd(clientInfo_.GetUidByPid(pid));

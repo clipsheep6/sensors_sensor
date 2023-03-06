@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "client_info_file_descriptor_listener.h"
+#include "fd_listener.h"
 
 #include <cinttypes>
 
@@ -24,15 +24,15 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::AppExecFwk;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "ClientInfoFileDescriptorListener" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "FdListener" };
 }
 
-void ClientInfoFileDescriptorListener::SetChannel(SensorDataChannel *channel)
+void FdListener::SetChannel(SensorDataChannel *channel)
 {
     channel_ = channel;
 }
 
-void ClientInfoFileDescriptorListener::OnReadable(int32_t fd)
+void FdListener::OnReadable(int32_t fd)
 {
     if (fd < 0) {
         SEN_HILOGE("Invalid fd");
@@ -62,7 +62,7 @@ void ClientInfoFileDescriptorListener::OnReadable(int32_t fd)
     }
 }
 
-void ClientInfoFileDescriptorListener::OnShutdown(int32_t fd)
+void FdListener::OnShutdown(int32_t fd)
 {
     if (fd < 0) {
         SEN_HILOGE("Invalid fd");
@@ -70,7 +70,7 @@ void ClientInfoFileDescriptorListener::OnShutdown(int32_t fd)
     channel_->disconnect_();
 }
 
-void ClientInfoFileDescriptorListener::OnException(int32_t fd)
+void FdListener::OnException(int32_t fd)
 {
     if (fd < 0) {
         SEN_HILOGE("Invalid fd");

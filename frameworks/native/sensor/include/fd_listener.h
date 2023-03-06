@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CLIENT_INFO_FILE_DESCRIPTOR_LISTENER_H
-#define CLIENT_INFO_FILE_DESCRIPTOR_LISTENER_H
+#ifndef FD_LISTENER_H
+#define FD_LISTENER_H
 
 #include "file_descriptor_listener.h"
 
@@ -22,19 +22,19 @@
 
 namespace OHOS {
 namespace Sensors {
-class ClientInfoFileDescriptorListener : public AppExecFwk::FileDescriptorListener {
+class FdListener : public AppExecFwk::FileDescriptorListener {
 public:
-    ClientInfoFileDescriptorListener() = default;
-    ~ClientInfoFileDescriptorListener() override = default;
+    FdListener() = default;
+    ~FdListener() override = default;
     void OnReadable(int32_t fd) override;
     void OnShutdown(int32_t fd) override;
     void OnException(int32_t fd) override;
     void SetChannel(SensorDataChannel *channel);
-    DISALLOW_COPY_AND_MOVE(ClientInfoFileDescriptorListener);
+    DISALLOW_COPY_AND_MOVE(FdListener);
 
 private:
     SensorDataChannel *channel_ = nullptr;
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // CLIENT_INFO_FILE_DESCRIPTOR_LISTENER_H
+#endif  // FD_LISTENER_H
