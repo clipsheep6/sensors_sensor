@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -146,4 +146,81 @@ int32_t SetMode(int32_t sensorId, const SensorUser *user, int32_t mode)
         return SERVICE_EXCEPTION;
     }
     return proxy->SetMode(sensorId, user, mode);
+}
+
+int32_t SuspendSensors(int32_t pid)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("Proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->SuspendSensors(pid);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t ResumeSensors(int32_t pid)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("Proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->ResumeSensors(pid);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count)
+{
+    CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(count, OHOS::Sensors::ERROR);
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("Proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->GetSubscribeInfos(pid, subscribeSensorInfos, count);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Get subscribe Infos failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t RegisterClientInfoCallback(ClientInfoCallback callback)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->RegisterClientInfoCallback(callback);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t UnregisterClientInfoCallback(ClientInfoCallback callback)
+{
+    const SensorAgentProxy *proxy = GetInstance();
+    if (proxy == nullptr) {
+        SEN_HILOGE("proxy is nullptr");
+        return SERVICE_EXCEPTION;
+    }
+    int32_t ret = proxy->UnregisterClientInfoCallback(callback);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("Unregister client info callback failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return ret;
 }

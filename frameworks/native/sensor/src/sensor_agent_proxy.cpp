@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include <cstring>
 
 #include "securec.h"
+
 #include "sensor_service_client.h"
 #include "sensors_errors.h"
 
@@ -38,6 +39,8 @@ std::recursive_mutex SensorAgentProxy::subscribeMutex_;
 std::mutex SensorAgentProxy::chanelMutex_;
 std::mutex sensorInfoMutex_;
 SensorInfo *sensorInfos_ = nullptr;
+std::mutex subscribeSensorInfoMutex_;
+SubscribeSensorInfo *subscribeSensorInfos_ = nullptr;
 int32_t sensorInfoCount_ = 0;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_subscribeMap;
 std::map<int32_t, const SensorUser *> SensorAgentProxy::g_unsubscribeMap;
@@ -266,6 +269,10 @@ int32_t SensorAgentProxy::SetMode(int32_t sensorId, const SensorUser *user, int3
 
 void SensorAgentProxy::ClearSensorInfos() const
 {
+    if (subscribeSensorInfos_ != nullptr) {
+        free(subscribeSensorInfos_);
+        subscribeSensorInfos_ = nullptr;
+    }
     CHKPV(sensorInfos_);
     free(sensorInfos_);
     sensorInfos_ = nullptr;
@@ -328,6 +335,99 @@ int32_t SensorAgentProxy::GetAllSensors(SensorInfo **sensorInfo, int32_t *count)
     }
     *sensorInfo = sensorInfos_;
     *count = sensorInfoCount_;
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::SuspendSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid");
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.SuspendSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Suspend pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::ResumeSensors(int32_t pid) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid");
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.ResumeSensors(pid);
+    if (ret != 0) {
+        SEN_HILOGE("Resume pid sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t SensorAgentProxy::GetSubscribeInfos(int32_t pid, SubscribeSensorInfo **subscribeSensorInfos, int32_t *count) const
+{
+    CALL_LOG_ENTER;
+    if (pid < 0) {
+        SEN_HILOGE("Pid is invalid");
+        return PARAMETER_ERROR;
+    }
+    CHKPR(subscribeSensorInfos, OHOS::Sensors::ERROR);
+    CHKPR(count, OHOS::Sensors::ERROR);
+    std::lock_guard<std::mutex> subscribeSensorInfoLock(subscribeSensorInfoMutex_);
+    if (subscribeSensorInfos_ != nullptr) {
+        free(subscribeSensorInfos_);
+        subscribeSensorInfos_ = nullptr;
+    }
+    std::vector<SubscribeInfo> subscribeInfoList;
+    int32_t ret = SenClient.GetSubscribeInfoList(pid, subscribeInfoList);
+    if (ret != 0) {
+        SEN_HILOGE("Get subscribe info list failed, ret:%{public}d", ret);
+        return ERROR;
+    }
+    if (subscribeInfoList.empty()) {
+        SEN_HILOGE("Subscribe info list is empty");
+        return ERROR;
+    }
+    size_t subscribeInfoCount = subscribeInfoList.size();
+    if (subscribeInfoCount > MAX_SENSOR_LIST_SIZE) {
+        SEN_HILOGE("The number of subscribe info exceeds the maximum value, count:%{public}zu", subscribeInfoCount);
+        return ERROR;
+    }
+    subscribeSensorInfos_ = (SubscribeSensorInfo *)malloc(sizeof(SubscribeSensorInfo) * subscribeInfoCount);
+    CHKPR(subscribeSensorInfos_, ERROR);
+    for (size_t i = 0; i < subscribeInfoCount; ++i) {
+        SubscribeSensorInfo *curSubscribeInfo= subscribeSensorInfos_ + i;
+        curSubscribeInfo->pid = subscribeInfoList[i].GetPid();
+        curSubscribeInfo->sensorId = subscribeInfoList[i].GetSensorId();
+        curSubscribeInfo->isActive = subscribeInfoList[i].IsActive();
+        curSubscribeInfo->samplingPeriodNs = subscribeInfoList[i].GetSamplingPeriodNs();
+        curSubscribeInfo->maxReportDelayNs = subscribeInfoList[i].GetMaxReportDelayNs();
+    }
+    *subscribeSensorInfos = subscribeSensorInfos_;
+    *count = static_cast<int32_t>(subscribeInfoCount);
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::RegisterClientInfoCallback(ClientInfoCallback callback) const
+{
+    CHKPR(callback, OHOS::Sensors::ERROR);
+    CHKPR(dataChannel_, INVALID_POINTER);
+    int32_t ret = SenClient.RegisterClientInfoCallback(callback, dataChannel_);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Register client info callback failed, ret:%{public}d", ret);
+    }
+    return SUCCESS;
+}
+
+int32_t SensorAgentProxy::UnregisterClientInfoCallback(ClientInfoCallback callback) const
+{
+    CHKPR(callback, OHOS::Sensors::ERROR);
+    int32_t ret = SenClient.UnregisterClientInfoCallback(callback);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Unregister client info callback failed, ret:%{public}d, ret", ret);
+    }
     return SUCCESS;
 }
 }  // namespace Sensors

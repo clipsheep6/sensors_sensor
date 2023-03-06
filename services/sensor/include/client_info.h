@@ -19,6 +19,7 @@
 #include <map>
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "refbase.h"
@@ -75,6 +76,11 @@ public:
     int32_t GetUidByPid(int32_t pid);
     AccessTokenID GetTokenIdByPid(int32_t pid);
 
+    int32_t AddClientInfoCallbackPid(int32_t pid);
+    int32_t DelClientInfoCallbackPid(int32_t pid);
+    std::unordered_set<int32_t> GetClientInfoCallbackPidSet();
+    bool IsUnregisterClientDeathRecipient(int32_t pid);
+
 private:
     DISALLOW_COPY_AND_MOVE(ClientInfo);
     std::vector<int32_t> GetCmdList(int32_t sensorId, int32_t uid);
@@ -92,6 +98,9 @@ private:
     std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
     std::unordered_map<int32_t, std::unordered_map<int32_t, std::vector<int32_t>>> cmdMap_;
     std::unordered_map<int32_t, std::queue<SensorData>> dumpQueue_;
+
+    std::mutex clientInfoCallbackMutex_;
+    std::unordered_set<int32_t> clientInfoCallbackPidSet_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
