@@ -450,7 +450,8 @@ ErrCode SensorService::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &a
         SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
-    return suspendPolicy_.GetActiveInfoList(pid, activeInfoList);
+    suspendPolicy_.GetActiveInfoList(pid, activeInfoList);
+    return ERR_OK;
 }
 
 ErrCode SensorService::CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient)

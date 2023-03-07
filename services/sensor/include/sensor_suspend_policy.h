@@ -22,13 +22,12 @@
 
 #include "nocopyable.h"
 
+#include "active_info.h"
 #include "client_info.h"
-#include "sensor_agent_type.h"
 #include "sensor_hdi_connection.h"
 #include "sensor_manager.h"
 #include "sensors_errors.h"
 #include "stream_session.h"
-#include "active_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -36,17 +35,15 @@ class SensorSuspendPolicy : public Singleton<SensorSuspendPolicy>{
 public:
     ErrCode SuspendSensors(int32_t pid);
     ErrCode ResumeSensors(int32_t pid);
-    ErrCode GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList);
+    void GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList);
     void ReportActiveInfo(ActiveInfo activeInfo, const std::vector<SessionPtr> &sessionList);
 
 private:
     bool CheckFreezingSensor(int32_t sensorId);
-    bool DisableSensorList(std::unordered_map<int32_t, SensorBasicInfo> &SensorInfoMap,
-                           std::vector<int32_t> &sensorIdList, int32_t pid);
-    ErrCode DisableSensor(std::unordered_map<int32_t, SensorBasicInfo> &SensorInfoMap,
-                          int32_t sensorId, int32_t pid);
-    ErrCode EnableSensor(int32_t sensorId, int32_t pid, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
-    ErrCode RestoreSensorInfo(int32_t sensorId, int32_t pid, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
+    bool Suspend(std::unordered_map<int32_t, SensorBasicInfo> &SensorInfoMap,
+                 std::vector<int32_t> &sensorIdList, int32_t pid);
+    bool Resume(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
+    ErrCode RestoreSensorInfo(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
     SensorHdiConnection &sensorHdiConnection_ = SensorHdiConnection::GetInstance();
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
     SensorManager &sensorManager_ = SensorManager::GetInstance();
