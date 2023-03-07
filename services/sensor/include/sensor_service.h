@@ -28,8 +28,8 @@
 #include "sensor_data_event.h"
 #include "sensor_hdi_connection.h"
 #include "sensor_manager.h"
+#include "sensor_power_policy.h"
 #include "sensor_service_stub.h"
-#include "sensor_suspend_policy.h"
 #include "stream_server.h"
 
 namespace OHOS {
@@ -85,7 +85,7 @@ private:
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
     SensorManager &sensorManager_ = SensorManager::GetInstance();
     FlushInfoRecord &flushInfo_ = FlushInfoRecord::GetInstance();
-    SensorSuspendPolicy &suspendPolicy_ = SensorSuspendPolicy::GetInstance();
+    SensorPowerPolicy &sensorPowerPolicy_ = SensorPowerPolicy::GetInstance();
     sptr<SensorDataProcesser> sensorDataProcesser_ = nullptr;
     sptr<ReportDataCallback> reportDataCallback_ = nullptr;
     std::mutex uidLock_;

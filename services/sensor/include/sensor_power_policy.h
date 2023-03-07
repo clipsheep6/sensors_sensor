@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_SUSPEND_POLICY_H
-#define SENSOR_SUSPEND_POLICY_H
+#ifndef SENSOR_POWER_POLICY_H
+#define SENSOR_POWER_POLICY_H
 
 #include <mutex>
 #include <unordered_map>
@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace Sensors {
-class SensorSuspendPolicy : public Singleton<SensorSuspendPolicy>{
+class SensorPowerPolicy : public Singleton<SensorPowerPolicy>{
 public:
     ErrCode SuspendSensors(int32_t pid);
     ErrCode ResumeSensors(int32_t pid);
@@ -52,4 +52,4 @@ private:
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif // SENSOR_SUSPEND_POLICY_H
+#endif // SENSOR_POWER_POLICY_H

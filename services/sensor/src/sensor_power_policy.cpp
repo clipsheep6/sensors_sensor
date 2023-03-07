@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sensor_suspend_policy.h"
+#include "sensor_power_policy.h"
 
 #include "sensor.h"
 #include "sensor_agent_type.h"
@@ -23,17 +23,17 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorSuspendPolicy" };
+constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorPowerPolicy" };
 constexpr int32_t INVALID_SENSOR_ID = -1;
 constexpr int64_t MAX_EVENT_COUNT = 1000;
 }  // namespace
 
-bool SensorSuspendPolicy::CheckFreezingSensor(int32_t sensorId)
+bool SensorPowerPolicy::CheckFreezingSensor(int32_t sensorId)
 {
     return ((sensorId == SENSOR_TYPE_ID_PEDOMETER_DETECTION) || (sensorId == SENSOR_TYPE_ID_PEDOMETER));
 }
 
-ErrCode SensorSuspendPolicy::SuspendSensors(int32_t pid)
+ErrCode SensorPowerPolicy::SuspendSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
@@ -67,7 +67,7 @@ ErrCode SensorSuspendPolicy::SuspendSensors(int32_t pid)
     return ERR_OK;
 }
 
-bool SensorSuspendPolicy::Suspend(std::unordered_map<int32_t, SensorBasicInfo> &SensorInfoMap,
+bool SensorPowerPolicy::Suspend(std::unordered_map<int32_t, SensorBasicInfo> &SensorInfoMap,
                                   std::vector<int32_t> &sensorIdList, int32_t pid)
 {
     CALL_LOG_ENTER;
@@ -94,7 +94,7 @@ bool SensorSuspendPolicy::Suspend(std::unordered_map<int32_t, SensorBasicInfo> &
     return isAllSuspend;
 }
 
-ErrCode SensorSuspendPolicy::ResumeSensors(int32_t pid)
+ErrCode SensorPowerPolicy::ResumeSensors(int32_t pid)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> pidSensorInfoLock(pidSensorInfoMutex_);
@@ -125,7 +125,7 @@ ErrCode SensorSuspendPolicy::ResumeSensors(int32_t pid)
     return ERR_OK;
 }
 
-bool SensorSuspendPolicy::Resume(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs,
+bool SensorPowerPolicy::Resume(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs,
                                     int64_t maxReportDelayNs)
 {
     CALL_LOG_ENTER;
@@ -157,7 +157,7 @@ bool SensorSuspendPolicy::Resume(int32_t pid, int32_t sensorId, int64_t sampling
     return true;
 }
 
-ErrCode SensorSuspendPolicy::RestoreSensorInfo(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs,
+ErrCode SensorPowerPolicy::RestoreSensorInfo(int32_t pid, int32_t sensorId, int64_t samplingPeriodNs,
                                                int64_t maxReportDelayNs)
 {
     CALL_LOG_ENTER;
@@ -175,7 +175,7 @@ ErrCode SensorSuspendPolicy::RestoreSensorInfo(int32_t pid, int32_t sensorId, in
     return ERR_OK;
 }
 
-void SensorSuspendPolicy::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
+void SensorPowerPolicy::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> sensorIdList = clientInfo_.GetSensorIdByPid(pid);
@@ -187,7 +187,7 @@ void SensorSuspendPolicy::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo>
     }
 }
 
-void SensorSuspendPolicy::ReportActiveInfo(ActiveInfo activeInfo,
+void SensorPowerPolicy::ReportActiveInfo(ActiveInfo activeInfo,
                                            const std::vector<SessionPtr> &sessionList)
 {
     CALL_LOG_ENTER;

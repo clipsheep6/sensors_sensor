@@ -430,7 +430,7 @@ ErrCode SensorService::SuspendSensors(int32_t pid)
         SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
-    return suspendPolicy_.SuspendSensors(pid);
+    return sensorPowerPolicy_.SuspendSensors(pid);
 }
 
 ErrCode SensorService::ResumeSensors(int32_t pid)
@@ -440,7 +440,7 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
         SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
-    return suspendPolicy_.ResumeSensors(pid);
+    return sensorPowerPolicy_.ResumeSensors(pid);
 }
 
 ErrCode SensorService::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
@@ -450,7 +450,7 @@ ErrCode SensorService::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &a
         SEN_HILOGE("Pid is invalid");
         return CLIENT_PID_INVALID_ERR;
     }
-    suspendPolicy_.GetActiveInfoList(pid, activeInfoList);
+    sensorPowerPolicy_.GetActiveInfoList(pid, activeInfoList);
     return ERR_OK;
 }
 
@@ -510,7 +510,7 @@ void SensorService::ReportActiveInfo(int32_t sensorId, int32_t pid)
     SensorBasicInfo sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, pid);
     ActiveInfo activeInfo(pid, sensorId, sensorInfo.GetSamplingPeriodNs(),
                           sensorInfo.GetMaxReportDelayNs());
-    suspendPolicy_.ReportActiveInfo(activeInfo, sessionList);
+    sensorPowerPolicy_.ReportActiveInfo(activeInfo, sessionList);
 }
 }  // namespace Sensors
 }  // namespace OHOS
