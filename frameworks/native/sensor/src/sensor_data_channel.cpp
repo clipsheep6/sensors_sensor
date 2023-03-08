@@ -80,18 +80,8 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
 
 int32_t SensorDataChannel::DestroySensorDataChannel()
 {
-    std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
-    CHKPL(eventHandler_);
     int32_t receiveFd = GetReceiveDataFd();
-    eventHandler_->RemoveFileDescriptorListener(receiveFd);
-    auto it = listenedFdSet_.find(receiveFd);
-    if (it != listenedFdSet_.end()) {
-        listenedFdSet_.erase(it);
-    }
-    if (listenedFdSet_.empty() && eventHandler_ != nullptr) {
-        eventHandler_ = nullptr;
-        SEN_HILOGD("Set eventHandler_ nullptr");
-    }
+    DelFdListener(receiveFd);
     return DestroySensorBasicChannel();
 }
 
