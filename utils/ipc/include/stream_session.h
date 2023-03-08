@@ -17,8 +17,8 @@
 #define STREAM_SESSION_H
 
 #include <list>
-#include <memory>
 #include <map>
+#include <memory>
 
 #include <sys/socket.h>
 #include <sys/un.h>
