@@ -38,9 +38,9 @@ void FdListener::OnReadable(int32_t fd)
         SEN_HILOGE("Invalid fd");
         return;
     }
-    char szBuf[PROTO_MAX_PACKET_BUF_SIZE] = {};
-    for (int32_t i = 0; i < PROTO_MAX_RECV_LIMIT; i++) {
-        ssize_t size = recv(fd, szBuf, PROTO_MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    for (size_t i = 0; i < MAX_RECV_LIMIT; i++) {
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             channel_->receiveMessage_(szBuf, size);
         } else if (size < 0) {
@@ -56,7 +56,7 @@ void FdListener::OnReadable(int32_t fd)
                        i, errno);
             break;
         }       
-        if (size < PROTO_MAX_PACKET_BUF_SIZE) {
+        if (size < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }

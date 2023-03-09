@@ -20,23 +20,16 @@
 
 namespace OHOS {
 namespace Sensors {
-#define PROTO_SEND_RETRY_LIMIT 32
-#define PROTO_SEND_RETRY_SLEEP_TIME 10000
+#define SEND_RETRY_LIMIT 32
+#define SEND_RETRY_SLEEP_TIME 10000
 
-static const int32_t PROTO_STREAM_BUF_READ_FAIL = 1;
-static const int32_t PROTO_STREAM_BUF_WRITE_FAIL = 2;
-static const int32_t PROTO_MEM_OUT_OF_BOUNDS = 3;
-static const int32_t PROTO_MEMCPY_SEC_FUN_FAIL = 4;
-static const int32_t PROTO_PARAM_INPUT_INVALID = 5;
-static const int32_t PROTO_SESSION_NOT_FOUND = 8;
-static const int32_t PROTO_MAX_VECTOR_SIZE = 10;
-static const int32_t PROTO_ADD_SESSION_FAIL = 11;
-static const int32_t PROTO_MAX_SESSON_ALARM = 12;
-static const int32_t PROTO_MAX_RECV_LIMIT = 13;
 
-static const int32_t PROTO_MAX_STREAM_BUF_SIZE = 256;
-static const int32_t PROTO_MAX_PACKET_BUF_SIZE = 256;
-static const int32_t PROTO_ONCE_PROCESS_NETPACKET_LIMIT = 100;
+static const size_t MAX_VECTOR_SIZE = 10;
+static const size_t MAX_SESSON_ALARM = 100;
+static const size_t MAX_RECV_LIMIT = 13;
+static const size_t MAX_STREAM_BUF_SIZE = 256;
+static const size_t MAX_PACKET_BUF_SIZE = 256;
+static const size_t ONCE_PROCESS_NETPACKET_LIMIT = 100;
 
 enum class MessageId : int32_t {
     INVALID,

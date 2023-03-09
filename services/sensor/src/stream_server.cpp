@@ -49,7 +49,7 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        SEN_HILOGE("Fd not found, The message was discarded. errCode:%{public}d", PROTO_SESSION_NOT_FOUND);
+        SEN_HILOGE("Fd not found, The message was discarded.");
         return false;
     }
     return ses->SendMsg(pkt);
@@ -155,7 +155,7 @@ int32_t StreamServer::AddSocketPairInfo(int32_t uid, int32_t pid, int32_t tokenT
     sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
-        SEN_HILOGE("AddSession fail errCode:%{public}d", PROTO_ADD_SESSION_FAIL);
+        SEN_HILOGE("AddSession fail");
         goto CLOSE_SOCK;
     }
     return ERR_OK;
@@ -182,9 +182,9 @@ bool StreamServer::AddSession(SessionPtr ses)
         SEN_HILOGE("Get process failed");
         return false;
     }
-    if (sessionsMap_.size() > PROTO_MAX_SESSON_ALARM) {
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
         SEN_HILOGE("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
-            PROTO_MAX_SESSON_ALARM, sessionsMap_.size());
+            MAX_SESSON_ALARM, sessionsMap_.size());
         return false;
     }
     DelSession(pid);

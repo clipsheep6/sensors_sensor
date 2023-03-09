@@ -37,7 +37,7 @@ public:
     virtual ~StreamBuffer() = default;
     void Reset();
     void Clean();
-    bool SeekReadPos(int32_t n);
+    bool SeekReadPos(size_t n);
     bool Read(std::string &buf);
     bool Read(StreamBuffer &buf);
     bool Read(char *buf, size_t size);
@@ -47,8 +47,8 @@ public:
     bool IsEmpty() const;
     bool ChkRWError() const;
     size_t Size() const;
-    int32_t UnreadSize() const;
-    int32_t GetAvailableBufSize() const;
+    size_t UnreadSize() const;
+    size_t GetAvailableBufSize() const;
     const std::string& GetErrorStatusRemark() const;
     const char* Data() const;
 
@@ -76,19 +76,19 @@ protected:
         ERROR_STATUS_WRITE,
     };
     ErrorStatus rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    int32_t rCount_ { 0 };
-    int32_t wCount_ { 0 };
-    int32_t rPos_ { 0 };
-    int32_t wPos_ { 0 };
-    char szBuff_[PROTO_MAX_STREAM_BUF_SIZE + 1] = {};
+    size_t rCount_ { 0 };
+    size_t wCount_ { 0 };
+    size_t rPos_ { 0 };
+    size_t wPos_ { 0 };
+    char szBuff_[MAX_STREAM_BUF_SIZE + 1] = {};
 };
 
 template<typename T>
 bool StreamBuffer::Read(T &data)
 {
     if (!Read(reinterpret_cast<char *>(&data), sizeof(data))) {
-        SEN_HILOGE("[%{public}s] size:%{public}zu count:%{public}d,errCode:%{public}d",
-            GetErrorStatusRemark().c_str(), sizeof(data), rCount_ + 1, PROTO_STREAM_BUF_READ_FAIL);
+        SEN_HILOGE("%{public}s, size:%{public}zu, count:%{public}zu",
+            GetErrorStatusRemark().c_str(), sizeof(data), rCount_ + 1);
         return false;
     }
     return true;
@@ -98,8 +98,8 @@ template<typename T>
 bool StreamBuffer::Write(const T &data)
 {
     if (!Write(reinterpret_cast<const char *>(&data), sizeof(data))) {
-        SEN_HILOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
-            GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1, PROTO_STREAM_BUF_WRITE_FAIL);
+        SEN_HILOGE("%{public}s, size:%{public}zu, count:%{public}zu",
+            GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1);
         return false;
     }
     return true;
@@ -108,19 +108,19 @@ bool StreamBuffer::Write(const T &data)
 template<typename T>
 bool StreamBuffer::Read(std::vector<T> &data)
 {
-    int32_t size = 0;
+    size_t size = 0;
     if (!Read(size)) {
-        SEN_HILOGE("Read vector size error");
+        SEN_HILOGE("Read vector size failed");
         return false;
     }
-    if (size < 0 || size > PROTO_MAX_VECTOR_SIZE) {
-        SEN_HILOGE("Read vector size:%{public}d error", size);
+    if (size > MAX_VECTOR_SIZE) {
+        SEN_HILOGE("Vector size is invalid, size:%{public}zu", size);
         return false;
     }
-    for (int32_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         T val;
         if (!Read(val)) {
-            SEN_HILOGE("Read vector data error");
+            SEN_HILOGE("Read vector data failed");
             return false;
         }
         data.push_back(val);
@@ -135,14 +135,14 @@ bool StreamBuffer::Write(const std::vector<T> &data)
         SEN_HILOGE("Vector exceeds the max range");
         return false;
     }
-    int32_t size = static_cast<int32_t>(data.size());
+    size_t size = data.size();
     if (!Write(size)) {
-        SEN_HILOGE("Write vector size error");
+        SEN_HILOGE("Write vector size failed");
         return false;
     }
     for (const auto &item : data) {
         if (!Write(item)) {
-            SEN_HILOGE("Write vector data error");
+            SEN_HILOGE("Write vector data failed");
             return false;
         }
     }

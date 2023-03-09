@@ -47,7 +47,7 @@ StreamSession::StreamSession(const std::string &programName, const int32_t modul
 bool StreamSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    if ((size == 0) || (size > PROTO_MAX_PACKET_BUF_SIZE)) {
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
         SEN_HILOGE("Buf size:%{public}zu", size);
         return false;
     }
@@ -55,17 +55,15 @@ bool StreamSession::SendMsg(const char *buf, size_t size) const
         SEN_HILOGE("The fd_ is less than 0");
         return false;
     }
-
-    int32_t idx = 0;
-    int32_t retryCount = 0;
-    const int32_t bufSize = static_cast<int32_t>(size);
-    int32_t remSize = bufSize;
-    while (remSize > 0 && retryCount < PROTO_SEND_RETRY_LIMIT) {
+    size_t idx = 0;
+    size_t retryCount = 0;
+    size_t remSize = size;
+    while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                usleep(PROTO_SEND_RETRY_SLEEP_TIME);
+                usleep(SEND_RETRY_SLEEP_TIME);
                 SEN_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
@@ -75,12 +73,12 @@ bool StreamSession::SendMsg(const char *buf, size_t size) const
         idx += count;
         remSize -= count;
         if (remSize > 0) {
-            usleep(PROTO_SEND_RETRY_SLEEP_TIME);
+            usleep(SEND_RETRY_SLEEP_TIME);
         }
     }
-    if (retryCount >= PROTO_SEND_RETRY_LIMIT || remSize != 0) {
-        SEN_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            retryCount, PROTO_SEND_RETRY_LIMIT, idx, bufSize, fd_);
+    if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
+        SEN_HILOGE("Send too many times:%{public}zu/%{public}zu, size:%{public}zu/%{public}zu, fd:%{public}d",
+            retryCount, SEND_RETRY_LIMIT, idx, size, fd_);
         return false;
     }
     return true;
@@ -88,7 +86,6 @@ bool StreamSession::SendMsg(const char *buf, size_t size) const
 
 void StreamSession::Close()
 {
-    SEN_HILOGD("Enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -113,7 +110,7 @@ void StreamSession::UpdateDescript()
 bool StreamSession::SendMsg(NetPacket &pkt) const
 {
     if (pkt.ChkRWError()) {
-        SEN_HILOGE("Read and write status is error");
+        SEN_HILOGE("Read and write status failed");
         return false;
     }
     StreamBuffer buf;

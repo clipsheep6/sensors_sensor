@@ -333,7 +333,7 @@ int32_t SensorServiceClient::UnregisterSensorActiveInfoCB(SensorActiveInfoCB cal
 void SensorServiceClient::ReceiveMessage(const char *buf, size_t size)
 {
     CHKPV(buf);
-    if (size == 0 || size > PROTO_MAX_PACKET_BUF_SIZE) {
+    if (size == 0 || size > MAX_PACKET_BUF_SIZE) {
         SEN_HILOGE("Invalid input param size. size:%{public}zu", size);
         return;
     }

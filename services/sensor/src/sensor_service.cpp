@@ -390,7 +390,7 @@ void SensorService::UnregisterClientDeathRecipient(sptr<IRemoteObject> sensorCli
         return;
     }
     if (!clientInfo_.IsUnregisterClientDeathRecipient(pid)) {
-        SEN_HILOGD("Client call other service, not need unregister client death recipient");
+        SEN_HILOGD("Client call other service, can not unregister client death recipient");
         return;
     }
     sptr<ISensorClient> client = iface_cast<ISensorClient>(sensorClient);

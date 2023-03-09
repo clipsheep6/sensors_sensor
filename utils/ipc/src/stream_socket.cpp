@@ -64,7 +64,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
         ret = epoll_ctl(epollFd, op, fd, &event);
     }
     if (ret < 0) {
-        SEN_HILOGE("Epoll_ctl return %{public}d,epollFd_:%{public}d, op:%{public}d,fd:%{public}d,errno:%{public}d",
+        SEN_HILOGE("Epoll_ctl ret:%{public}d, epollFd_:%{public}d, op:%{public}d, fd:%{public}d, errno:%{public}d",
             ret, epollFd, op, fd, errno);
     }
     return ret;
@@ -81,27 +81,27 @@ int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, i
     }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        SEN_HILOGE("Epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
+        SEN_HILOGE("Epoll_wait ret:%{public}d, errno:%{public}d", ret, errno);
     }
     return ret;
 }
 
 void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::PacketCallBackFun callbackFun)
 {
-    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    for (int32_t i = 0; i < PROTO_ONCE_PROCESS_NETPACKET_LIMIT; i++) {
-        const int32_t unreadSize = circBuf.UnreadSize();
+    constexpr size_t headSize = sizeof(PackHead);
+    for (size_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+        const size_t unreadSize = circBuf.UnreadSize();
         if (unreadSize < headSize) {
             break;
         }
-        int32_t dataSize = unreadSize - headSize;
+        size_t dataSize = unreadSize - headSize;
         char *buf = const_cast<char *>(circBuf.ReadBuf());
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (head->size < 0 || head->size > PROTO_MAX_PACKET_BUF_SIZE) {
+        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
             SEN_HILOGE("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
-                " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+                " head->size:%{public}zu, unreadSize:%{public}zu", head->size, unreadSize);
             circBuf.Reset();
             break;
         }
@@ -111,12 +111,12 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         NetPacket pkt(head->idMsg);
         if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
             SEN_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid:%{public}d,"
-                "size:%{public}d", head->idMsg, head->size);
+                "size:%{public}zu", head->idMsg, head->size);
             break;
         }
         if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
             SEN_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
-                " packetSize:%{public}d unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+                " packetSize:%{public}zu, unreadSize:%{public}zu", pkt.GetPacketLength(), unreadSize);
             circBuf.Reset();
             break;
         }
@@ -141,7 +141,7 @@ void StreamSocket::Close()
     if (fd_ >= 0) {
         auto rf = close(fd_);
         if (rf > 0) {
-            SEN_HILOGE("Socket close failed rf:%{public}d", rf);
+            SEN_HILOGE("Socket close failed, rf:%{public}d", rf);
         }
     }
     fd_ = -1;
