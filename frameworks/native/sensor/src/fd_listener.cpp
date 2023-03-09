@@ -52,7 +52,7 @@ void FdListener::OnReadable(int32_t fd)
             SEN_HILOGE("Recv return %{public}zu, errno:%{public}d", size, errno);
             break;
         } else {
-            SEN_HILOGD("The service side disconnect with the client. size:0, count:%{public}d, errno:%{public}d",
+            SEN_HILOGD("The service side disconnect with the client. size:0, count:%{public}zu, errno:%{public}d",
                        i, errno);
             break;
         }       
