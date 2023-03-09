@@ -20,10 +20,8 @@
 
 namespace OHOS {
 namespace Sensors {
-#define SEND_RETRY_LIMIT 32
-#define SEND_RETRY_SLEEP_TIME 10000
-
-
+static const size_t SEND_RETRY_LIMIT = 32;
+static const size_t SEND_RETRY_SLEEP_TIME = 10000;
 static const size_t MAX_VECTOR_SIZE = 10;
 static const size_t MAX_SESSON_ALARM = 100;
 static const size_t MAX_RECV_LIMIT = 13;
