@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef PERMISSION_UTIL_H
-#define PERMISSION_UTIL_H
+#ifndef FD_LISTENER_H
+#define FD_LISTENER_H
 
-#include <string>
-#include <unordered_map>
+#include "file_descriptor_listener.h"
 
-#include "access_token.h"
-#include "singleton.h"
+#include "sensor_data_channel.h"
 
 namespace OHOS {
 namespace Sensors {
-using namespace Security::AccessToken;
-class PermissionUtil : public Singleton<PermissionUtil> {
+class FdListener : public AppExecFwk::FileDescriptorListener {
 public:
-    PermissionUtil() = default;
-    virtual ~PermissionUtil() {};
-    int32_t CheckSensorPermission(AccessTokenID callerToken, int32_t sensorTypeId);
+    FdListener() = default;
+    ~FdListener() override = default;
+    void OnReadable(int32_t fd) override;
+    void OnShutdown(int32_t fd) override;
+    void OnException(int32_t fd) override;
+    void SetChannel(SensorDataChannel *channel);
+    DISALLOW_COPY_AND_MOVE(FdListener);
 
 private:
-    void AddPermissionRecord(AccessTokenID tokenID, const std::string& permissionName, bool status);
-    static std::unordered_map<int32_t, std::string> sensorPermissions_;
+    SensorDataChannel *channel_ = nullptr;
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // PERMISSION_UTIL_H
+#endif  // FD_LISTENER_H
