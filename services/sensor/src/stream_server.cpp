@@ -110,7 +110,6 @@ int32_t StreamServer::AddSocketPairInfo(int32_t uid, int32_t pid, int32_t tokenT
 {
     CALL_LOG_ENTER;
     std::string programName = "";
-    int32_t moduleType = 0;
     int32_t sockFds[2] = { -1 };
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         SEN_HILOGE("Call socketpair failed, errno:%{public}d", errno);
@@ -152,7 +151,7 @@ int32_t StreamServer::AddSocketPairInfo(int32_t uid, int32_t pid, int32_t tokenT
             goto CLOSE_SOCK;
         }
     }
-    sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
+    sess = std::make_shared<StreamSession>(programName, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
         SEN_HILOGE("AddSession fail");

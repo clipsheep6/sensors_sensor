@@ -33,10 +33,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "StreamSession" };
 }
 
-StreamSession::StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
-    const int32_t uid, const int32_t pid)
+StreamSession::StreamSession(const std::string &programName, const int32_t fd, const int32_t uid, const int32_t pid)
     : programName_(programName),
-      moduleType_(moduleType),
       fd_(fd),
       uid_(uid),
       pid_(pid)
@@ -98,7 +96,6 @@ void StreamSession::UpdateDescript()
     std::ostringstream oss;
     oss << "fd = " << fd_
         << ", programName = " << programName_
-        << ", moduleType = " << moduleType_
         << ((fd_ < 0) ? ", closed" : ", opened")
         << ", uid = " << uid_
         << ", pid = " << pid_
@@ -126,11 +123,6 @@ int32_t StreamSession::GetUid() const
 int32_t StreamSession::GetPid() const
 {
     return pid_;
-}
-
-int32_t StreamSession::GetModuleType() const
-{
-    return moduleType_;
 }
 
 SessionPtr StreamSession::GetSharedPtr()
