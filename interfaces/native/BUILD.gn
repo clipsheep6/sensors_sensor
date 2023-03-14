@@ -17,7 +17,7 @@ SUBSYSTEM_DIR = "//base/sensors/sensor"
 
 ##############################################
 ohos_ndk_library("libsensor_ndk") {
-  output_name = "sensor"
+  output_name = "sensor_ndk"
   ndk_description_file = "./libsensor.json"
   min_compact_version = "6"
 }
