@@ -14,10 +14,12 @@
  */
 
 #include "sensoragent_fuzzer.h"
+
+#include "securec.h"
+#include <thread>
+
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
-#include <unistd.h>
-#include <thread>
 
 void SensorDataCallbackImpl(SensorEvent *event)
 {
@@ -45,6 +47,9 @@ bool CheckSensorTypeId(int32_t sensorTypeId)
 
 bool SensorAgentFuzzTest(const uint8_t* data, size_t size)
 {
+    if (data == nullptr || size < sizeof(int32_t)) {
+        return false;
+    }
     intptr_t sensorTypeId = reinterpret_cast<intptr_t>(data);
     bool validSensorId = CheckSensorTypeId(sensorTypeId);
     SensorUser user;
