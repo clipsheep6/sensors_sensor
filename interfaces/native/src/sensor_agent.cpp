@@ -35,6 +35,7 @@ static const SensorAgentProxy *GetInstance()
 
 static int32_t NormalizeErrCode(int32_t code)
 {
+    SEN_HILOGE("NormalizeErrCode");
     switch (code) {
         case PERMISSION_DENIED: {
             return PERMISSION_DENIED;
