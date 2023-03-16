@@ -75,7 +75,7 @@ bool StreamBuffer::Read(std::string &buf)
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    return Write(buf.c_str(), buf.length()+1);
+    return Write(buf.c_str(), buf.length() + 1);
 }
 
 bool StreamBuffer::Read(StreamBuffer &buf)
@@ -115,7 +115,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         return false;
     }
     rPos_ += size;
-    rCount_ += 1;
+    ++rCount_;
     return true;
 }
 
@@ -147,7 +147,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         return false;
     }
     wPos_ += size;
-    wCount_ += 1;
+    ++wCount_;
     return true;
 }
 
