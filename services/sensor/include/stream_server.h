@@ -19,15 +19,12 @@
 #include <map>
 #include <mutex>
 
-#include "nocopyable.h"
-#include "refbase.h"
-
 #include "stream_session.h"
 #include "stream_socket.h"
 
 namespace OHOS {
 namespace Sensors {
-class StreamServer : public RefBase, public StreamSocket {
+class StreamServer : public StreamSocket {
 public:
     StreamServer() = default;
     virtual ~StreamServer();
@@ -38,7 +35,6 @@ public:
     SessionPtr GetSession(int32_t fd);
     SessionPtr GetSessionByPid(int32_t pid);
     int32_t AddSocketPairInfo(int32_t uid, int32_t pid, int32_t tokenType, int32_t &serverFd, int32_t &clientFd);
-    DISALLOW_COPY_AND_MOVE(StreamServer);
 
 protected:
     bool AddSession(SessionPtr ses);

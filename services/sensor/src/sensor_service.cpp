@@ -512,6 +512,8 @@ void SensorService::ReportActiveInfo(int32_t sensorId, int32_t pid)
     ActiveInfo activeInfo(pid, sensorId, sensorInfo.GetSamplingPeriodNs(),
                           sensorInfo.GetMaxReportDelayNs());
     sensorPowerPolicy_.ReportActiveInfo(activeInfo, sessionList);
+}
+
 bool SensorService::RegisterPermCallback()
 {
     Security::AccessToken::PermStateChangeScope scope = {
