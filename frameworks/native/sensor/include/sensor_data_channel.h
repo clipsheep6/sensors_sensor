@@ -16,14 +16,14 @@
 #ifndef SENSOR_DATA_CHANNEL_H
 #define SENSOR_DATA_CHANNEL_H
 
-#include <memory>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <unordered_set>
 
 #include "sensor_agent_type.h"
-#include "sensor_event_handler.h"
 #include "sensor_basic_data_channel.h"
+#include "sensor_event_handler.h"
 
 namespace OHOS {
 namespace Sensors {

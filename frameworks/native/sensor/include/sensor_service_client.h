@@ -37,7 +37,7 @@ namespace OHOS {
 namespace Sensors {
 class SensorServiceClient : public StreamSocket, public Singleton<SensorServiceClient> {
 public:
-    ~SensorServiceClient();
+    ~SensorServiceClient() override;
     std::vector<Sensor> GetSensorList();
     int32_t EnableSensor(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
     int32_t DisableSensor(int32_t sensorId);
@@ -57,6 +57,8 @@ private:
     int32_t InitServiceClient();
     void UpdateSensorInfoMap(int32_t sensorId, int64_t samplingPeriod, int64_t maxReportDelay);
     void DeleteSensorInfoItem(int32_t sensorId);
+    int32_t CreateSocketChannel();
+    void HandleNetPacke(NetPacket &pkt);
     std::mutex clientMutex_;
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_;
     sptr<ISensorService> sensorServer_;
@@ -65,9 +67,6 @@ private:
     sptr<SensorClientStub> sensorClientStub_;
     std::mutex mapMutex_;
     std::map<int32_t, SensorBasicInfo> sensorInfoMap_;
-
-    int32_t CreateSocketChannel();
-    void HandleNetPacke(NetPacket &pkt);
     std::atomic_bool isConnected_ = false;
     CircleStreamBuffer circBuf_;
     std::mutex activeInfoCBMutex_;
