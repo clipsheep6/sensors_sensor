@@ -18,6 +18,7 @@
 
 #include <map>
 #include <queue>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -79,6 +80,9 @@ public:
     int32_t DelActiveInfoCBPid(int32_t pid);
     std::unordered_set<int32_t> GetActiveInfoCBPid();
     bool IsUnregisterClientDeathRecipient(int32_t pid);
+    int32_t GetPidByTokenId(AccessTokenID tokenId);
+    void UpdatePermState(int32_t pid, int32_t sensorId, bool state);
+    void ChangeSensorPerm(AccessTokenID tokenId, const std::string &permName, bool state);
 
 private:
     DISALLOW_COPY_AND_MOVE(ClientInfo);
@@ -99,6 +103,7 @@ private:
     std::unordered_map<int32_t, std::queue<SensorData>> dumpQueue_;
     std::mutex activeInfoCBPidMutex_;
     std::unordered_set<int32_t> activeInfoCBPidSet_;
+    static std::unordered_map<std::string, std::set<int32_t>> userGrantPermMap_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
