@@ -736,6 +736,9 @@ bool ClientInfo::IsUnregisterClientDeathRecipient(int32_t pid)
         return false;
     }
     return true;
+}
+
+
 int32_t ClientInfo::GetPidByTokenId(AccessTokenID tokenId)
 {
     std::lock_guard<std::mutex> uidLock(uidMutex_);
