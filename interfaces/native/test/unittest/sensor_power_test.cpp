@@ -94,15 +94,15 @@ void SensorDataCallbackImpl(SensorEvent *event)
 void SensorActiveInfoCBImpl(SensorActiveInfo &sensorActiveInfo)
 {
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, samplingPeriodNs:%{public}" PRId64 ", "
-               "maxReportDelayNs:%{public}" PRId64 "", sensorActiveInfo.pid, sensorActiveInfo.sensorId,
-               sensorActiveInfo.samplingPeriodNs, sensorActiveInfo.maxReportDelayNs);
+        "maxReportDelayNs:%{public}" PRId64 "", sensorActiveInfo.pid, sensorActiveInfo.sensorId,
+        sensorActiveInfo.samplingPeriodNs, sensorActiveInfo.maxReportDelayNs);
 }
 
 void SensorActiveInfoCBImpl2(SensorActiveInfo &sensorActiveInfo)
 {
     SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, samplingPeriodNs:%{public}" PRId64 ", "
-               "maxReportDelayNs:%{public}" PRId64 "", sensorActiveInfo.pid, sensorActiveInfo.sensorId,
-               sensorActiveInfo.samplingPeriodNs, sensorActiveInfo.maxReportDelayNs);
+        "maxReportDelayNs:%{public}" PRId64 "", sensorActiveInfo.pid, sensorActiveInfo.sensorId,
+        sensorActiveInfo.samplingPeriodNs, sensorActiveInfo.maxReportDelayNs);
 }
 
 HWTEST_F(SensorPowerTest, SensorPowerTest_001, TestSize.Level1)
@@ -199,8 +199,8 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_007, TestSize.Level1)
     for (int32_t i = 0; i < count; ++i) {
         SensorActiveInfo *curSensorActiveInfo = sensorActiveInfos + i;
         SEN_HILOGI("pid:%{public}d, sensorId:%{public}d, samplingPeriodNs:%{public}" PRId64 ", "
-                   "maxReportDelayNs:%{public}" PRId64 "", curSensorActiveInfo->pid, curSensorActiveInfo->sensorId,
-                    curSensorActiveInfo->samplingPeriodNs, curSensorActiveInfo->maxReportDelayNs);
+            "maxReportDelayNs:%{public}" PRId64 "", curSensorActiveInfo->pid, curSensorActiveInfo->sensorId,
+            curSensorActiveInfo->samplingPeriodNs, curSensorActiveInfo->maxReportDelayNs);
     }
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 

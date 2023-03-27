@@ -390,7 +390,7 @@ int32_t SensorServiceClient::CreateSocketChannel()
     CHKPR(sensorServer_, ERROR);
     int32_t clientFd = -1;
     StartTrace(HITRACE_TAG_SENSORS, "CreateSocketChannel");
-    ret = sensorServer_->CreateSocketChannel(clientFd, sensorClientStub_);
+    ret = sensorServer_->CreateSocketChannel(sensorClientStub_, clientFd);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (!(ret == ERR_OK && clientFd >= 0)) {
         Close();

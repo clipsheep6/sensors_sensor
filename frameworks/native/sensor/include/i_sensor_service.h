@@ -43,7 +43,7 @@ public:
     virtual ErrCode SuspendSensors(int32_t pid) = 0;
     virtual ErrCode ResumeSensors(int32_t pid) = 0;
     virtual ErrCode GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList) = 0;
-    virtual ErrCode CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient) = 0;
+    virtual ErrCode CreateSocketChannel(const sptr<IRemoteObject> &sensorClient, int32_t &clientFd) = 0;
     virtual ErrCode DestroySocketChannel(const sptr<IRemoteObject> &sensorClient) = 0;
     virtual ErrCode EnableActiveInfoCB() = 0;
     virtual ErrCode DisableActiveInfoCB() = 0;

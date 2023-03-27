@@ -46,14 +46,14 @@ void FdListener::OnReadable(int32_t fd)
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 SEN_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, size:%{public}zu, errno:%{public}d",
-                           size, errno);
+                    size, errno);
                 continue;
             }
             SEN_HILOGE("Recv return %{public}zu, errno:%{public}d", size, errno);
             break;
         } else {
             SEN_HILOGD("The service side disconnect with the client. size:0, count:%{public}zu, errno:%{public}d",
-                       i, errno);
+                i, errno);
             break;
         }       
         if (size < MAX_PACKET_BUF_SIZE) {

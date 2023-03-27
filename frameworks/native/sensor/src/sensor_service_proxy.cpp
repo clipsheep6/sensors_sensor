@@ -278,7 +278,7 @@ ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInf
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::CreateSocketChannel(int32_t &clientFd, const sptr<IRemoteObject> &sensorClient)
+ErrCode SensorServiceProxy::CreateSocketChannel(const sptr<IRemoteObject> &sensorClient, int32_t &clientFd)
 {
     CHKPR(sensorClient, OBJECT_NULL);
     MessageParcel data;

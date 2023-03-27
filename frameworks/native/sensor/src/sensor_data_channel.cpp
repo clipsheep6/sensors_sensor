@@ -80,8 +80,7 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
 
 int32_t SensorDataChannel::DestroySensorDataChannel()
 {
-    int32_t receiveFd = GetReceiveDataFd();
-    DelFdListener(receiveFd);
+    DelFdListener(GetReceiveDataFd());
     return DestroySensorBasicChannel();
 }
 
