@@ -698,7 +698,7 @@ int32_t ClientInfo::AddActiveInfoCBPid(int32_t pid)
     std::lock_guard<std::mutex> activeInfoCBPidLock(activeInfoCBPidMutex_);
     auto pairRet = activeInfoCBPidSet_.insert(pid);
     if (!pairRet.second) {
-        SEN_HILOGE("ActiveInfoCBPidSet insert pid fail");
+        SEN_HILOGE("Pid is duplicated");
         return ERROR;
     }
     return ERR_OK;
