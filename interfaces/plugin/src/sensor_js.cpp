@@ -106,7 +106,6 @@ static void EmitSubscribeCallback(SensorEvent *event)
         return;
     }
     std::lock_guard<std::mutex> subscribeLock(mutex_);
-    auto callback = g_subscribeCallbacks[sensorTypeId];
     auto callbacks = g_subscribeCallbacks[sensorTypeId];
     for (auto &callback : callbacks) {
         if (!copySensorData(callback, event)) {
@@ -214,12 +213,23 @@ static bool IsOnceSubscribed(napi_env env, int32_t sensorTypeId, napi_value call
         if (callbackInfo->env != env) {
             continue;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            SEN_HILOGE("Scope is nullptr");
+            continue;
+        }
         napi_value sensorCallback = nullptr;
-        CHKNRF(env, napi_get_reference_value(env, callbackInfo->callback[0], &sensorCallback),
-            "napi_get_reference_value");
+        if (napi_get_reference_value(env, callbackInfo->callback[0], &sensorCallback) != napi_ok) {
+            SEN_HILOGE("napi_get_reference_value fail");
+            napi_close_handle_scope(env, scope);
+            return false;
+        }
         if (IsSameValue(env, callback, sensorCallback)) {
+            napi_close_handle_scope(env, scope);
             return true;
         }
+        napi_close_handle_scope(env, scope);
     }
     return false;
 }
@@ -286,12 +296,23 @@ static bool IsSubscribed(napi_env env, int32_t sensorTypeId, napi_value callback
         if (callbackInfo->env != env) {
             continue;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            SEN_HILOGE("Scope is nullptr");
+            continue;
+        }
         napi_value sensorCallback = nullptr;
-        CHKNRF(env, napi_get_reference_value(env, callbackInfo->callback[0], &sensorCallback),
-            "napi_get_reference_value");
+        if (napi_get_reference_value(env, callbackInfo->callback[0], &sensorCallback) != napi_ok) {
+            SEN_HILOGE("napi_get_reference_value fail");
+            napi_close_handle_scope(env, scope);
+            return false;
+        }
         if (IsSameValue(env, callback, sensorCallback)) {
+            napi_close_handle_scope(env, scope);
             return true;
         }
+        napi_close_handle_scope(env, scope);
     }
     return false;
 }
@@ -391,16 +412,25 @@ static int32_t RemoveCallback(napi_env env, int32_t sensorTypeId, napi_value cal
         if ((*iter)->env != env) {
             continue;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(env, &scope);
+        if (scope == nullptr) {
+            SEN_HILOGE("Scope is nullptr");
+            continue;
+        }
         napi_value sensorCallback = nullptr;
         if (napi_get_reference_value(env, (*iter)->callback[0], &sensorCallback) != napi_ok) {
             SEN_HILOGE("napi_get_reference_value fail");
+            napi_close_handle_scope(env, scope);
             continue;
         }
         if (IsSameValue(env, callback, sensorCallback)) {
             callbackInfos.erase(iter++);
             SEN_HILOGD("Remove callback success");
+            napi_close_handle_scope(env, scope);
             break;
         }
+        napi_close_handle_scope(env, scope);
     }
     if (callbackInfos.empty()) {
         SEN_HILOGD("No subscription to change sensor data");
