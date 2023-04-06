@@ -14,15 +14,38 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+module_output_path = "sensors/sensor"
+
+ohos_fuzztest("SuspendSensorsFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file =
+      "//base/sensors/sensor/interfaces/native/test/fuzztest/suspendsensors_fuzzer"
+
+  include_dirs = [
+    "//base/sensors/sensor/interfaces/native/test/fuzztest/suspendsensors_fuzzer",
+    "//base/sensors/sensor/interfaces/native/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "suspendsensors_fuzzer.cpp" ]
+
+  deps = [ "//base/sensors/sensor/interfaces/native:sensor_interface_native" ]
+
+  external_deps = [ "c_utils:utils" ]
+}
 
 group("fuzztest") {
   testonly = true
-  deps = [
-    "sensoragent_fuzzer:fuzztest",
-    "suspendsensors_fuzzer:fuzztest",
-    "resumesensors_fuzzer:fuzztest",
-    "getsensoractiveinfos_fuzzer:fuzztest",
-    "registersensoractiveInfocb_fuzzer:fuzztest",
-    "unregistersensoractiveInfocb_fuzzer:fuzztest",
+  deps = []
+  deps += [
+    # deps file
+    ":SuspendSensorsFuzzTest",
   ]
 }

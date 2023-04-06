@@ -16,6 +16,8 @@
 #include <cinttypes>
 #include <gtest/gtest.h>
 #include <thread>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -23,7 +25,6 @@
 
 #include "sensor_agent.h"
 #include "sensors_errors.h"
-#include "system_info.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -67,9 +68,7 @@ void SensorPowerTest::SetUpTestCase()
     AccessTokenKit::ReloadNativeTokenInfo();
     delete[] perms;
 
-    SYSTEM_INFO::CpuInfo cpuInfo;
-    const std::string process_name = "SensorPowerTest";
-    process_pid = cpuInfo.GetTaskPidFile(process_name);
+    process_pid = getpid();
     SEN_HILOGI("Current process pid is %{public}d", process_pid);
     ASSERT_NE(process_pid, 0);
 }

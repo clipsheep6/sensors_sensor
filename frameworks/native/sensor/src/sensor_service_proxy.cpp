@@ -278,7 +278,7 @@ ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInf
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::CreateSocketChannel(const sptr<IRemoteObject> &sensorClient, int32_t &clientFd)
+ErrCode SensorServiceProxy::CreateSocketChannel(sptr<IRemoteObject> sensorClient, int32_t &clientFd)
 {
     CHKPR(sensorClient, OBJECT_NULL);
     MessageParcel data;
@@ -309,7 +309,7 @@ ErrCode SensorServiceProxy::CreateSocketChannel(const sptr<IRemoteObject> &senso
     return static_cast<ErrCode>(ret);
 }
 
-ErrCode SensorServiceProxy::DestroySocketChannel(const sptr<IRemoteObject> &sensorClient)
+ErrCode SensorServiceProxy::DestroySocketChannel(sptr<IRemoteObject> sensorClient)
 {
     CHKPR(sensorClient, OBJECT_NULL);
     MessageParcel data;

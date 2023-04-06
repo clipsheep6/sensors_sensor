@@ -76,16 +76,12 @@ ohos_unittest("SensorAlgorithmTest") {
 ohos_unittest("SensorPowerTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "$SUBSYSTEM_DIR/sensor/test/unittest/common/src/system_info.cpp",
-    "unittest/sensor_power_test.cpp",
-  ]
+  sources = [ "unittest/sensor_power_test.cpp" ]
 
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
     "$SUBSYSTEM_DIR/sensor/utils/common/include",
     "$SUBSYSTEM_DIR/sensor/interfaces/native/include",
-    "$SUBSYSTEM_DIR/sensor/test/unittest/common/include",
   ]
 
   deps = [
