@@ -40,7 +40,7 @@ StreamServer::~StreamServer()
     sessionsMap_.clear();
 }
 
-bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
+bool StreamServer::SendMsg(int32_t fd, const NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     if (fd < 0) {
@@ -55,7 +55,7 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
     return ses->SendMsg(pkt);
 }
 
-void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
+void StreamServer::Multicast(const std::vector<int32_t>& fdList, const NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     for (const auto &item : fdList) {
