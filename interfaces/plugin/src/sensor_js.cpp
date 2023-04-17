@@ -552,8 +552,8 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
         ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
         return nullptr;
     }
-    std::vector<float> inRotationVector;
-    if (!GetFloatArray(env, args[0], inRotationVector)) {
+    std::vector<double> inRotationVector;
+    if (!GetDoubleArray(env, args[0], inRotationVector)) {
         ThrowErr(env, PARAMETER_ERROR, "Get inRotationVector fail");
         return nullptr;
     }
@@ -585,7 +585,7 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, TRANSFORM_COORDINATE_SYSTEM);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> outRotationVector(length);
+    std::vector<double> outRotationVector(length);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.TransformCoordinateSystem(inRotationVector, axisX, axisY, outRotationVector);
     if (ret != OHOS::ERR_OK) {
@@ -642,17 +642,17 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, GET_ANGLE_MODIFY);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> curRotationVector;
-    if (!GetFloatArray(env, args[0], curRotationVector)) {
+    std::vector<double> curRotationVector;
+    if (!GetDoubleArray(env, args[0], curRotationVector)) {
         ThrowErr(env, PARAMETER_ERROR, "Get curRotationVector fail");
         return nullptr;
     }
-    std::vector<float> preRotationVector;
-    if (!GetFloatArray(env, args[1], preRotationVector)) {
+    std::vector<double> preRotationVector;
+    if (!GetDoubleArray(env, args[1], preRotationVector)) {
         ThrowErr(env, PARAMETER_ERROR, "Get preRotationVector fail");
         return nullptr;
     }
-    std::vector<float> angleChange(ROTATION_VECTOR_LENGTH);
+    std::vector<double> angleChange(ROTATION_VECTOR_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetAngleModify(curRotationVector, preRotationVector, angleChange);
     if (ret != OHOS::ERR_OK) {
@@ -705,12 +705,12 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, GET_DIRECTION);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> rotationMatrix;
-    if (!GetFloatArray(env, args[0], rotationMatrix)) {
+    std::vector<double> rotationMatrix;
+    if (!GetDoubleArray(env, args[0], rotationMatrix)) {
         ThrowErr(env, PARAMETER_ERROR, "Get rotationMatrix fail");
         return nullptr;
     }
-    std::vector<float> rotationAngle(ROTATION_VECTOR_LENGTH);
+    std::vector<double> rotationAngle(ROTATION_VECTOR_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetDirection(rotationMatrix, rotationAngle);
     if (ret != OHOS::ERR_OK) {
@@ -763,12 +763,12 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, CREATE_QUATERNION);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> rotationVector;
-    if (!GetFloatArray(env, args[0], rotationVector)) {
+    std::vector<double> rotationVector;
+    if (!GetDoubleArray(env, args[0], rotationVector)) {
         ThrowErr(env, PARAMETER_ERROR, "Get rotationVector fail");
         return nullptr;
     }
-    std::vector<float> quaternion(QUATERNION_LENGTH);
+    std::vector<double> quaternion(QUATERNION_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateQuaternion(rotationVector, quaternion);
     if (ret != OHOS::ERR_OK) {
@@ -821,17 +821,17 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, GET_ALTITUDE);
     CHKPP(asyncCallbackInfo);
-    float seaPressure = 0;
-    if (!GetNativeFloat(env, args[0], seaPressure)) {
+    double seaPressure = 0;
+    if (!GetNativeDouble(env, args[0], seaPressure)) {
         ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get seaPressure fail");
         return nullptr;
     }
-    float currentPressure = 0;
-    if (!GetNativeFloat(env, args[1], currentPressure)) {
+    double currentPressure = 0;
+    if (!GetNativeDouble(env, args[1], currentPressure)) {
         ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get currentPressure fail");
         return nullptr;
     }
-    float altitude = 0;
+    double altitude = 0;
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetAltitude(seaPressure, currentPressure, &altitude);
     if (ret != OHOS::ERR_OK) {
@@ -881,12 +881,12 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, GET_GEOMAGNETIC_DIP);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> inclinationMatrix;
-    if (!GetFloatArray(env, args[0], inclinationMatrix)) {
+    std::vector<double> inclinationMatrix;
+    if (!GetDoubleArray(env, args[0], inclinationMatrix)) {
         ThrowErr(env, PARAMETER_ERROR, "Get inclinationMatrix fail");
         return nullptr;
     }
-    float geomagneticDip = 0;
+    double geomagneticDip = 0;
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetGeomagneticDip(inclinationMatrix, &geomagneticDip);
     if (ret != OHOS::ERR_OK) {
@@ -925,18 +925,18 @@ static napi_value CreateRotationAndInclination(const napi_env &env, napi_value a
         ThrowErr(env, PARAMETER_ERROR, "The number of parameters is not valid");
         return nullptr;
     }
-    std::vector<float> gravity;
-    if (!GetFloatArray(env, args[0], gravity)) {
+    std::vector<double> gravity;
+    if (!GetDoubleArray(env, args[0], gravity)) {
         ThrowErr(env, PARAMETER_ERROR, "Get gravity fail");
         return nullptr;
     }
-    std::vector<float> geomagnetic;
-    if (!GetFloatArray(env, args[1], geomagnetic)) {
+    std::vector<double> geomagnetic;
+    if (!GetDoubleArray(env, args[1], geomagnetic)) {
         ThrowErr(env, PARAMETER_ERROR, "Get geomagnetic fail");
         return nullptr;
     }
-    std::vector<float> rotation(THREE_DIMENSIONAL_MATRIX_LENGTH);
-    std::vector<float> inclination(THREE_DIMENSIONAL_MATRIX_LENGTH);
+    std::vector<double> rotation(THREE_DIMENSIONAL_MATRIX_LENGTH);
+    std::vector<double> inclination(THREE_DIMENSIONAL_MATRIX_LENGTH);
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, ROTATION_INCLINATION_MATRIX);
     CHKPP(asyncCallbackInfo);
@@ -985,15 +985,15 @@ static napi_value GetRotationMatrix(const napi_env &env, napi_value args[], size
         ThrowErr(env, PARAMETER_ERROR, "The number of parameters is not valid");
         return nullptr;
     }
-    std::vector<float> rotationVector;
-    if (!GetFloatArray(env, args[0], rotationVector)) {
+    std::vector<double> rotationVector;
+    if (!GetDoubleArray(env, args[0], rotationVector)) {
         ThrowErr(env, PARAMETER_ERROR, "Get rotationVector fail");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
         new (std::nothrow) AsyncCallbackInfo(env, CREATE_ROTATION_MATRIX);
     CHKPP(asyncCallbackInfo);
-    std::vector<float> rotationMatrix(THREE_DIMENSIONAL_MATRIX_LENGTH);
+    std::vector<double> rotationMatrix(THREE_DIMENSIONAL_MATRIX_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateRotationMatrix(rotationVector, rotationMatrix);
     if (ret != OHOS::ERR_OK) {

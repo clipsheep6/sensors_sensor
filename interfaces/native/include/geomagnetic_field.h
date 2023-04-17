@@ -21,23 +21,23 @@
 
 class GeomagneticField {
 public:
-    GeomagneticField(float latitude, float longitude, float altitude, int64_t timeMillis);
+    GeomagneticField(double latitude, double longitude, double altitude, int64_t timeMillis);
     ~GeomagneticField() = default;
-    float ObtainX();
-    float ObtainY();
-    float ObtainZ();
-    float ObtainGeomagneticDip();
-    float ObtainDeflectionAngle();
-    float ObtainLevelIntensity();
-    float ObtainTotalIntensity();
+    double ObtainX();
+    double ObtainY();
+    double ObtainZ();
+    double ObtainGeomagneticDip();
+    double ObtainDeflectionAngle();
+    double ObtainLevelIntensity();
+    double ObtainTotalIntensity();
 
 private:
-    std::vector<std::vector<float>> GetSchmidtQuasiNormalFactors(int32_t expansionDegree);
+    std::vector<std::vector<double>> GetSchmidtQuasiNormalFactors(int32_t expansionDegree);
     void CalculateGeomagneticComponent(double latDiffRad, int64_t timeMillis);
     void GetLongitudeTrigonometric();
     void GetRelativeRadiusPower();
-    void CalibrateGeocentricCoordinates(float latitude, float longitude, float altitude);
-    void InitLegendreTable(int32_t expansionDegree, float thetaRad);
+    void CalibrateGeocentricCoordinates(double latitude, double longitude, double altitude);
+    void InitLegendreTable(int32_t expansionDegree, double thetaRad);
     double ToDegrees(double angrad);
     double ToRadians(double angdeg);
 };
