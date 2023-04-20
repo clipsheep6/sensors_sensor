@@ -20,7 +20,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "accesstoken_kit.h"
 #include "hisysevent.h"
 #include "iservice_registry.h"
 #include "permission_util.h"
@@ -33,7 +32,6 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-using namespace Security::AccessToken;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorService" };
 constexpr int32_t INVALID_SENSOR_ID = -1;
@@ -457,7 +455,7 @@ ErrCode SensorService::CreateSocketChannel(sptr<IRemoteObject> sensorClient, int
     CHKPR(sensorClient, INVALID_POINTER);
     int32_t serverFd = -1;
     int32_t ret = AddSocketPairInfo(GetCallingUid(), GetCallingPid(),
-        AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID()), 
+        AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID()),
         serverFd, std::ref(clientFd));
     if (ret != ERR_OK) {
         SEN_HILOGE("Add socket pair info failed, ret:%{public}d", ret);

@@ -163,7 +163,7 @@ ErrCode SensorServiceStub::DestroyDataChannelInner(MessageParcel &data, MessageP
 ErrCode SensorServiceStub::SuspendSensorsInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+    if (!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
@@ -179,7 +179,7 @@ ErrCode SensorServiceStub::SuspendSensorsInner(MessageParcel &data, MessageParce
 ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+    if (!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
@@ -195,7 +195,7 @@ ErrCode SensorServiceStub::ResumeSensorsInner(MessageParcel &data, MessageParcel
 ErrCode SensorServiceStub::GetActiveInfoListInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+    if (!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
@@ -258,7 +258,7 @@ ErrCode SensorServiceStub::DestroySocketChannelInner(MessageParcel &data, Messag
 ErrCode SensorServiceStub::EnableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+    if (!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
@@ -268,7 +268,7 @@ ErrCode SensorServiceStub::EnableActiveInfoCBInner(MessageParcel &data, MessageP
 ErrCode SensorServiceStub::DisableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if(!permissionUtil.IsNativeToken(GetCallingTokenID())) {
+    if (!permissionUtil.IsNativeToken(GetCallingTokenID())) {
         SEN_HILOGE("TokenType is not TOKEN_NATIVE");
         return PERMISSION_DENIED;
     }
