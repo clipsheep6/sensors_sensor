@@ -43,18 +43,9 @@ ErrCode SensorServiceProxy::EnableSensor(int32_t sensorId, int64_t samplingPerio
         SEN_HILOGE("write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteInt32(sensorId)) {
-        SEN_HILOGE("write sensorId failed");
-        return WRITE_PARCEL_ERR;
-    }
-    if (!data.WriteInt64(samplingPeriodNs)) {
-        SEN_HILOGE("write samplingPeriodNs failed");
-        return WRITE_PARCEL_ERR;
-    }
-    if (!data.WriteInt64(maxReportDelayNs)) {
-        SEN_HILOGE("write maxReportDelayNs failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEINT32(data, sensorId, WRITE_PARCEL_ERR);
+    WRITEINT64(data, samplingPeriodNs, WRITE_PARCEL_ERR);
+    WRITEINT64(data, maxReportDelayNs, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(ISensorService::ENABLE_SENSOR, data, reply, option);
@@ -75,10 +66,7 @@ ErrCode SensorServiceProxy::DisableSensor(int32_t sensorId)
         SEN_HILOGE("write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteInt32(sensorId)) {
-        SEN_HILOGE("write sensorId failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEINT32(data, sensorId, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(ISensorService::DISABLE_SENSOR, data, reply, option);
@@ -145,10 +133,7 @@ ErrCode SensorServiceProxy::TransferDataChannel(const sptr<SensorBasicDataChanne
         return WRITE_PARCEL_ERR;
     }
     sensorBasicDataChannel->SendToBinder(data);
-    if (!data.WriteRemoteObject(sensorClient)) {
-        SEN_HILOGE("sensorClient failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEREMOTEOBJECT(data, sensorClient, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(ISensorService::TRANSFER_DATA_CHANNEL, data, reply, option);
@@ -171,10 +156,7 @@ ErrCode SensorServiceProxy::DestroySensorChannel(sptr<IRemoteObject> sensorClien
         SEN_HILOGE("write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteRemoteObject(sensorClient)) {
-        SEN_HILOGE("write sensorClient failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEREMOTEOBJECT(data, sensorClient, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(ISensorService::DESTROY_SENSOR_CHANNEL, data, reply, option);
@@ -193,10 +175,7 @@ ErrCode SensorServiceProxy::SuspendSensors(int32_t pid)
         SEN_HILOGE("Parcel write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteInt32(pid)) {
-        SEN_HILOGE("Parcel write pid failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEINT32(data, pid, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     MessageParcel reply;
@@ -217,10 +196,7 @@ ErrCode SensorServiceProxy::ResumeSensors(int32_t pid)
         SEN_HILOGE("Parcel write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteInt32(pid)) {
-        SEN_HILOGE("Parcel write pid failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEINT32(data, pid, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     MessageParcel reply;
@@ -241,10 +217,7 @@ ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInf
         SEN_HILOGE("Parcel write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteInt32(pid)) {
-        SEN_HILOGE("Parcel write pid failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEINT32(data, pid, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     MessageParcel reply;
@@ -257,10 +230,7 @@ ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInf
         return static_cast<ErrCode>(ret);
     }
     size_t activeInfoCount;
-    if (!reply.ReadUint32(activeInfoCount)) {
-        SEN_HILOGE("Parcel read activeInfoCount failed");
-        return READ_PARCEL_ERR;
-    }
+    READUINT32(reply, activeInfoCount, READ_PARCEL_ERR);
     ActiveInfo activeInfo;
     for (size_t i = 0; i < activeInfoCount; ++i) {
         auto tmpActiveInfo = activeInfo.Unmarshalling(reply);
@@ -281,10 +251,7 @@ ErrCode SensorServiceProxy::CreateSocketChannel(sptr<IRemoteObject> sensorClient
         SEN_HILOGE("Parcel write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteRemoteObject(sensorClient)) {
-        SEN_HILOGE("Parcel write sensorClient failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEREMOTEOBJECT(data, sensorClient, WRITE_PARCEL_ERR);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -312,10 +279,7 @@ ErrCode SensorServiceProxy::DestroySocketChannel(sptr<IRemoteObject> sensorClien
         SEN_HILOGE("Parcel write descriptor failed");
         return WRITE_PARCEL_ERR;
     }
-    if (!data.WriteRemoteObject(sensorClient)) {
-        SEN_HILOGE("Parcel write sensorClient failed");
-        return WRITE_PARCEL_ERR;
-    }
+    WRITEREMOTEOBJECT(data, sensorClient, WRITE_PARCEL_ERR);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     MessageParcel reply;
