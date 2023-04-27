@@ -193,11 +193,11 @@ ErrCode SensorServiceStub::GetActiveInfoListInner(MessageParcel &data, MessagePa
         SEN_HILOGE("Get activeInfo list failed");
         return ret;
     }
-    size_t activeInfoCount = activeInfoList.size();
-    WRITEUINT32(reply, activeInfoCount, WRITE_PARCEL_ERR);
-    for (size_t i = 0; i < activeInfoCount; ++i) {
+    int32_t activeInfoCount = activeInfoList.size();
+    WRITEINT32(reply, activeInfoCount, WRITE_PARCEL_ERR);
+    for (int32_t i = 0; i < activeInfoCount; ++i) {
         if (!activeInfoList[i].Marshalling(reply)) {
-            SEN_HILOGE("ActiveInfo %{public}zu marshalling failed", i);
+            SEN_HILOGE("ActiveInfo %{public}d marshalling failed", i);
             return WRITE_PARCEL_ERR;
         }
     }

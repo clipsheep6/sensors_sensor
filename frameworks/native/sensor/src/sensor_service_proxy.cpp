@@ -230,13 +230,13 @@ ErrCode SensorServiceProxy::GetActiveInfoList(int32_t pid, std::vector<ActiveInf
         SEN_HILOGE("Failed, ret:%{public}d", ret);
         return static_cast<ErrCode>(ret);
     }
-    size_t activeInfoCount;
-    READUINT32(reply, activeInfoCount, READ_PARCEL_ERR);
+    int32_t activeInfoCount;
+    READINT32(reply, activeInfoCount, READ_PARCEL_ERR);
     ActiveInfo activeInfo;
-    for (size_t i = 0; i < activeInfoCount; ++i) {
+    for (int32_t i = 0; i < activeInfoCount; ++i) {
         auto tmpActiveInfo = activeInfo.Unmarshalling(reply);
         if (tmpActiveInfo == nullptr) {
-            SEN_HILOGE("Current activeInfo is nullptr, i:%{public}zu", i);
+            SEN_HILOGE("Current activeInfo is nullptr, i:%{public}d", i);
             continue;
         }
         activeInfoList.push_back(*tmpActiveInfo);
