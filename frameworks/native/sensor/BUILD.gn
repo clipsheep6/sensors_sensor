@@ -35,7 +35,7 @@ ohos_shared_library("libsensor_native") {
 
   deps = [
     "$SUBSYSTEM_DIR/utils/common:libsensor_utils",
-    "$SUBSYSTEM_DIR/sensor/utils/ipc:libsensor_ipc",
+    "$SUBSYSTEM_DIR/utils/ipc:libsensor_ipc",
   ]
 
   external_deps = [
