@@ -98,7 +98,6 @@ private:
     SensorHdiConnection &sensorHdiConnection_ = SensorHdiConnection::GetInstance();
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
     SensorManager &sensorManager_ = SensorManager::GetInstance();
-    using PowerPolicy = SensorPowerPolicy::GetInstance();
     sptr<SensorDataProcesser> sensorDataProcesser_ = nullptr;
     sptr<ReportDataCallback> reportDataCallback_ = nullptr;
     std::mutex uidLock_;
