@@ -195,14 +195,14 @@ int32_t GetSensorActiveInfos(int32_t pid, SensorActiveInfo **sensorActiveInfos, 
     return ret;
 }
 
-int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback)
+int32_t Register(SensorActiveInfoCB callback)
 {
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->RegisterSensorActiveInfoCB(callback);
+    int32_t ret = proxy->Register(callback);
     if (ret != OHOS::ERR_OK) {
         SEN_HILOGE("Register sensor active Info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -210,14 +210,14 @@ int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback)
     return ret;
 }
 
-int32_t UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback)
+int32_t Unregister(SensorActiveInfoCB callback)
 {
     const SensorAgentProxy *proxy = GetInstance();
     if (proxy == nullptr) {
         SEN_HILOGE("proxy is nullptr");
         return SERVICE_EXCEPTION;
     }
-    int32_t ret = proxy->UnregisterSensorActiveInfoCB(callback);
+    int32_t ret = proxy->Unregister(callback);
     if (ret != OHOS::ERR_OK) {
         SEN_HILOGE("Unregister sensor active info callback failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);

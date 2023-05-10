@@ -164,7 +164,7 @@ int32_t GetSensorActiveInfos(int32_t pid, SensorActiveInfo **sensorActiveInfos, 
  *
  * @since 10
  */
-int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback);
+int32_t Register(SensorActiveInfoCB callback);
 /**
  * @brief 取消注册传感器打开信息上报函数
  *
@@ -173,7 +173,7 @@ int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback);
  *
  * @since 10
  */
-int32_t UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback);
+int32_t Unregister(SensorActiveInfoCB callback);
 
 #ifdef __cplusplus
 #if __cplusplus

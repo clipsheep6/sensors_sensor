@@ -135,7 +135,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_004, TestSize.Level1)
     // 注册接口异常用例
     SEN_HILOGI("SensorPowerTest_004 in");
     SensorActiveInfoCB callback = nullptr;
-    int32_t ret = RegisterSensorActiveInfoCB(callback);
+    int32_t ret = Register(callback);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -144,7 +144,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_005, TestSize.Level1)
     // 取消注册接口异常用例
     SEN_HILOGI("SensorPowerTest_005 in");
     SensorActiveInfoCB callback = nullptr;
-    int32_t ret = UnregisterSensorActiveInfoCB(callback);
+    int32_t ret = Unregister(callback);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -225,7 +225,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_008, TestSize.Level1)
     user.callback = SensorDataCallbackImpl;
     SensorActiveInfoCB callback = SensorActiveInfoCBImpl;
 
-    int32_t ret = RegisterSensorActiveInfoCB(callback);
+    int32_t ret = Register(callback);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
     ret = SubscribeSensor(sensorId, &user);
@@ -249,7 +249,7 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_008, TestSize.Level1)
     ret = UnsubscribeSensor(sensorId, &user);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
-    ret = UnregisterSensorActiveInfoCB(callback);
+    ret = Unregister(callback);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -262,9 +262,9 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_009, TestSize.Level1)
     SensorActiveInfoCB callback = SensorActiveInfoCBImpl;
     SensorActiveInfoCB callback2 = SensorActiveInfoCBImpl2;
 
-    int32_t ret = RegisterSensorActiveInfoCB(callback);
+    int32_t ret = Register(callback);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
-    ret = RegisterSensorActiveInfoCB(callback2);
+    ret = Register(callback2);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
     ret = SubscribeSensor(sensorId, &user);
@@ -288,9 +288,9 @@ HWTEST_F(SensorPowerTest, SensorPowerTest_009, TestSize.Level1)
     ret = UnsubscribeSensor(sensorId, &user);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 
-    ret = UnregisterSensorActiveInfoCB(callback);
+    ret = Unregister(callback);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
-    ret = UnregisterSensorActiveInfoCB(callback2);
+    ret = Unregister(callback2);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 }  // namespace Sensors

@@ -48,8 +48,8 @@ public:
     int32_t SuspendSensors(int32_t pid);
     int32_t ResumeSensors(int32_t pid);
     int32_t GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList);
-    int32_t RegisterSensorActiveInfoCB(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel);
-    int32_t UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback);
+    int32_t Register(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel);
+    int32_t Unregister(SensorActiveInfoCB callback);
     void ReceiveMessage(const char *buf, size_t size);
     void Disconnect();
 

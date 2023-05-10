@@ -280,7 +280,7 @@ int32_t SensorServiceClient::GetActiveInfoList(int32_t pid, std::vector<ActiveIn
     return ret;
 }
 
-int32_t SensorServiceClient::RegisterSensorActiveInfoCB(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel)
+int32_t SensorServiceClient::Register(SensorActiveInfoCB callback, sptr<SensorDataChannel> sensorDataChannel)
 {
     CALL_LOG_ENTER;
     if (!isConnected_) {
@@ -297,7 +297,7 @@ int32_t SensorServiceClient::RegisterSensorActiveInfoCB(SensorActiveInfoCB callb
     return ERR_OK;
 }
 
-int32_t SensorServiceClient::UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback)
+int32_t SensorServiceClient::Unregister(SensorActiveInfoCB callback)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> activeInfoCBLock(activeInfoCBMutex_);

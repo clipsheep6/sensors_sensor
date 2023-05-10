@@ -408,21 +408,21 @@ int32_t SensorAgentProxy::GetSensorActiveInfos(int32_t pid, SensorActiveInfo **s
     return ERR_OK;
 }
 
-int32_t SensorAgentProxy::RegisterSensorActiveInfoCB(SensorActiveInfoCB callback) const
+int32_t SensorAgentProxy::Register(SensorActiveInfoCB callback) const
 {
     CHKPR(callback, OHOS::Sensors::ERROR);
     CHKPR(dataChannel_, INVALID_POINTER);
-    int32_t ret = SenClient.RegisterSensorActiveInfoCB(callback, dataChannel_);
+    int32_t ret = SenClient.Register(callback, dataChannel_);
     if (ret != ERR_OK) {
         SEN_HILOGE("Register sensor active info callback failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t SensorAgentProxy::UnregisterSensorActiveInfoCB(SensorActiveInfoCB callback) const
+int32_t SensorAgentProxy::Unregister(SensorActiveInfoCB callback) const
 {
     CHKPR(callback, OHOS::Sensors::ERROR);
-    int32_t ret = SenClient.UnregisterSensorActiveInfoCB(callback);
+    int32_t ret = SenClient.Unregister(callback);
     if (ret != ERR_OK) {
         SEN_HILOGE("Unregister sensor active info callback failed, ret:%{public}d", ret);
     }
