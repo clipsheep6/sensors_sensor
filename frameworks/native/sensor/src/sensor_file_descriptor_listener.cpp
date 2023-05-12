@@ -83,6 +83,7 @@ void SensorFileDescriptorListener::SetChannel(SensorDataChannel* channel)
 
 void SensorFileDescriptorListener::OnShutdown(int32_t fileDescriptor)
 {
+    SEN_HILOGI("Sensor data listening stopped");
     if (fileDescriptor < 0) {
         SEN_HILOGE("Invalid fd:%{public}d", fileDescriptor);
     }
@@ -96,6 +97,7 @@ void SensorFileDescriptorListener::OnShutdown(int32_t fileDescriptor)
 
 void SensorFileDescriptorListener::OnException(int32_t fileDescriptor)
 {
+    SEN_HILOGE("The sensor data listening is abnormal");
     if (fileDescriptor < 0) {
         SEN_HILOGE("Invalid fd::%{public}d", fileDescriptor);
     }

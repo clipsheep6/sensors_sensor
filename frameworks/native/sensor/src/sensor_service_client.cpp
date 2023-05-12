@@ -175,7 +175,7 @@ int32_t SensorServiceClient::DestroyDataChannel()
 
 void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    CALL_LOG_ENTER;
+    SEN_HILOGE("Sensor service death");
     (void)object;
     CHKPV(dataChannel_);
     // STEP1 : Destroy previous data channel

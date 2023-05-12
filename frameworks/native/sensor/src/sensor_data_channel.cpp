@@ -31,6 +31,7 @@ constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataChannel" 
 
 int32_t SensorDataChannel::CreateSensorDataChannel(DataChannelCB callBack, void *data)
 {
+    CALL_LOG_ENTER;
     CHKPR(callBack, SENSOR_NATIVE_REGSITER_CB_ERR);
     dataCB_ = callBack;
     privateData_ = data;
@@ -39,6 +40,7 @@ int32_t SensorDataChannel::CreateSensorDataChannel(DataChannelCB callBack, void 
 
 int32_t SensorDataChannel::RestoreSensorDataChannel()
 {
+    CALL_LOG_ENTER;
     CHKPR(dataCB_, SENSOR_NATIVE_REGSITER_CB_ERR);
     if (GetReceiveDataFd() != -1) {
         SEN_HILOGE("fd not close");
@@ -49,6 +51,7 @@ int32_t SensorDataChannel::RestoreSensorDataChannel()
 
 int32_t SensorDataChannel::InnerSensorDataChannel()
 {
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
     // create basic data channel
     int32_t ret = CreateSensorBasicChannel();
@@ -73,6 +76,7 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
 
 int32_t SensorDataChannel::DestroySensorDataChannel()
 {
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
     CHKPL(eventHandler_);
     eventHandler_ = nullptr;
@@ -82,6 +86,7 @@ int32_t SensorDataChannel::DestroySensorDataChannel()
 
 SensorDataChannel::~SensorDataChannel()
 {
+    CALL_LOG_ENTER;
     DestroySensorDataChannel();
 }
 }  // namespace Sensors
