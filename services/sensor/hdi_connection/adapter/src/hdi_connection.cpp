@@ -249,7 +249,7 @@ void HdiConnection::UnregisterHdiDeathRecipient()
 
 void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    CALL_LOG_ENTER;
+    SEN_HILOGE("Sensor hdi service death");
     sptr<IRemoteObject> hdiService = object.promote();
     CHKPV(hdiService);
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
