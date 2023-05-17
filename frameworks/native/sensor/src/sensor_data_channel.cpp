@@ -23,7 +23,6 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
-std::shared_ptr<SensorEventHandler> SensorDataChannel::eventHandler_;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataChannel" };
@@ -74,9 +73,8 @@ int32_t SensorDataChannel::InnerSensorDataChannel()
 int32_t SensorDataChannel::DestroySensorDataChannel()
 {
     std::lock_guard<std::mutex> eventRunnerLock(eventRunnerMutex_);
-    CHKPL(eventHandler_);
     eventHandler_ = nullptr;
-    // destroy sensor basic channelx
+    // destroy sensor basic channel
     return DestroySensorBasicChannel();
 }
 

@@ -30,23 +30,17 @@ class SensorDataChannel : public SensorBasicDataChannel {
 public:
     SensorDataChannel() = default;
     ~SensorDataChannel();
-    static int32_t HandleEvent(int32_t fd, int32_t events, void *data);
     int32_t CreateSensorDataChannel(DataChannelCB callBack, void *data);
     int32_t DestroySensorDataChannel();
-    bool IsThreadExit();
-    bool IsThreadStart();
     int32_t RestoreSensorDataChannel();
-    int32_t test = 10;
     DataChannelCB dataCB_ = nullptr;
     void *privateData_ = nullptr;
 
 private:
-    static void ThreadProcessTask(SensorDataChannel *sensorChannel);
     int32_t InnerSensorDataChannel();
     std::mutex eventRunnerMutex_;
-    static std::shared_ptr<SensorEventHandler> eventHandler_;
-    static std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
-    static int32_t receiveFd_;
+    std::shared_ptr<SensorEventHandler> eventHandler_;
+    int32_t receiveFd_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
