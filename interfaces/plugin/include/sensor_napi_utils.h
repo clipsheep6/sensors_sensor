@@ -34,6 +34,7 @@ bool IsMatchArrayType(const napi_env &env, const napi_value &value);
 bool GetNativeInt32(const napi_env &env, const napi_value &value, int32_t &number);
 bool GetNativeDouble(const napi_env &env, const napi_value &value, double &number);
 bool GetFloatArray(const napi_env &env, const napi_value &value, vector<float> &array);
+bool GetDoubleArray(const napi_env &env, const napi_value &value, vector<double> &array);
 bool GetNativeInt64(const napi_env &env, const napi_value &value, int64_t &number);
 bool RegisterNapiCallback(const napi_env &env, const napi_value &value, napi_ref &callback);
 napi_value GetNamedProperty(const napi_env &env, const napi_value &object, string name);
