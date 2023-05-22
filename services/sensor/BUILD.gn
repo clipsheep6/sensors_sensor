@@ -60,7 +60,6 @@ ohos_shared_library("libsensor_service") {
     "safwk:system_ability_fwk",
   ]
 
-  shlib_type = "sa"
   part_name = "sensor"
   subsystem_name = "sensors"
 }
