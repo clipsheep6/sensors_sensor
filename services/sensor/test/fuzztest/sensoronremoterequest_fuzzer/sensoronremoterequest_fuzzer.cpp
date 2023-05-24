@@ -37,19 +37,55 @@ public:
     SensorOnRemoteRequestFuzzTest() {}
     virtual ~SensorOnRemoteRequestFuzzTest() = default;
     ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs,
-                                int64_t maxReportDelayNs) {return 0;};
-    ErrCode DisableSensor(int32_t sensorId) {return 0;};
-    std::vector<Sensor> GetSensorList() {return {};};
+                                int64_t maxReportDelayNs)
+    {
+        return 0;
+    }
+    ErrCode DisableSensor(int32_t sensorId)
+    {
+        return 0;
+    }
+    std::vector<Sensor> GetSensorList()
+    {
+        return {};
+    }
     ErrCode TransferDataChannel(const sptr<Sensors::SensorBasicDataChannel> &sensorBasicDataChannel,
-                                    const sptr<IRemoteObject> &sensorClient) {return 0;};
-    ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient) {return 0;};
-    ErrCode SuspendSensors(int32_t pid) {return 0;};
-    ErrCode ResumeSensors(int32_t pid) {return 0;};
-    ErrCode GetActiveInfoList(int32_t pid, std::vector<Sensors::ActiveInfo> &activeInfoList) {return 0;};
-    ErrCode CreateSocketChannel(sptr<IRemoteObject> sensorClient, int32_t &clientFd) {return 0;};
-    ErrCode DestroySocketChannel(sptr<IRemoteObject> sensorClient) {return 0;};
-    ErrCode EnableActiveInfoCB() {return 0;};
-    ErrCode DisableActiveInfoCB() {return 0;};
+                                    const sptr<IRemoteObject> &sensorClient)
+    {
+        return 0;
+    }
+    ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient)
+    {
+        return 0;
+    }
+    ErrCode SuspendSensors(int32_t pid)
+    {
+        return 0;
+    }
+    ErrCode ResumeSensors(int32_t pid)
+    {
+        return 0;
+    }
+    ErrCode GetActiveInfoList(int32_t pid, std::vector<Sensors::ActiveInfo> &activeInfoList)
+    {
+        return 0;
+    }
+    ErrCode CreateSocketChannel(sptr<IRemoteObject> sensorClient, int32_t &clientFd)
+    {
+        return 0;
+    }
+    ErrCode DestroySocketChannel(sptr<IRemoteObject> sensorClient)
+    {
+        return 0;
+    }
+    ErrCode EnableActiveInfoCB()
+    {
+        return 0;
+    }
+    ErrCode DisableActiveInfoCB()
+    {
+        return 0;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)
@@ -71,8 +107,8 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     sensorServiceStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+}
+}
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

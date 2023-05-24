@@ -20,16 +20,15 @@ ohos_fuzztest("SensorOnRemoteRequestFuzzTest") {
   module_out_path = "sensors/sensor"
 
   fuzz_config_file =
-      "$SUBSYSTEM_DIR/interfaces/native/test/fuzztest/sensoronremoterequest_fuzzer"
+      "$SUBSYSTEM_DIR/services/sensor/test/fuzztest/sensoronremoterequest_fuzzer"
 
   include_dirs = [
-    "include",
-    "$SUBSYSTEM_DIR/services/sensor/include",
     "$SUBSYSTEM_DIR/frameworks/native/sensor/include",
-    "$SUBSYSTEM_DIR/interfaces/native/test/fuzztest/sensoronremoterequest_fuzzer",
     "$SUBSYSTEM_DIR/services/sensor/hdi_connection/interface/include",
     "$SUBSYSTEM_DIR/services/sensor/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/sensor/hdi_connection/hardware/include",
+    "$SUBSYSTEM_DIR/services/sensor/include",
+    "$SUBSYSTEM_DIR/services/sensor/test/fuzztest/sensoronremoterequest_fuzzer",
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/ipc/include",
   ]
@@ -43,17 +42,20 @@ ohos_fuzztest("SensorOnRemoteRequestFuzzTest") {
 
   sources = [ "sensoronremoterequest_fuzzer.cpp" ]
 
-  deps = [ "$SUBSYSTEM_DIR/interfaces/native:sensor_interface_native",
-           "$SUBSYSTEM_DIR/services/sensor:libsensor_service",
-           "$SUBSYSTEM_DIR/utils/common:libsensor_utils",
-           "$SUBSYSTEM_DIR/utils/ipc:libsensor_ipc",
-           ]
+  deps = [ 
+      "$SUBSYSTEM_DIR/interfaces/native:sensor_interface_native",
+      "$SUBSYSTEM_DIR/services/sensor:libsensor_service",
+      "$SUBSYSTEM_DIR/utils/common:libsensor_utils",
+      "$SUBSYSTEM_DIR/utils/ipc:libsensor_ipc",
+    ]
 
-  external_deps = [ "c_utils:utils",
-                    "ipc:ipc_core",
-                    "samgr:samgr_proxy",
-                    "access_token:libaccesstoken_sdk",
-                    "hiviewdfx_hilog_native:libhilog", ]
+  external_deps = [
+      "access_token:libaccesstoken_sdk",
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "samgr:samgr_proxy",
+    ]
 }
 
 group("fuzztest") {
