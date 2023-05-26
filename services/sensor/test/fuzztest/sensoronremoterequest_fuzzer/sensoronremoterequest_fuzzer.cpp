@@ -32,7 +32,7 @@ constexpr size_t U32_AT_SIZE = 4;
 std::shared_ptr<SensorService> sensorServicePtr =
                             std::make_shared<SensorService>(3601, false);
 const std::u16string SENSOR_INTERFACE_TOKEN = u"ISensorService";
-}
+}  // namespace
 
 uint32_t GetU32Data(const char* ptr)
 {
@@ -52,12 +52,12 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     sensorServicePtr->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
-}
-}
+}  // namespace Sensors
+}  // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-        /* Run your code on data */
+    /* Run your code on data */
     if (data == nullptr) {
         std::cout << "invalid data" << std::endl;
         return 0;

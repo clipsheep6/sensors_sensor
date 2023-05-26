@@ -60,8 +60,7 @@ ohos_fuzztest("SensorOnRemoteRequestFuzzTest") {
 
 group("fuzztest") {
   testonly = true
-  deps = []
-  deps += [
+  deps = [
     # deps file
     ":SensorOnRemoteRequestFuzzTest",
   ]
