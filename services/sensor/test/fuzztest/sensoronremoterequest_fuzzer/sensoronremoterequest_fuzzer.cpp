@@ -29,64 +29,10 @@ namespace Sensors {
 namespace {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+std::shared_ptr<SensorService> sensorServicePtr =
+                            std::make_shared<SensorService>(3601, false);
 const std::u16string SENSOR_INTERFACE_TOKEN = u"ISensorService";
 }
-
-class SensorOnRemoteRequestFuzzTest : public SensorServiceStub {
-public:
-    SensorOnRemoteRequestFuzzTest() {}
-    virtual ~SensorOnRemoteRequestFuzzTest() = default;
-    ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs,
-                                int64_t maxReportDelayNs)
-    {
-        return 0;
-    }
-    ErrCode DisableSensor(int32_t sensorId)
-    {
-        return 0;
-    }
-    std::vector<Sensor> GetSensorList()
-    {
-        return {};
-    }
-    ErrCode TransferDataChannel(const sptr<Sensors::SensorBasicDataChannel> &sensorBasicDataChannel,
-                                    const sptr<IRemoteObject> &sensorClient)
-    {
-        return 0;
-    }
-    ErrCode DestroySensorChannel(sptr<IRemoteObject> sensorClient)
-    {
-        return 0;
-    }
-    ErrCode SuspendSensors(int32_t pid)
-    {
-        return 0;
-    }
-    ErrCode ResumeSensors(int32_t pid)
-    {
-        return 0;
-    }
-    ErrCode GetActiveInfoList(int32_t pid, std::vector<Sensors::ActiveInfo> &activeInfoList)
-    {
-        return 0;
-    }
-    ErrCode CreateSocketChannel(sptr<IRemoteObject> sensorClient, int32_t &clientFd)
-    {
-        return 0;
-    }
-    ErrCode DestroySocketChannel(sptr<IRemoteObject> sensorClient)
-    {
-        return 0;
-    }
-    ErrCode EnableActiveInfoCB()
-    {
-        return 0;
-    }
-    ErrCode DisableActiveInfoCB()
-    {
-        return 0;
-    }
-};
 
 uint32_t GetU32Data(const char* ptr)
 {
@@ -103,8 +49,7 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<Sensors::SensorServiceStub> sensorServiceStub = std::make_shared<SensorOnRemoteRequestFuzzTest>();
-    sensorServiceStub->OnRemoteRequest(code, datas, reply, option);
+    sensorServicePtr->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 }
