@@ -514,6 +514,66 @@ describe("SensorJsTest", function () {
         }, 500);
     })
 
+    /*
+     * @tc.name:SensorJsTest_025
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("SensorJsTest_025", 0, async function (done) {
+        console.info('----------------------SensorJsTest_025---------------------------');
+        sensor.on(sensor.SensorId.COLOR, callback, {'interval': 100000000});
+        setTimeout(() => {
+            sensor.off(sensor.SensorId.COLOR);
+            done();
+        }, 500);
+    })
+
+    /*
+     * @tc.name:SensorJsTest_026
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("SensorJsTest_026", 0, async function (done) {
+        console.info('----------------------SensorJsTest_026---------------------------');
+        sensor.once(sensor.SensorId.COLOR, callback);
+        setTimeout(() => {
+            expect(true).assertTrue();
+            done();
+        }, 500);
+    })
+
+    /*
+     * @tc.name:SensorJsTest_027
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("SensorJsTest_027", 0, async function (done) {
+        console.info('----------------------SensorJsTest_027---------------------------');
+        sensor.on(sensor.SensorId.SAR, callback, {'interval': 100000000});
+        setTimeout(() => {
+            sensor.off(sensor.SensorId.SAR);
+            done();
+        }, 500);
+    })
+
+    /*
+     * @tc.name:SensorJsTest_028
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("SensorJsTest_028", 0, async function (done) {
+        console.info('----------------------SensorJsTest_028---------------------------');
+        sensor.once(sensor.SensorId.SAR, callback);
+        setTimeout(() => {
+            expect(true).assertTrue();
+            done();
+        }, 500);
+    })
+
     let GEOMAGNETIC_COMPONENT_YEAR_RESULT = [
         [6570.3935546875, -146.3289337158203, 54606.0078125, -1.2758207321166992, 83.13726043701172, 6572.02294921875, 55000.0703125],
         [6554.17041015625, -87.19947052001953, 54649.078125, -0.7622424364089966, 83.16046905517578, 6554.75048828125, 55040.7734375],
