@@ -178,7 +178,9 @@ std::map<int32_t, vector<string>> g_sensorAttributeList = {
     { SENSOR_TYPE_ID_PEDOMETER, { "steps" } },
     { SENSOR_TYPE_ID_HEART_RATE, { "heartRate" } },
     { SENSOR_TYPE_ID_WEAR_DETECTION, { "value" } },
-    { SENSOR_TYPE_ID_ACCELEROMETER_UNCALIBRATED, { "x", "y", "z", "biasX", "biasY", "biasZ" } }
+    { SENSOR_TYPE_ID_ACCELEROMETER_UNCALIBRATED, { "x", "y", "z", "biasX", "biasY", "biasZ" } },
+    { SENSOR_TYPE_ID_COLOR, { "x", "y"} },
+    { SENSOR_TYPE_ID_SAR, { "x" } }
 };
 
 std::map<int32_t, ConvertDataFunc> g_convertfuncList = {

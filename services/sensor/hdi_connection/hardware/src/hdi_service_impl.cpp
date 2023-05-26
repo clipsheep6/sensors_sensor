@@ -30,15 +30,28 @@ constexpr int32_t CONVERT_MULTIPLES = 1000;
 std::vector<SensorInfo> g_sensorInfos = {
     {"sensor_test", "default", "1.0.0", "1.0.0", 0, 1, 9999.0, 0.000001, 23.0, 100000000, 1000000000},
 };
-std::vector<int32_t> supportSensors = {1};
+std::vector<int32_t> supportSensors = {1, 14, 15};
 float testData[] = {9.8, 0.0, 0.0};
+float colorData[] = {2.2, 3.3};
+float sarData[] = {8.8};
 SensorEvent testEvent = {
     .sensorTypeId = 1,
     .data = (uint8_t *)testData,
     .dataLen = 12
 };
+SensorEvent colorEvent = {
+    .sensorTypeId = 14,
+    .data = (uint8_t *)colorData,
+    .dataLen = 8
+};
+SensorEvent sarEvent = {
+    .sensorTypeId = 15,
+    .data = (uint8_t *)sarData,
+    .dataLen = 4
+};
 }
-RecordSensorCallback HdiServiceImpl::callback_;
+std::vector<int32_t> HdiServiceImpl::g_enableSensors;
+std::vector<RecordSensorCallback> HdiServiceImpl::callbacks_;
 int64_t HdiServiceImpl::samplingInterval_ = -1;
 int64_t HdiServiceImpl::reportInterval_ = -1;
 std::atomic_bool HdiServiceImpl::isStop_ = false;
@@ -55,7 +68,20 @@ void HdiServiceImpl::DataReportThread()
     CALL_LOG_ENTER;
     while (true) {
         usleep(samplingInterval_ / CONVERT_MULTIPLES);
-        callback_(&testEvent);
+        for (const auto &it : callbacks_) {
+            if (it == nullptr) {
+                continue;
+            }
+            for (const auto &iter : g_enableSensors) {
+                if (iter == 14) {
+                    it(&colorEvent);
+                } else if (iter == 15) {
+                    it(&sarEvent);
+                } else {
+                    it(&testEvent);
+                }
+            }
+        }
         if (isStop_) {
             break;
         }
@@ -67,7 +93,6 @@ void HdiServiceImpl::DataReportThread()
 int32_t HdiServiceImpl::EnableSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
-    CHKPR(callback_, ERROR);
     if (std::find(supportSensors.begin(), supportSensors.end(), sensorId) == supportSensors.end()) {
         SEN_HILOGE("not support enable sensorId:%{public}d", sensorId);
         return ERR_NO_INIT;
@@ -132,7 +157,7 @@ int32_t HdiServiceImpl::SetMode(int32_t sensorId, int32_t mode)
 int32_t HdiServiceImpl::Register(RecordSensorCallback cb)
 {
     CHKPR(cb, ERROR);
-    callback_ = cb;
+    callbacks_.push_back(cb);
     return ERR_OK;
 }
 
