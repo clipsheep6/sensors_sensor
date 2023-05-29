@@ -33,15 +33,15 @@ public:
     int32_t DisableSensor(int32_t sensorId);
     int32_t SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval);
     int32_t SetMode(int32_t sensorId, int32_t mode);
-    int32_t Register(RecordSensorCallback cb);
+    static int32_t Register(RecordSensorCallback cb);
     int32_t Unregister();
 
 private:
     DISALLOW_COPY_AND_MOVE(HdiServiceImpl);
     static void DataReportThread();
-    std::vector<int32_t> g_enableSensors;
+    static std::vector<int32_t> g_enableSensors;
     std::thread dataReportThread_;
-    static RecordSensorCallback callback_;
+    static std::vector<RecordSensorCallback> callbacks_;
     static int64_t samplingInterval_;
     static int64_t reportInterval_;
     static std::atomic_bool isStop_;

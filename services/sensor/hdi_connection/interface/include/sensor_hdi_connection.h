@@ -37,8 +37,10 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(SensorHdiConnection);
     std::unique_ptr<ISensorHdiConnection> iSensorHdiConnection_;
+    std::unique_ptr<ISensorHdiConnection> iSensorCompatibleHdiConnection_;
     std::vector<Sensor> sensorList_;
     int32_t ConnectHdiService();
+    int32_t ConnectCompatibleHdi();
 };
 }  // namespace Sensors
 }  // namespace OHOS
