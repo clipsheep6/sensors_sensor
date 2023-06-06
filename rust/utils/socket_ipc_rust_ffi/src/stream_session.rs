@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,7 @@
 pub mod ffi;
 use hilog_rust::{debug, error, hilog, HiLogLabel, LogType};
 use libc::{int32_t, int64_t, c_int};
-use std::ffi::{CString, c_char};
-use std::thread::sleep; 
-use std::time::Duration;
+use std::{ffi::{CString, c_char}, thread::sleep, time::Duration};
 use crate::net_packet::NetPacket;
 use crate::stream_buffer::StreamBuffer;
 const LOG_LABEL: HiLogLabel = HiLogLabel {

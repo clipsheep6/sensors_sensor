@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn StreamSessionSetUid(object: *mut StreamSession, uid: i3
         obj.set_uid(uid);
         SessionStatusCode::Ok.into()
     } else {
-        SessionStatusCode::Fail.into()
+        SessionStatusCode::SetUidFail.into()
     }
 }
 /// StreamSessionSetFd
@@ -69,7 +69,7 @@ pub unsafe extern "C" fn StreamSessionSetFd(object: *mut StreamSession, fd: i32)
         obj.set_fd(fd);
         SessionStatusCode::Ok.into()
     } else {
-        SessionStatusCode::Fail.into()
+        SessionStatusCode::SetFdFail.into()
     }
 }
 /// StreamSessionSetPid
@@ -84,7 +84,7 @@ pub unsafe extern "C" fn StreamSessionSetPid(object: *mut StreamSession, pid: i3
         obj.set_pid(pid);
         SessionStatusCode::Ok.into()
     } else {
-        SessionStatusCode::Fail.into()
+        SessionStatusCode::SetPidFail.into()
     }
 }
 /// StreamSessionGetUid
@@ -170,7 +170,7 @@ pub unsafe extern "C" fn StreamSessionGetModuleType(object: *const StreamSession
     if let Some(obj) = StreamSession::as_ref(object) {
         obj.module_type()
     } else {
-        SessionStatusCode::Fail.into()
+        SessionStatusCode::ModuleTypeFail.into()
     }
 }
 /// get session close

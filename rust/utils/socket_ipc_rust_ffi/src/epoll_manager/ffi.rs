@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,14 +15,14 @@
  
 use super::*;
 use hilog_rust::{info, error, hilog, HiLogLabel, LogType};
-use crate::error::SocketStatusCode;
-use crate::epoll_manager::EpollManager;
+use crate::{error::SocketStatusCode, epoll_manager::EpollManager};
 use std::mem::drop;
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
     tag: "stream_socket_ffi"
 };
+const RET_ERR: i32 = -1;
 
 /// create unique_ptr of stream_socket for C++
 ///
@@ -89,7 +89,6 @@ pub unsafe extern "C" fn StreamSocketEpollCreate(object: *mut EpollManager, size
     } else {
         SocketStatusCode::EpollCreateFail.into()
     }
-
 }
 
 /// StreamSocketEpollCtl
@@ -104,14 +103,14 @@ pub unsafe extern "C" fn StreamSocketEpollCtl(object: *const EpollManager, fd: i
     if let Some(obj) = EpollManager::as_ref(object) {
         if fd < 0 {
             error!(LOG_LABEL, "Invalid fd");
-            return -1
+            return RET_ERR
         }
         let epoll_fd = 
             if epoll_fd < 0 {
                 if obj.is_valid_epoll(){
                     obj.epoll_fd()
                 } else {
-                    return -1;
+                    return RET_ERR;
                 }
             } else {
                 epoll_fd
@@ -137,7 +136,7 @@ pub unsafe extern "C" fn StreamSocketEpollWait(
                 if obj.is_valid_epoll() {
                     obj.epoll_fd()
                 } else {
-                    return -1;
+                    return RET_ERR;
                 }
             } else {
                 epoll_fd
@@ -176,6 +175,21 @@ pub unsafe extern "C" fn StreamSocketClose(object: *mut EpollManager) -> i32 {
         SocketStatusCode::Ok.into()
     } else {
         SocketStatusCode::SocketCloseFail.into()
+    }
+}
+/// StreamSocketSetFd
+///
+/// # Safety
+/// 
+/// object must be valid
+#[no_mangle]
+pub unsafe extern "C" fn StreamSocketSetFd(object: *mut EpollManager, fd: i32) -> i32 {
+    info!(LOG_LABEL, "enter StreamSocketSetFd");
+    if let Some(obj) = EpollManager::as_mut(object) {
+        obj.socket_set_fd(fd);
+        SocketStatusCode::Ok.into()
+    } else {
+        SocketStatusCode::SocketSetFdFail.into()
     }
 }
 

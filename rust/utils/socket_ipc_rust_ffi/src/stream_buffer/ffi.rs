@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,10 +144,9 @@ pub unsafe extern "C" fn StreamBufferRead(object: *const StreamBuffer, buf: *mut
 #[no_mangle]
 pub unsafe extern "C" fn StreamBufferChkRWError(object: *const StreamBuffer) -> bool {
     if let Some(obj) = StreamBuffer::as_ref(object) {
-        obj.chk_rwerror()
-    } else {
-        false
+        return obj.chk_rwerror();
     }
+    false
 }
 /// StreamBufferGetErrorStatusRemark
 ///
@@ -234,31 +233,15 @@ pub unsafe extern "C" fn CircleStreamBufferWrite(object: *mut StreamBuffer, buf:
         false
     }
 }
-/// read_server_packets
+/// ReadClientPackets
 ///
 /// # Safety
 /// 
 /// object is valid
 #[no_mangle]
-pub unsafe extern "C" fn read_server_packets(object: *mut StreamBuffer, stream_server: *const CStreamServer,
-    fd: i32, callback_fun: ServerPacketCallBackFun) -> i32 {
-    info!(LOG_LABEL,"enter read_server_packets");
-    if let Some(obj) = StreamBuffer::as_mut(object) {
-        obj.read_server_packets(stream_server, fd, callback_fun);
-        BufferStatusCode::Ok.into()
-    } else {
-        BufferStatusCode::ReadServerPacketsFail.into()
-    }
-}
-/// read_client_packets
-///
-/// # Safety
-/// 
-/// object is valid
-#[no_mangle]
-pub unsafe extern "C" fn read_client_packets(object: *mut StreamBuffer, stream_client: *const CClient,
+pub unsafe extern "C" fn ReadClientPackets(object: *mut StreamBuffer, stream_client: *const CSensorServiceClient,
     callback_fun: ClientPacketCallBackFun) -> i32 {
-    info!(LOG_LABEL,"enter read_client_packets");
+    info!(LOG_LABEL,"enter ReadClientPackets");
     if let Some(obj) = StreamBuffer::as_mut(object) {
         obj.read_client_packets(stream_client, callback_fun);
         BufferStatusCode::Ok.into()
@@ -289,7 +272,7 @@ pub unsafe extern "C" fn StreamBufferGetRcount(object: *const StreamBuffer) -> i
     if let Some(obj) = StreamBuffer::as_ref(object) {
         obj.r_count() as i32
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::RcountFail.into()
     }
 }
 /// StreamBufferGetWcount
@@ -302,7 +285,7 @@ pub unsafe extern "C" fn StreamBufferGetWcount(object: *const StreamBuffer) -> i
     if let Some(obj) = StreamBuffer::as_ref(object) {
         obj.w_count() as i32
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::WcountFail.into()
     }
 }
 /// StreamBufferGetWpos
@@ -315,7 +298,7 @@ pub unsafe extern "C" fn StreamBufferGetWpos(object: *const StreamBuffer) -> i32
     if let Some(obj) = StreamBuffer::as_ref(object) {
         obj.w_pos() as i32
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::WposFail.into()
     }
 }
 /// StreamBufferGetRpos
@@ -328,7 +311,7 @@ pub unsafe extern "C" fn StreamBufferGetRpos(object: *const StreamBuffer) -> i32
     if let Some(obj) = StreamBuffer::as_ref(object) {
         obj.r_pos() as i32
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::RposFail.into()
     }
 }
 /// StreamBufferGetSzBuff
@@ -355,7 +338,7 @@ pub unsafe extern "C" fn StreamBufferSetRwErrStatus(object: *mut StreamBuffer, r
         obj.set_rw_error_status(rw_error_status);
         BufferStatusCode::Ok.into()
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::SetRwErrStatusFail.into()
     }
 }
 /// StreamBufferSetRpos
@@ -369,7 +352,7 @@ pub unsafe extern "C" fn StreamBufferSetRpos(object: *mut StreamBuffer, r_pos: i
         obj.set_r_pos(r_pos as usize);
         BufferStatusCode::Ok.into()
     } else {
-        BufferStatusCode::Fail.into()
+        BufferStatusCode::SetRposFail.into()
     }
 }
 

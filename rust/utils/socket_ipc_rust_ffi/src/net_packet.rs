@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,8 +89,18 @@ pub enum MessageId {
 pub struct NetPacket {
     /// NetPacket head
     pub msg_id: MessageId,
-    /// NetPacket stream buffer
+    /// NetPacket stream_buffer
     pub stream_buffer: StreamBuffer,
+}
+
+/// struct CNetPacket
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct CNetPacket {
+    /// NetPacket head
+    pub msg_id: MessageId,
+    /// NetPacket stream_buffer_ptr
+    pub stream_buffer_ptr: *const StreamBuffer,
 }
 
 impl Default for NetPacket {

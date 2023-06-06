@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,26 +19,16 @@ use hilog_rust::{info, error, hilog, debug, HiLogLabel, LogType};
 use std::ffi::{CString, c_char};
 use crate::binding;
 use std::mem::size_of;
-use crate::binding::CStreamServer;
-use crate::binding::CClient;
-use crate::net_packet::NetPacket;
+use crate::binding::CSensorServiceClient;
+use crate::net_packet::{NetPacket, CNetPacket};
 use crate::net_packet::PackHead;
 type ErrorStatus = crate::stream_buffer::ErrStatus;
 /// function pointer alias
-pub type ServerPacketCallBackFun = unsafe extern "C" fn (
-    stream_server: *const CStreamServer,
-    fd: i32,
-    pkt: *const NetPacket,
-);
-/// function pointer alias
 pub type ClientPacketCallBackFun = unsafe extern "C" fn (
-    client: *const CClient,
-    pkt: *const NetPacket,
+    client: *const CSensorServiceClient,
+    pkt: *const CNetPacket,
 );
-/// function pointer alias
-pub type ReadPacketCallBackFun = unsafe fn (
-    pkt: *mut NetPacket,
-);
+
 const ONCE_PROCESS_NETPACKET_LIMIT: i32 = 100;
 const MAX_STREAM_BUF_SIZE: usize = 256;
 /// max buffer size of packet
@@ -306,78 +296,12 @@ impl StreamBuffer {
         }
         self.write_char_usize(buf, size)
     }
-    /// callback function
-    ///
-    ///# Safety
-    ///
-    /// call unsafe function
-    pub unsafe fn read_server_packets(&mut self, stream_server: *const CStreamServer,
-        fd: i32, callback_fun: ServerPacketCallBackFun) {
-        const HEAD_SIZE: usize = size_of::<PackHead>();
-        for _i in 0..ONCE_PROCESS_NETPACKET_LIMIT {
-            let unread_size = self.unread_size();
-            if unread_size < HEAD_SIZE {
-                break;
-            }
-            let data_size = unread_size - HEAD_SIZE;
-            let buf: *const c_char = self.read_buf();
-            if buf.is_null() {
-                error!(LOG_LABEL, "buf is null, skip then break");
-                break;
-            }
-            let head: *const PackHead = buf as *const PackHead;
-            if head.is_null() {
-                error!(LOG_LABEL, "head is null, skip then break");
-                break;
-            }
-            let size;
-            let id_msg;
-            unsafe {
-                size = (*head).size;
-                id_msg = (*head).id_msg;
-            }
-            if !(0..=MAX_PACKET_BUF_SIZE).contains(&size) {
-                error!(LOG_LABEL, "Packet header parsing error, and this error cannot be recovered. \
-                    The buffer will be reset. size:{}, unreadSize:{}", size, unread_size);
-                self.reset();
-                break;
-            }
-            if size > data_size {
-                break;
-            }
-            let mut pkt: NetPacket = NetPacket {
-                msg_id: id_msg,
-                ..Default::default()
-            };
-            unsafe {
-                if size > 0 &&
-                    !pkt.stream_buffer.write_char_usize(buf.add(HEAD_SIZE) as *const c_char, size) {
-                    error!(LOG_LABEL, "Error writing data in the NetPacket. It will be retried next time. \
-                        messageid:{}, size:{}", id_msg as i32, size);
-                    break;
-                }
-            }
-            if !self.seek_read_pos(pkt.get_packet_length()) {
-                error!(LOG_LABEL, "Set read position error, and this error cannot be recovered, and the buffer \
-                    will be reset. packetSize:{} unreadSize:{}", pkt.get_packet_length(), unread_size);
-                self.reset();
-                break;
-            }
-            unsafe {
-                callback_fun(stream_server, fd, &mut pkt as *const NetPacket);
-            }
-            if self.is_empty() {
-                self.reset();
-                break;
-            }
-        }
-    }
     /// callback of client
     ///
     ///# Safety
     ///
     /// call unsafe function
-    pub unsafe fn read_client_packets(&mut self, client: *const CClient, callback_fun: ClientPacketCallBackFun) {
+    pub unsafe fn read_client_packets(&mut self, client: *const CSensorServiceClient, callback_fun: ClientPacketCallBackFun) {
         const HEAD_SIZE: usize = size_of::<PackHead>();
         for _i in 0..ONCE_PROCESS_NETPACKET_LIMIT {
             let unread_size = self.unread_size();
@@ -428,72 +352,13 @@ impl StreamBuffer {
                 self.reset();
                 break;
             }
-            unsafe {
-                callback_fun(client, &pkt as *const NetPacket);
-            }
-            if self.is_empty() {
-                self.reset();
-                break;
-            }
-        }
-    }
-    /// read packets
-    ///
-    ///# Safety
-    ///
-    /// call unsafe function
-    pub unsafe fn read_packets(&mut self, callback_fun: ReadPacketCallBackFun) {
-        const HEAD_SIZE: usize = size_of::<PackHead>();
-        for _i in 0..ONCE_PROCESS_NETPACKET_LIMIT {
-            let unread_size = self.unread_size();
-            if unread_size < HEAD_SIZE {
-                break;
-            }
-            let data_size = unread_size - HEAD_SIZE;
-            let buf: *const c_char = self.read_buf();
-            if buf.is_null() {
-                error!(LOG_LABEL, "buf is null, skip then break");
-                break;
-            }
-            let head: *const PackHead = buf as *const PackHead;
-            if head.is_null() {
-                error!(LOG_LABEL, "head is null, skip then break");
-                break;
-            }
-            let size;
-            let id_msg;
-            unsafe {
-                size = (*head).size;
-                id_msg = (*head).id_msg;
-            }
-            if !(0..=MAX_PACKET_BUF_SIZE).contains(&size) {
-                error!(LOG_LABEL, "Packet header parsing error, and this error cannot be recovered. \
-                    The buffer will be reset. size:{}, unreadSize:{}", size, unread_size);
-                self.reset();
-                break;
-            }
-            if size > data_size {
-                break;
-            }
-            let mut pkt: NetPacket = NetPacket {
-                msg_id: id_msg,
-                ..Default::default()
+            let c_net_packet: CNetPacket = CNetPacket {
+                msg_id: pkt.msg_id,
+                stream_buffer_ptr: Box::into_raw(Box::new(pkt.stream_buffer))
             };
             unsafe {
-                if size > 0 &&
-                    !pkt.stream_buffer.write_char_usize(buf.add(HEAD_SIZE) as *const c_char, size) {
-                    error!(LOG_LABEL, "Error writing data in the NetPacket. It will be retried next time. \
-                        messageid:{}, size:{}", id_msg as i32, size);
-                    break;
-                }
+                callback_fun(client, &c_net_packet as *const CNetPacket);
             }
-            if !self.seek_read_pos(pkt.get_packet_length()) {
-                error!(LOG_LABEL, "Set read position error, and this error cannot be recovered, and the buffer \
-                    will be reset. packetSize:{} unreadSize:{}", pkt.get_packet_length(), unread_size);
-                self.reset();
-                break;
-            }
-            callback_fun(&mut pkt as *mut NetPacket);
             if self.is_empty() {
                 self.reset();
                 break;
