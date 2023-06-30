@@ -33,6 +33,7 @@ public:
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
     int32_t RegisterDataReport(ReportDataCb cb, sptr<ReportDataCallback> reportDataCallback) override;
     int32_t DestroyHdiConnection() override;
+    int32_t ConnectCompatible();
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorHdiConnection);

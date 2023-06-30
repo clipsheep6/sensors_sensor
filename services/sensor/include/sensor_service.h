@@ -64,6 +64,7 @@ public:
     ErrCode EnableActiveInfoCB() override;
     ErrCode DisableActiveInfoCB() override;
     ErrCode ResetSensors() override;
+    void OnStartFuzzer();
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);
@@ -80,7 +81,7 @@ private:
 
     void RegisterClientDeathRecipient(sptr<IRemoteObject> sensorClient, int32_t pid);
     void UnregisterClientDeathRecipient(sptr<IRemoteObject> sensorClient);
-    bool InitInterface();
+    bool InitInterface(bool isConnectHdi);
     bool InitDataCallback();
     bool InitSensorList();
     bool InitSensorPolicy();

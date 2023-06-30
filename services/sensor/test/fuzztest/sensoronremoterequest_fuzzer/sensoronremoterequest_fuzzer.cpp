@@ -49,6 +49,7 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
+    sensorServicePtr->OnStartFuzzer();
     sensorServicePtr->OnRemoteRequest(code, datas, reply, option);
     return true;
 }

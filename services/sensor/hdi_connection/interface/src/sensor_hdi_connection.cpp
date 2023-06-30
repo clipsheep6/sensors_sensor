@@ -51,6 +51,20 @@ int32_t SensorHdiConnection::ConnectHdi()
     return ERR_OK;
 }
 
+int32_t SensorHdiConnection::ConnectCompatible()
+{
+    iSensorHdiConnection_ = std::make_unique<CompatibleConnection>();
+    int32_t ret = ConnectHdiService();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Connect compatible failed");
+    }
+    ret = ConnectCompatibleHdi();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("Connect compatible hdi failed, ret:%{public}d", ret);
+    }
+    return ERR_OK;
+}
+
 int32_t SensorHdiConnection::ConnectHdiService()
 {
     int32_t ret = iSensorHdiConnection_->ConnectHdi();
@@ -58,6 +72,7 @@ int32_t SensorHdiConnection::ConnectHdiService()
         SEN_HILOGE("Connect hdi service failed");
         return CONNECT_SENSOR_HDF_ERR;
     }
+    sensorList_.clear();
     ret = iSensorHdiConnection_->GetSensorList(sensorList_);
     if (ret != 0) {
         SEN_HILOGE("Get sensor list failed");

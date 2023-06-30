@@ -57,7 +57,7 @@ void SensorService::OnStart()
         SEN_HILOGW("SensorService has already started");
         return;
     }
-    if (!InitInterface()) {
+    if (!InitInterface(true)) {
         SEN_HILOGE("Init interface error");
         return;
     }
@@ -82,9 +82,45 @@ void SensorService::OnStart()
     state_ = SensorServiceState::STATE_RUNNING;
 }
 
-bool SensorService::InitInterface()
+void SensorService::OnStartFuzzer()
 {
-    auto ret = sensorHdiConnection_.ConnectHdi();
+    CALL_LOG_ENTER;
+    if (state_ == SensorServiceState::STATE_RUNNING) {
+        SEN_HILOGW("SensorService has already started");
+        return;
+    }
+    if (!InitInterface(false)) {
+        SEN_HILOGE("Init interface error");
+        return;
+    }
+    if (!InitDataCallback()) {
+        SEN_HILOGE("Init data callback error");
+        return;
+    }
+    if (!InitSensorList()) {
+        SEN_HILOGE("Init sensor list error");
+        return;
+    }
+    sensorDataProcesser_ = new (std::nothrow) SensorDataProcesser(sensorMap_);
+    CHKPV(sensorDataProcesser_);
+    if (!InitSensorPolicy()) {
+        SEN_HILOGE("Init sensor policy error");
+    }
+    if (!SystemAbility::Publish(this)) {
+        SEN_HILOGE("Publish SensorService error");
+        return;
+    }
+    sensorManager_.InitSensorMap(sensorMap_, sensorDataProcesser_, reportDataCallback_);
+    state_ = SensorServiceState::STATE_RUNNING;
+}
+
+bool SensorService::InitInterface(bool isConnectHdi)
+{
+    if (isConnectHdi) {
+        auto ret = sensorHdiConnection_.ConnectHdi();
+    } else {
+        auto ret = sensorHdiConnection_.ConnectCompatible();
+    }
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi failed");
         return false;
@@ -108,6 +144,7 @@ bool SensorService::InitDataCallback()
 bool SensorService::InitSensorList()
 {
     std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
+    sensors_.clear();
     int32_t ret = sensorHdiConnection_.GetSensorList(sensors_);
     if (ret != 0) {
         SEN_HILOGE("GetSensorList is failed");
@@ -115,6 +152,7 @@ bool SensorService::InitSensorList()
     }
     {
         std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
+        sensorMap_.clear();
         for (const auto &it : sensors_) {
             if (!(sensorMap_.insert(std::make_pair(it.GetSensorId(), it)).second)) {
                 SEN_HILOGW("sensorMap_ insert failed");
