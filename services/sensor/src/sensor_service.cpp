@@ -112,10 +112,11 @@ void SensorService::OnStartFuzz()
 
 bool SensorService::InitInterface(bool isConnectHdi)
 {
+    int32_t ret = -1;
     if (isConnectHdi) {
-        auto ret = sensorHdiConnection_.ConnectHdi();
+        ret = sensorHdiConnection_.ConnectHdi();
     } else {
-        auto ret = sensorHdiConnection_.ConnectCompatible();
+        ret = sensorHdiConnection_.ConnectCompatible();
     }
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi failed");
