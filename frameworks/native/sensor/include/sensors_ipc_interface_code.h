@@ -35,6 +35,7 @@ enum class SensorInterfaceCode {
     ENABLE_ACTIVE_INFO_CB,
     DISABLE_ACTIVE_INFO_CB,
     RESET_SENSORS,
+    IPC_CODE_TEST1,
 };
 }  // namespace Sensors
 }  // namespace OHOS
