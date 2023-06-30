@@ -141,7 +141,6 @@ bool SensorService::InitDataCallback()
 bool SensorService::InitSensorList()
 {
     std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
-    sensors_.clear();
     int32_t ret = sensorHdiConnection_.GetSensorList(sensors_);
     if (ret != 0) {
         SEN_HILOGE("GetSensorList is failed");
@@ -149,7 +148,6 @@ bool SensorService::InitSensorList()
     }
     {
         std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
-        sensorMap_.clear();
         for (const auto &it : sensors_) {
             if (!(sensorMap_.insert(std::make_pair(it.GetSensorId(), it)).second)) {
                 SEN_HILOGW("sensorMap_ insert failed");

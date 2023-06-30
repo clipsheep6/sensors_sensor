@@ -73,7 +73,6 @@ int32_t SensorHdiConnection::ConnectHdiService()
         SEN_HILOGE("Connect hdi service failed");
         return CONNECT_SENSOR_HDF_ERR;
     }
-    sensorList_.clear();
     ret = iSensorHdiConnection_->GetSensorList(sensorList_);
     if (ret != 0) {
         SEN_HILOGE("Get sensor list failed");
