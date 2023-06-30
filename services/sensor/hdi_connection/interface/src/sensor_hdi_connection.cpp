@@ -58,6 +58,7 @@ int32_t SensorHdiConnection::ConnectCompatible()
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect compatible failed");
     }
+    SEN_HILOGE("Connect compatible success");
     ret = ConnectCompatibleHdi();
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect compatible hdi failed, ret:%{public}d", ret);

@@ -64,7 +64,7 @@ public:
     ErrCode EnableActiveInfoCB() override;
     ErrCode DisableActiveInfoCB() override;
     ErrCode ResetSensors() override;
-    void OnStartFuzzer();
+    void OnStartFuzz();
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);

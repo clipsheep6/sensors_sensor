@@ -82,7 +82,7 @@ void SensorService::OnStart()
     state_ = SensorServiceState::STATE_RUNNING;
 }
 
-void SensorService::OnStartFuzzer()
+void SensorService::OnStartFuzz()
 {
     CALL_LOG_ENTER;
     if (state_ == SensorServiceState::STATE_RUNNING) {
@@ -105,10 +105,6 @@ void SensorService::OnStartFuzzer()
     CHKPV(sensorDataProcesser_);
     if (!InitSensorPolicy()) {
         SEN_HILOGE("Init sensor policy error");
-    }
-    if (!SystemAbility::Publish(this)) {
-        SEN_HILOGE("Publish SensorService error");
-        return;
     }
     sensorManager_.InitSensorMap(sensorMap_, sensorDataProcesser_, reportDataCallback_);
     state_ = SensorServiceState::STATE_RUNNING;
