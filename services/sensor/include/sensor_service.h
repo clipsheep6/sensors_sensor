@@ -81,7 +81,7 @@ private:
 
     void RegisterClientDeathRecipient(sptr<IRemoteObject> sensorClient, int32_t pid);
     void UnregisterClientDeathRecipient(sptr<IRemoteObject> sensorClient);
-    bool InitInterface(bool isConnectHdi);
+    bool InitInterface(bool status);
     bool InitDataCallback();
     bool InitSensorList();
     bool InitSensorPolicy();

@@ -86,7 +86,7 @@ void SensorService::OnStartFuzz()
 {
     CALL_LOG_ENTER;
     if (state_ == SensorServiceState::STATE_RUNNING) {
-        SEN_HILOGW("SensorService has already started");
+        SEN_HILOGD("SensorService has already started");
         return;
     }
     if (!InitInterface(false)) {
@@ -110,10 +110,10 @@ void SensorService::OnStartFuzz()
     state_ = SensorServiceState::STATE_RUNNING;
 }
 
-bool SensorService::InitInterface(bool isConnectHdi)
+bool SensorService::InitInterface(bool status)
 {
     int32_t ret = -1;
-    if (isConnectHdi) {
+    if (status) {
         ret = sensorHdiConnection_.ConnectHdi();
     } else {
         ret = sensorHdiConnection_.ConnectCompatible();
