@@ -19,33 +19,66 @@
 #include <cstdint>
 #include <iostream>
 
+#include "accesstoken_kit.h"
 #include "message_parcel.h"
+#include "nativetoken_kit.h"
+#include "securec.h"
+#include "token_setproc.h"
+
 #include "sensor.h"
 #include "sensor_service.h"
 
-
 namespace OHOS {
 namespace Sensors {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t FOO_MAX_LEN = 1024;
+constexpr size_t FOO_MIN_LEN = 96;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr uint32_t IPC_CODE_COUNT = 13;
 std::shared_ptr<SensorService> sensorServicePtr =
                             std::make_shared<SensorService>(3601, false);
 const std::u16string SENSOR_INTERFACE_TOKEN = u"ISensorService";
 }  // namespace
 
+void SetUpTestCase()
+{
+    const char **perms = new (std::nothrow) const char *[2];
+    if (perms == nullptr) {
+        return;
+    }
+    perms[0] = "ohos.permission.ACCELEROMETER";
+    perms[1] = "ohos.permission.MANAGE_SENSOR";
+    TokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "SensorOnRemoteRequestFuzzTest",
+        .aplStr = "system_core",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    AccessTokenKit::ReloadNativeTokenInfo();
+    delete[] perms;
+}
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    return ((ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3]) % IPC_CODE_COUNT;
 }
 
 bool OnRemoteRequestFuzzTest(const char* data, size_t size)
 {
+    SetUpTestCase();
     uint32_t code = GetU32Data(data);
     MessageParcel datas;
     datas.WriteInterfaceToken(SENSOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
+    datas.WriteBuffer(data + U32_AT_SIZE, size - U32_AT_SIZE);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -65,7 +98,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     /* Validate the length of size */
-    if (size > OHOS::Sensors::FOO_MAX_LEN || size < OHOS::Sensors::U32_AT_SIZE) {
+    if (size > OHOS::Sensors::FOO_MAX_LEN || size < OHOS::Sensors::FOO_MIN_LEN) {
         return 0;
     }
 

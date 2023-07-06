@@ -48,6 +48,7 @@ public:
     void OnDump() override;
     void OnStart() override;
     void OnStop() override;
+    void OnStartFuzz();
     int Dump(int fd, const std::vector<std::u16string> &args) override;
     ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs) override;
     ErrCode DisableSensor(int32_t sensorId) override;
@@ -64,7 +65,6 @@ public:
     ErrCode EnableActiveInfoCB() override;
     ErrCode DisableActiveInfoCB() override;
     ErrCode ResetSensors() override;
-    void OnStartFuzz();
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorService);
