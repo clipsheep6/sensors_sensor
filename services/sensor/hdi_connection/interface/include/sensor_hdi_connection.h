@@ -40,7 +40,6 @@ private:
     std::unique_ptr<ISensorHdiConnection> iSensorCompatibleHdiConnection_ { nullptr };
     std::vector<Sensor> sensorList_;
     int32_t ConnectHdiService();
-    int32_t ConnectCompatibleHdi();
 };
 }  // namespace Sensors
 }  // namespace OHOS
