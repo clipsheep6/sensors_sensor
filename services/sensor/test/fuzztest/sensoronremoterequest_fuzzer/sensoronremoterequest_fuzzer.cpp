@@ -40,7 +40,7 @@ constexpr uint32_t IPC_CODE_COUNT = 13;
 std::shared_ptr<SensorService> sensorServicePtr =
                             std::make_shared<SensorService>(3601, false);
 const std::u16string SENSOR_INTERFACE_TOKEN = u"ISensorService";
-}  // namespace
+} // namespace
 
 void SetUpTestCase()
 {

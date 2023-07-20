@@ -68,13 +68,14 @@ int32_t SensorHdiConnection::ConnectCompatible()
     iSensorHdiConnection_ = std::make_unique<CompatibleConnection>();
     int32_t ret = ConnectHdiService();
     if (ret != ERR_OK) {
-        SEN_HILOGE("Connect compatible failed");
+        SEN_HILOGE("Connect compatible connection failed, ret:%{public}d", ret);
+        return ret;
     }
     ret = ConnectCompatibleHdi();
     if (ret != ERR_OK) {
-        SEN_HILOGE("Connect compatible hdi failed, ret:%{public}d", ret);
+        SEN_HILOGE("Connect color and sar compatible connection failed, ret:%{public}d", ret);
     }
-    return ERR_OK;
+    return ret;
 }
 
 int32_t SensorHdiConnection::ConnectHdiService()
