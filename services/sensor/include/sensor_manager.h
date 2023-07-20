@@ -30,6 +30,7 @@ namespace Sensors {
 using namespace Security::AccessToken;
 class SensorManager : public Singleton<SensorManager> {
 public:
+    ~SensorManager();
     bool SetBestSensorParams(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs);
     bool ResetBestSensorParams(int32_t sensorId);
     ErrCode SaveSubscriber(int32_t sensorId, uint32_t pid, int64_t samplingPeriodNs, int64_t maxReportDelayNs);

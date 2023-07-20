@@ -56,6 +56,14 @@ int64_t HdiServiceImpl::samplingInterval_ = -1;
 int64_t HdiServiceImpl::reportInterval_ = -1;
 std::atomic_bool HdiServiceImpl::isStop_ = false;
 
+HdiServiceImpl::~HdiServiceImpl()
+{
+    if (dataReportThread_.joinable()) {
+        pthread_cancel(dataReportThread_.native_handle());
+        dataReportThread_.join();
+    }
+}
+
 int32_t HdiServiceImpl::GetSensorList(std::vector<SensorInfo>& sensorList)
 {
     CALL_LOG_ENTER;

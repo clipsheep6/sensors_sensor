@@ -32,6 +32,14 @@ constexpr uint32_t PROXIMITY_SENSOR_ID = 50331904;
 constexpr float PROXIMITY_FAR = 5.0;
 }  // namespace
 
+SensorManager::~SensorManager()
+{
+    if (dataThread_.joinable()) {
+        pthread_cancel(dataThread_.native_handle());
+        dataThread_.join();
+    }
+}
+
 void SensorManager::InitSensorMap(std::unordered_map<int32_t, Sensor> &sensorMap,
                                   sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback)
 {

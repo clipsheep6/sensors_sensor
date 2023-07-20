@@ -27,7 +27,7 @@ namespace Sensors {
 class HdiServiceImpl : public Singleton<HdiServiceImpl> {
 public:
     HdiServiceImpl() = default;
-    virtual ~HdiServiceImpl() {}
+    ~HdiServiceImpl();
     int32_t GetSensorList(std::vector<SensorInfo>& sensorList);
     int32_t EnableSensor(int32_t sensorId);
     int32_t DisableSensor(int32_t sensorId);
