@@ -35,8 +35,7 @@ constexpr float PROXIMITY_FAR = 5.0;
 SensorManager::~SensorManager()
 {
     if (dataThread_.joinable()) {
-        pthread_cancel(dataThread_.native_handle());
-        dataThread_.join();
+        dataThread_.detach();
     }
 }
 

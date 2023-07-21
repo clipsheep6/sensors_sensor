@@ -59,8 +59,7 @@ std::atomic_bool HdiServiceImpl::isStop_ = false;
 HdiServiceImpl::~HdiServiceImpl()
 {
     if (dataReportThread_.joinable()) {
-        pthread_cancel(dataReportThread_.native_handle());
-        dataReportThread_.join();
+        dataReportThread_.detach();
     }
 }
 
