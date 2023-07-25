@@ -26,6 +26,7 @@
 #include "token_setproc.h"
 
 #include "sensor.h"
+#include "sensor_delayed_sp_singleton.h"
 #include "sensor_service.h"
 
 namespace OHOS {
@@ -37,8 +38,7 @@ constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t FOO_MIN_LEN = 96;
 constexpr size_t U32_AT_SIZE = 4;
 constexpr uint32_t IPC_CODE_COUNT = 13;
-std::shared_ptr<SensorService> sensorServicePtr =
-                            std::make_shared<SensorService>(3601, false);
+auto g_sensorService = SensorDelayedSpSingleton<SensorService>::GetInstance();
 const std::u16string SENSOR_INTERFACE_TOKEN = u"ISensorService";
 } // namespace
 
@@ -82,8 +82,8 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    sensorServicePtr->OnStartFuzz();
-    sensorServicePtr->OnRemoteRequest(code, datas, reply, option);
+    g_sensorService->OnStartFuzz();
+    g_sensorService->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 }  // namespace Sensors
