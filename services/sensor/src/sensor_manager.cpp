@@ -37,13 +37,15 @@ constexpr float PROXIMITY_FAR = 5.0;
 
 SensorManager::~SensorManager()
 {
+#ifdef HDF_DRIVERS_INTERFACE_SENSOR
     if (dataThread_.joinable()) {
         dataThread_.detach();
     }
+#endif // HDF_DRIVERS_INTERFACE_SENSOR
 }
 
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
-void SensorManager::InitSensorMap(std::unordered_map<int32_t, Sensor> &sensorMap,
+void SensorManager::InitSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap,
                                   sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback)
 {
     std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
