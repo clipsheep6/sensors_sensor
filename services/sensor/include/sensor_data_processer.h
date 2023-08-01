@@ -16,6 +16,7 @@
 #ifndef SENSORS_DATA_PROCESSER_H
 #define SENSORS_DATA_PROCESSER_H
 
+#include <atomic>
 #include <unordered_map>
 #include <vector>
 
@@ -41,6 +42,7 @@ public:
     int32_t SendEvents(sptr<SensorBasicDataChannel> &channel, SensorData &data);
     static int DataThread(sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback);
     int32_t CacheSensorEvent(const SensorData &data, sptr<SensorBasicDataChannel> &channel);
+    void StopThread();
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorDataProcesser);
@@ -61,6 +63,7 @@ private:
     std::unordered_map<int32_t, std::vector<sptr<FifoCacheData>>> dataCountMap_;
     std::mutex sensorMutex_;
     std::unordered_map<int32_t, Sensor> sensorMap_;
+    static std::atomic_bool isStop_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

@@ -58,8 +58,10 @@ std::atomic_bool HdiServiceImpl::isStop_ = false;
 
 HdiServiceImpl::~HdiServiceImpl()
 {
+    CALL_LOG_ENTER;
+    isStop_ = true;
     if (dataReportThread_.joinable()) {
-        dataReportThread_.detach();
+        dataReportThread_.join();
     }
 }
 
@@ -167,6 +169,12 @@ int32_t HdiServiceImpl::SetMode(int32_t sensorId, int32_t mode)
 int32_t HdiServiceImpl::Register(RecordSensorCallback cb)
 {
     CHKPR(cb, ERROR);
+    for (auto it = callbacks_.begin(); it != callbacks_.end(); it++) {
+        if (*it == cb) {
+            SEN_HILOGW("Same recordSensorCallback has been registered");
+            return ERR_OK;
+        }
+    }
     callbacks_.push_back(cb);
     return ERR_OK;
 }

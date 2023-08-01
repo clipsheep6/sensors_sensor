@@ -37,9 +37,15 @@ constexpr float PROXIMITY_FAR = 5.0;
 
 SensorManager::~SensorManager()
 {
+    CALL_LOG_ENTER;
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
+    sensorDataProcesser_->StopThread();
     if (dataThread_.joinable()) {
-        dataThread_.detach();
+        {
+            std::unique_lock<std::mutex> lk(ISensorHdiConnection::dataMutex_);
+            ISensorHdiConnection::dataCondition_.notify_one();
+        }
+        dataThread_.join();
     }
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
 }
