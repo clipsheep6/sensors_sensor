@@ -405,6 +405,21 @@ typedef struct WearDetectionData {
     float value;
 } WearDetectionData;
 
+/**
+ * @brief 定义颜色传感器数据结构。测量光强，单位勒克斯；色温，单位开尔文。
+ */
+typedef struct ColorData {
+    float lightIntensity;
+    float colorTemperature;
+} ColorData;
+
+/**
+ * @brief 定义比吸收率传感器数据结构。测量比吸收率，单位W/kg。
+ */
+typedef struct SarData {
+    float absorptionRatio;
+} SarData;
+
 typedef struct SensorActiveInfo {
     int32_t pid = -1;        /**< PID */
     int32_t sensorId = -1;   /**< Sensor ID */
