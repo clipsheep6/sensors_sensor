@@ -205,10 +205,20 @@ void GeomagneticField::CalibrateGeocentricCoordinates(float latitude, float long
     double gdLatRad = ToRadians(latitude);
     float clat = static_cast<float>(cos(gdLatRad));
     float slat = static_cast<float>(sin(gdLatRad));
-    float tlat = slat / clat;
     float latRad = static_cast<float>(sqrt(a2 * clat * clat + b2 * slat * slat));
-    geocentricLatitude = static_cast<float>(atan(tlat * (latRad * altitudeKm + b2)
-        / (latRad * altitudeKm + a2)));
+    if (fabs(clat) > PRECISION) {
+        float tlat = slat / clat;
+        geocentricLatitude = static_cast<float>(atan(tlat * (latRad * altitudeKm + b2)
+            / (latRad * altitudeKm + a2)));
+    } else {
+        if (fabs(latitude - 90) < PRECISION) {
+            geocentricLatitude = M_PI / 2.0;
+        }
+        if (fabs(latitude - 270) < PRECISION) {
+            geocentricLatitude = -(M_PI / 2.0);
+        }
+    }
+
     geocentricLongitude = static_cast<float>(ToRadians(longitude));
     float radSq = altitudeKm * altitudeKm + 2 * altitudeKm
         * latRad + (a2 * a2 * clat * clat + b2 * b2 * slat * slat)
