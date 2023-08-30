@@ -214,7 +214,7 @@ void SensorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object
     // STEP3 : Clear sensorlist and sensorServer_
     sensorList_.clear();
     sensorServer_ = nullptr;
-    // STEP4 : ReGet sensors 3601 service
+    // STEP4 : ReGet sensors  3601 service
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
