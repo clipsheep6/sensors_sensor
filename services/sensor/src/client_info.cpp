@@ -20,7 +20,7 @@
 #include "permission_util.h"
 #include "securec.h"
 #include "sensor_manager.h"
-#include "sensors_errors.h"
+#include "sensor_errors.h"
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
 #include "sensor_hdi_connection.h"
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
@@ -476,7 +476,7 @@ void ClientInfo::StoreEvent(const SensorData &data)
         return;
     }
     for (size_t i = 0; i < sensors.size(); i++) {
-        if ((int32_t)(sensors[i].GetSensorId()) == storedEvent.sensorTypeId) {
+        if (sensors[i].GetSensorId() == storedEvent.sensorTypeId) {
             foundSensor = true;
             break;
         }

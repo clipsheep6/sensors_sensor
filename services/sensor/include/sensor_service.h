@@ -75,7 +75,7 @@ private:
     public:
         PermStateChangeCb(const Security::AccessToken::PermStateChangeScope &scope,
             sptr<SensorService> server) : PermStateChangeCallbackCustomize(scope), server_(server) {}
-        void PermStateChangeCallback(PermStateChangeInfo& result) override;
+        void PermStateChangeCallback(PermStateChangeInfo &result) override;
 
     private:
         sptr<SensorService> server_ = nullptr;
@@ -107,6 +107,7 @@ private:
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
     SensorManager &sensorManager_ = SensorManager::GetInstance();
+    std::mutex uidLock_;
     // death recipient of sensor client
     sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     std::shared_ptr<PermStateChangeCb> permStateChangeCb_ = nullptr;
