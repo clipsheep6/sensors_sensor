@@ -311,5 +311,18 @@ ErrCode SensorServiceStub::ResetSensorsInner(MessageParcel &data, MessageParcel 
     }
     return ResetSensors();
 }
+
+ErrCode SensorServiceStub::InjectMockSensorInner(MessageParcel &data, MessageParcel &reply)
+{
+    (void)reply;
+    int32_t sensorId;
+    READINT32(data, sensorId, READ_PARCEL_ERR);
+    return InjectMockSensor(sensorId);
+}
+
+ErrCode SensorServiceStub::UninjectMockSensorInner(MessageParcel &data, MessageParcel &reply)
+{
+
+}
 }  // namespace Sensors
 }  // namespace OHOS

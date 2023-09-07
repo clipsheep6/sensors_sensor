@@ -30,7 +30,7 @@ constexpr float RESOLITION = 0.000001;
 constexpr float MIN_SAMPLE_PERIOD_NS = 100000000;
 constexpr float MAX_SAMPLE_PERIOD_NS = 1000000000;
 const std::string VERSION_NAME = "1.0.1";
-std::unordered_set<int32_t> g_targetSensors = { SENSOR_TYPE_ID_COLOR, SENSOR_TYPE_ID_SAR };
+std::unordered_set<int32_t> g_supportMockSensors = { SENSOR_TYPE_ID_COLOR, SENSOR_TYPE_ID_SAR, SENSOR_TYPE_ID_POSTURE };
 }
 
 int32_t SensorHdiConnection::ConnectHdi()
@@ -46,11 +46,11 @@ int32_t SensorHdiConnection::ConnectHdi()
             return ret;
         }
     }
-    if (!FindTargetSensors(g_targetSensors)) {
-        SEN_HILOGD("SensorList not contain target sensors, connect target sensors compatible connection");
+    if (!CheckAllInSensorSet(g_supportMockSensors)) {
+        SEN_HILOGD("SensorList not contain all mock sensors, connect compatible connection");
         ret = ConnectCompatibleHdi();
         if (ret != ERR_OK) {
-            SEN_HILOGE("Connect target sensors compatible connection failed, ret:%{public}d", ret);
+            SEN_HILOGE("Connect mock sensors compatible connection failed, ret:%{public}d", ret);
         }
         return ret;
     }
@@ -64,10 +64,14 @@ int32_t SensorHdiConnection::ConnectHdiService()
         SEN_HILOGE("Connect hdi service failed");
         return CONNECT_SENSOR_HDF_ERR;
     }
+    std::lock_guard<std::mutex> sensorLock(sensorMutex_);
     ret = iSensorHdiConnection_->GetSensorList(sensorList_);
     if (ret != 0) {
         SEN_HILOGE("Get sensor list failed");
         return GET_SENSOR_LIST_ERR;
+    }
+    for (const auto &sensor : sensorList_) {
+        sensorSet_.insert(sensor.GetSensorId());
     }
     return ERR_OK;
 }
@@ -85,58 +89,119 @@ int32_t SensorHdiConnection::ConnectCompatibleHdi()
     return ERR_OK;
 }
 
-bool SensorHdiConnection::FindTargetSensors(const std::unordered_set<int32_t> &targetSensors)
+bool SensorHdiConnection::CheckAllInSensorSet(const std::unordered_set<int32_t> &sensors)
 {
-    std::unordered_set<int32_t> sensorSet;
-    for (const auto &sensor : sensorList_) {
-        sensorSet.insert(sensor.GetSensorId());
-    }
-    for (const auto &sensorId : targetSensors) {
-        if (sensorSet.find(sensorId) == sensorSet.end()) {
+    std::lock_guard<std::mutex> sensorLock(sensorMutex_);
+    for (const auto &sensorId : sensors) {
+        if (sensorSet_.find(sensorId) == sensorSet_.end()) {
             return false;
         }
     }
-    existTargetSensors_ = true;
     return true;
 }
 
-bool SensorHdiConnection::CheckTargetSensors() const
+bool SensorHdiConnection::CheckOneInSensorSet(int32_t sensorId)
 {
-    return existTargetSensors_;
+    std::lock_guard<std::mutex> sensorLock(sensorMutex_);
+    if (sensorSet_.find(sensorId) == sensorSet_.end()) {
+        return false;
+    }
+    return true;
+}
+
+bool SensorHdiConnection::CheckOneInMockSet(int32_t sensorId)
+{
+    std::lock_guard<std::mutex> mockLock(mockMutex_);
+    if (mockSet_.find(sensorId) == mockSet_.end()) {
+        return false;
+    }
+    return true;
+}
+
+int32_t SensorHdiConnection::InjectMockSensor(int32_t sensorId)
+{
+    if (CheckOneInSensorSet(sensorId)) {
+        SEN_HILOGE("hdi的sensorList中有当前sensor，无需注入");
+        return ERROR;
+    }
+    if (g_supportMockSensors.find(sensorId) == g_supportMockSensors.end()) {
+        SEN_HILOGE("打桩代码中没有当前sensor的打桩实现，注入失败");
+        return ERROR;
+    }
+    std::lock_guard<std::mutex> mockLock(mockMutex_);
+    auto pairRet = mockSet_.insert(sensorId); // 保存注入的打桩传感器
+    if (!pairRet.second) {
+        SEN_HILOGE("mockSet_ insert sensorId fail, sensorId:%{public}d", sensorId);
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t SensorHdiConnection::UninjectMockSensor(int32_t sensorId)
+{
+    std::lock_guard<std::mutex> mockLock(mockMutex_);
+    mockSet_.erase(sensorId); // 删除注入的打桩传感器
+    return ERR_OK;
 }
 
 int32_t SensorHdiConnection::GetSensorList(std::vector<Sensor> &sensorList)
 {
-    sensorList.assign(sensorList_.begin(), sensorList_.end());
-    if (CheckTargetSensors()) {
-        return ERR_OK;
+    {
+        std::lock_guard<std::mutex> sensorLock(sensorMutex_);
+        sensorList.assign(sensorList_.begin(), sensorList_.end());
     }
-    Sensor sensorColor;
-    sensorColor.SetSensorId(SENSOR_TYPE_ID_COLOR);
-    sensorColor.SetSensorTypeId(SENSOR_TYPE_ID_COLOR);
-    sensorColor.SetFirmwareVersion(VERSION_NAME);
-    sensorColor.SetHardwareVersion(VERSION_NAME);
-    sensorColor.SetMaxRange(MAX_RANGE);
-    sensorColor.SetSensorName("sensor_color");
-    sensorColor.SetVendorName("default_color");
-    sensorColor.SetResolution(RESOLITION);
-    sensorColor.SetPower(POWER);
-    sensorColor.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
-    sensorColor.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
-    sensorList.push_back(sensorColor);
-    Sensor sensorSar;
-    sensorSar.SetSensorId(SENSOR_TYPE_ID_SAR);
-    sensorSar.SetSensorTypeId(SENSOR_TYPE_ID_SAR);
-    sensorSar.SetFirmwareVersion(VERSION_NAME);
-    sensorSar.SetHardwareVersion(VERSION_NAME);
-    sensorSar.SetMaxRange(MAX_RANGE);
-    sensorSar.SetSensorName("sensor_sar");
-    sensorSar.SetVendorName("default_sar");
-    sensorSar.SetResolution(RESOLITION);
-    sensorSar.SetPower(POWER);
-    sensorSar.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
-    sensorSar.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
-    sensorList.push_back(sensorSar);
+    std::lock_guard<std::mutex> mockLock(mockMutex_);
+    for (const auto &sensorId : mockSet_) {
+        switch (sensorId) {
+            case SENSOR_TYPE_ID_COLOR:
+                Sensor sensorColor;
+                sensorColor.SetSensorId(SENSOR_TYPE_ID_COLOR);
+                sensorColor.SetSensorTypeId(SENSOR_TYPE_ID_COLOR);
+                sensorColor.SetFirmwareVersion(VERSION_NAME);
+                sensorColor.SetHardwareVersion(VERSION_NAME);
+                sensorColor.SetMaxRange(MAX_RANGE);
+                sensorColor.SetSensorName("sensor_color");
+                sensorColor.SetVendorName("default_color");
+                sensorColor.SetResolution(RESOLITION);
+                sensorColor.SetPower(POWER);
+                sensorColor.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+                sensorColor.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+                sensorList.push_back(sensorColor);
+                break;
+            case SENSOR_TYPE_ID_SAR:
+                Sensor sensorSar;
+                sensorSar.SetSensorId(SENSOR_TYPE_ID_SAR);
+                sensorSar.SetSensorTypeId(SENSOR_TYPE_ID_SAR);
+                sensorSar.SetFirmwareVersion(VERSION_NAME);
+                sensorSar.SetHardwareVersion(VERSION_NAME);
+                sensorSar.SetMaxRange(MAX_RANGE);
+                sensorSar.SetSensorName("sensor_sar");
+                sensorSar.SetVendorName("default_sar");
+                sensorSar.SetResolution(RESOLITION);
+                sensorSar.SetPower(POWER);
+                sensorSar.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+                sensorSar.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+                sensorList.push_back(sensorSar);
+                break;
+            case SENSOR_TYPE_ID_POSTURE:
+                Sensor sensorPosture;
+                sensorPosture.SetSensorId(SENSOR_TYPE_ID_POSTURE);
+                sensorPosture.SetSensorTypeId(SENSOR_TYPE_ID_POSTURE);
+                sensorPosture.SetFirmwareVersion(VERSION_NAME);
+                sensorPosture.SetHardwareVersion(VERSION_NAME);
+                sensorPosture.SetMaxRange(MAX_RANGE);
+                sensorPosture.SetSensorName("sensor_posture");
+                sensorPosture.SetVendorName("default_posture");
+                sensorPosture.SetResolution(RESOLITION);
+                sensorPosture.SetPower(POWER);
+                sensorPosture.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+                sensorPosture.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+                sensorList.push_back(sensorPosture);
+                break;
+            default:
+                break;
+        }
+    }
     return ERR_OK;
 }
 
@@ -144,7 +209,8 @@ int32_t SensorHdiConnection::EnableSensor(int32_t sensorId)
 {
     StartTrace(HITRACE_TAG_SENSORS, "EnableSensor");
     int32_t ret = ENABLE_SENSOR_ERR;
-    if (!CheckTargetSensors() && g_targetSensors.find(sensorId) != g_targetSensors.end()) {
+    if (CheckOneInMockSet(sensorId)) {
+        // 当前sensor在注入打桩的set中，走打桩
         CHKPR(iSensorCompatibleHdiConnection_, ENABLE_SENSOR_ERR);
         ret = iSensorCompatibleHdiConnection_->EnableSensor(sensorId);
         FinishTrace(HITRACE_TAG_SENSORS);
@@ -168,7 +234,8 @@ int32_t SensorHdiConnection::DisableSensor(int32_t sensorId)
 {
     StartTrace(HITRACE_TAG_SENSORS, "DisableSensor");
     int32_t ret = DISABLE_SENSOR_ERR;
-    if (!CheckTargetSensors() && g_targetSensors.find(sensorId) != g_targetSensors.end()) {
+    if (CheckOneInMockSet(sensorId)) {
+        // 当前sensor在注入打桩的set中，走打桩
         CHKPR(iSensorCompatibleHdiConnection_, DISABLE_SENSOR_ERR);
         ret = iSensorCompatibleHdiConnection_->DisableSensor(sensorId);
         FinishTrace(HITRACE_TAG_SENSORS);
@@ -192,7 +259,8 @@ int32_t SensorHdiConnection::SetBatch(int32_t sensorId, int64_t samplingInterval
 {
     StartTrace(HITRACE_TAG_SENSORS, "SetBatch");
     int32_t ret = SET_SENSOR_CONFIG_ERR;
-    if (!CheckTargetSensors() && g_targetSensors.find(sensorId) != g_targetSensors.end()) {
+    if (CheckOneInMockSet(sensorId)) {
+        // 当前sensor在注入打桩的set中，走打桩
         CHKPR(iSensorCompatibleHdiConnection_, SET_SENSOR_CONFIG_ERR);
         ret = iSensorCompatibleHdiConnection_->SetBatch(sensorId, samplingInterval, reportInterval);
         FinishTrace(HITRACE_TAG_SENSORS);

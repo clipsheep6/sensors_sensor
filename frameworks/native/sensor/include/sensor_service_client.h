@@ -54,6 +54,9 @@ public:
     void ReceiveMessage(const char *buf, size_t size);
     void Disconnect();
     void HandleNetPacke(NetPacket &pkt);
+    int32_t InjectMockSensor(int32_t sensorId);
+    int32_t UninjectMockSensor(int32_t sensorId);
+    void UpdateSensorList();
 
 private:
     int32_t InitServiceClient();

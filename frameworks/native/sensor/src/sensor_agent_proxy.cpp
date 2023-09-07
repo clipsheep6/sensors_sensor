@@ -120,6 +120,7 @@ int32_t SensorAgentProxy::DestroySensorDataChannel()
 
 int32_t SensorAgentProxy::ActivateSensor(int32_t sensorId, const SensorUser *user)
 {
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
     if (samplingInterval_ < 0 || reportInterval_ < 0) {
@@ -148,6 +149,7 @@ int32_t SensorAgentProxy::ActivateSensor(int32_t sensorId, const SensorUser *use
 
 int32_t SensorAgentProxy::DeactivateSensor(int32_t sensorId, const SensorUser *user)
 {
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
     if (!SenClient.IsValid(sensorId)) {
@@ -172,6 +174,7 @@ int32_t SensorAgentProxy::DeactivateSensor(int32_t sensorId, const SensorUser *u
 int32_t SensorAgentProxy::SetBatch(int32_t sensorId, const SensorUser *user, int64_t samplingInterval,
                                    int64_t reportInterval)
 {
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     if (!SenClient.IsValid(sensorId)) {
         SEN_HILOGE("sensorId is invalid, %{public}d", sensorId);
@@ -237,6 +240,7 @@ int32_t SensorAgentProxy::UnsubscribeSensor(int32_t sensorId, const SensorUser *
 
 int32_t SensorAgentProxy::SetMode(int32_t sensorId, const SensorUser *user, int32_t mode)
 {
+    CALL_LOG_ENTER;
     CHKPR(user, OHOS::Sensors::ERROR);
     CHKPR(user->callback, OHOS::Sensors::ERROR);
     if (!SenClient.IsValid(sensorId)) {
@@ -398,6 +402,7 @@ int32_t SensorAgentProxy::GetSensorActiveInfos(int32_t pid,
 
 int32_t SensorAgentProxy::Register(SensorActiveInfoCB callback)
 {
+    CALL_LOG_ENTER;
     CHKPR(callback, OHOS::Sensors::ERROR);
     CHKPR(dataChannel_, INVALID_POINTER);
     int32_t ret = SenClient.Register(callback, dataChannel_);
@@ -409,6 +414,7 @@ int32_t SensorAgentProxy::Register(SensorActiveInfoCB callback)
 
 int32_t SensorAgentProxy::Unregister(SensorActiveInfoCB callback)
 {
+    CALL_LOG_ENTER;
     CHKPR(callback, OHOS::Sensors::ERROR);
     int32_t ret = SenClient.Unregister(callback);
     if (ret != ERR_OK) {
@@ -419,11 +425,37 @@ int32_t SensorAgentProxy::Unregister(SensorActiveInfoCB callback)
 
 int32_t SensorAgentProxy::ResetSensors() const
 {
+    CALL_LOG_ENTER;
     int32_t ret = SenClient.ResetSensors();
     if (ret != ERR_OK) {
         SEN_HILOGE("Reset sensors failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t SensorAgentProxy::InjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+    if (SenClient.IsValid(sensorId)) {
+        // 此时sensor列表中已包含当前sensor，所以不用注入
+        SEN_HILOGE("sensorId exist in sensorList, %{public}d", sensorId);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = SenClient.InjectMockSensor(sensorId);
+    if (ret != ERR_OK) {
+        // 注入sensor失败
+        SEN_HILOGE("inject sensors failed, ret:%{public}d", ret);
+        return ret;
+    }
+    // 注入sensor成功，更新sensorlist
+    SenClient.UpdateSensorList();
+    return ERR_OK
+}
+
+int32_t SensorAgentProxy::UninjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -526,6 +526,39 @@ ErrCode SensorService::ResetSensors()
     return POWER_POLICY.ResetSensors();
 }
 
+ErrCode InjectMockSensor(int32_t sensorId)
+{
+    int32_t ret = sensorHdiConnection_.InjectMockSensor(sensorId);
+    if (ret != 0) {
+        // 注入sensor失败
+        return ret;
+    }
+    std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
+    sensors_.clear();
+    ret = sensorHdiConnection_.GetSensorList(sensors_);
+    if (ret != 0) {
+        SEN_HILOGE("GetSensorList is failed");
+        return ret;
+    }
+    {
+        std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
+        sensorMap_.clear();
+        for (const auto &it : sensors_) {
+            if (!(sensorMap_.insert(std::make_pair(it.GetSensorId(), it)).second)) {
+                SEN_HILOGW("sensorMap_ insert failed");
+            }
+        }
+    }
+    //更新sensorManager_中的sensorMap中的值
+    sensorManager_.InitSensorMap(sensorMap_, sensorDataProcesser_, reportDataCallback_);
+    return ERR_OK;
+}
+
+ErrCode UninjectMockSensor(int32_t sensorId)
+{
+
+}
+
 void SensorService::ReportActiveInfo(int32_t sensorId, int32_t pid)
 {
     CALL_LOG_ENTER;

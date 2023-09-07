@@ -43,6 +43,8 @@ public:
     ErrCode EnableActiveInfoCB() override;
     ErrCode DisableActiveInfoCB() override;
     ErrCode ResetSensors() override;
+    ErrCode InjectMockSensor(int32_t sensorId) override;
+    ErrCode UninjectMockSensor(int32_t sensorId) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorServiceProxy);

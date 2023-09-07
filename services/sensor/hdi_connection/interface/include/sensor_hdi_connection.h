@@ -16,7 +16,6 @@
 #ifndef SENSOR_HDI_CONNECTION_H
 #define SENSOR_HDI_CONNECTION_H
 
-#include <atomic>
 #include<unordered_set>
 
 #include "i_sensor_hdi_connection.h"
@@ -36,17 +35,23 @@ public:
     int32_t SetMode(int32_t sensorId, int32_t mode) override;
     int32_t RegisterDataReport(ReportDataCb cb, sptr<ReportDataCallback> reportDataCallback) override;
     int32_t DestroyHdiConnection() override;
+    int32_t InjectMockSensor(int32_t sensorId);
+    int32_t UninjectMockSensor(int32_t sensorId);
 
 private:
     DISALLOW_COPY_AND_MOVE(SensorHdiConnection);
     std::unique_ptr<ISensorHdiConnection> iSensorHdiConnection_ { nullptr };
     std::unique_ptr<ISensorHdiConnection> iSensorCompatibleHdiConnection_ { nullptr };
+    std::mutex sensorMutex_;
     std::vector<Sensor> sensorList_;
+    std::unordered_set<int32_t> sensorSet_;
     int32_t ConnectHdiService();
     int32_t ConnectCompatibleHdi();
-    bool FindTargetSensors(const std::unordered_set<int32_t> &targetSensors);
-    bool CheckTargetSensors() const;
-    std::atomic_bool existTargetSensors_ = false;
+    bool CheckAllInSensorSet(const std::unordered_set<int32_t> &sensors);
+    bool CheckOneInSensorSet(int32_t sensorId);
+    bool CheckOneInMockSet(int32_t sensorId);
+    std::mutex mockMutex_;
+    std::unordered_set<int32_t> mockSet_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

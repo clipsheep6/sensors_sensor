@@ -32,17 +32,20 @@ constexpr int64_t SAMPLING_INTERVAL_NS = 200000000;
 constexpr int32_t CONVERT_MULTIPLES = 1000;
 constexpr float TARGET_SUM = 9.8F * 9.8F;
 constexpr float MAX_RANGE = 9999.0F;
+constexpr float MAX_ANGLE = 180.0F;
 std::vector<SensorInfo> g_sensorInfos = {
     {"sensor_test", "default", "1.0.0", "1.0.0", 0, 1, 9999.0, 0.000001, 23.0, 100000000, 1000000000},
 };
 std::vector<int32_t> g_supportSensors = {
     SENSOR_TYPE_ID_ACCELEROMETER,
     SENSOR_TYPE_ID_COLOR,
-    SENSOR_TYPE_ID_SAR
+    SENSOR_TYPE_ID_SAR,
+    SENSOR_TYPE_ID_POSTURE
 };
 float g_accData[3];
 float g_colorData[2];
 float g_sarData[1];
+float g_postureData[7];
 SensorEvent g_accEvent = {
     .sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER,
     .dataLen = 12
@@ -54,6 +57,10 @@ SensorEvent g_colorEvent = {
 SensorEvent g_sarEvent = {
     .sensorTypeId = SENSOR_TYPE_ID_SAR,
     .dataLen = 4
+};
+SensorEvent g_postureEvent = {
+    .sensorTypeId = SENSOR_TYPE_ID_POSTURE,
+    .dataLen = 28
 };
 }
 std::vector<int32_t> HdiServiceImpl::enableSensors_;
@@ -74,6 +81,9 @@ void HdiServiceImpl::GenerateEvent()
                 break;
             case SENSOR_TYPE_ID_SAR:
                 GenerateSarEvent();
+                break;
+            case SENSOR_TYPE_ID_POSTURE:
+                GeneratePostureEvent();
                 break;
             default:
                 SEN_HILOGW("Unknown sensorId:%{public}d", sensorId);
@@ -124,6 +134,34 @@ void HdiServiceImpl::GenerateSarEvent()
     g_sarEvent.data = reinterpret_cast<uint8_t *>(g_sarData);
 }
 
+void HdiServiceImpl::GeneratePostureEvent()
+{
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<float> distr1(0, TARGET_SUM);
+    float num1 = 0;
+    float num2 = 0;
+    while (true) {
+        num1 = distr1(eng);
+        num2 = distr1(eng);
+        if (std::fabs(num1 - num2) > std::numeric_limits<float>::epsilon && num1 > num2) {
+            float temp = num1;
+            num1 = num2;
+            num2 = temp;
+            break;
+        }
+    }
+    g_postureData[0] = static_cast<float>(sqrt(num1));
+    g_postureData[1] = static_cast<float>(sqrt(num2 - num1));
+    g_postureData[2] = static_cast<float>(sqrt(TARGET_SUM - num2));
+    g_postureData[3] = g_postureData[0];
+    g_postureData[4] = g_postureData[1];
+    g_postureData[5] = g_postureData[2];
+    std::uniform_real_distribution<float> distr2(0, MAX_ANGLE);
+    g_postureData[6] = distr2(eng);
+    g_postureEvent.data = reinterpret_cast<uint8_t *>(g_postureData);
+}
+
 int32_t HdiServiceImpl::GetSensorList(std::vector<SensorInfo> &sensorList)
 {
     CALL_LOG_ENTER;
@@ -152,6 +190,9 @@ void HdiServiceImpl::DataReportThread()
                         break;
                     case SENSOR_TYPE_ID_SAR:
                         it(&g_sarEvent);
+                        break;
+                    case SENSOR_TYPE_ID_POSTURE:
+                        it(&g_postureEvent);
                         break;
                     default:
                         SEN_HILOGW("Unknown sensorId:%{public}d", sensorId);
