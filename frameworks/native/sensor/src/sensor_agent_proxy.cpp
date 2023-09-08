@@ -436,26 +436,21 @@ int32_t SensorAgentProxy::ResetSensors() const
 int32_t SensorAgentProxy::InjectMockSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
-    if (SenClient.IsValid(sensorId)) {
-        // 此时sensor列表中已包含当前sensor，所以不用注入
-        SEN_HILOGE("sensorId exist in sensorList, %{public}d", sensorId);
-        return PARAMETER_ERROR;
-    }
     int32_t ret = SenClient.InjectMockSensor(sensorId);
     if (ret != ERR_OK) {
-        // 注入sensor失败
         SEN_HILOGE("inject sensors failed, ret:%{public}d", ret);
-        return ret;
     }
-    // 注入sensor成功，更新sensorlist
-    SenClient.UpdateSensorList();
-    return ERR_OK
+    return ret;
 }
 
 int32_t SensorAgentProxy::UninjectMockSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
-
+    int32_t ret = SenClient.UninjectMockSensor(sensorId);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("uninject sensors failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -50,6 +50,9 @@ private:
     bool CheckAllInSensorSet(const std::unordered_set<int32_t> &sensors);
     bool CheckOneInSensorSet(int32_t sensorId);
     bool CheckOneInMockSet(int32_t sensorId);
+    Sensor GenerateColorSensor();
+    Sensor GenerateSarSensor();
+    Sensor GeneratePostureSensor();
     std::mutex mockMutex_;
     std::unordered_set<int32_t> mockSet_;
 };

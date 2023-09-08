@@ -56,7 +56,6 @@ public:
     void HandleNetPacke(NetPacket &pkt);
     int32_t InjectMockSensor(int32_t sensorId);
     int32_t UninjectMockSensor(int32_t sensorId);
-    void UpdateSensorList();
 
 private:
     int32_t InitServiceClient();

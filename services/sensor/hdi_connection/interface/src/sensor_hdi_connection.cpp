@@ -121,11 +121,11 @@ bool SensorHdiConnection::CheckOneInMockSet(int32_t sensorId)
 int32_t SensorHdiConnection::InjectMockSensor(int32_t sensorId)
 {
     if (CheckOneInSensorSet(sensorId)) {
-        SEN_HILOGE("hdi的sensorList中有当前sensor，无需注入");
+        SEN_HILOGE("sensorId exist in sensorList, no need inject");
         return ERROR;
     }
     if (g_supportMockSensors.find(sensorId) == g_supportMockSensors.end()) {
-        SEN_HILOGE("打桩代码中没有当前sensor的打桩实现，注入失败");
+        SEN_HILOGE("no support cur sensor inject");
         return ERROR;
     }
     std::lock_guard<std::mutex> mockLock(mockMutex_);
@@ -140,8 +140,64 @@ int32_t SensorHdiConnection::InjectMockSensor(int32_t sensorId)
 int32_t SensorHdiConnection::UninjectMockSensor(int32_t sensorId)
 {
     std::lock_guard<std::mutex> mockLock(mockMutex_);
-    mockSet_.erase(sensorId); // 删除注入的打桩传感器
+    auto it = mockSet_.find(sensorId);
+    if (it == mockSet_.end()) {
+        SEN_HILOGE("mockSet_ not find sensorId, sensorId:%{public}d", sensorId);
+        return ERROR;
+    }
+    mockSet_.erase(it); // 删除注入的打桩传感器
     return ERR_OK;
+}
+
+Sensor SensorHdiConnection::GenerateColorSensor()
+{
+    Sensor sensorColor;
+    sensorColor.SetSensorId(SENSOR_TYPE_ID_COLOR);
+    sensorColor.SetSensorTypeId(SENSOR_TYPE_ID_COLOR);
+    sensorColor.SetFirmwareVersion(VERSION_NAME);
+    sensorColor.SetHardwareVersion(VERSION_NAME);
+    sensorColor.SetMaxRange(MAX_RANGE);
+    sensorColor.SetSensorName("sensor_color");
+    sensorColor.SetVendorName("default_color");
+    sensorColor.SetResolution(RESOLITION);
+    sensorColor.SetPower(POWER);
+    sensorColor.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+    sensorColor.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+    return sensorColor;
+}
+
+Sensor SensorHdiConnection::GenerateSarSensor()
+{
+    Sensor sensorSar;
+    sensorSar.SetSensorId(SENSOR_TYPE_ID_SAR);
+    sensorSar.SetSensorTypeId(SENSOR_TYPE_ID_SAR);
+    sensorSar.SetFirmwareVersion(VERSION_NAME);
+    sensorSar.SetHardwareVersion(VERSION_NAME);
+    sensorSar.SetMaxRange(MAX_RANGE);
+    sensorSar.SetSensorName("sensor_sar");
+    sensorSar.SetVendorName("default_sar");
+    sensorSar.SetResolution(RESOLITION);
+    sensorSar.SetPower(POWER);
+    sensorSar.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+    sensorSar.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+    return sensorSar;
+}
+
+Sensor SensorHdiConnection::GeneratePostureSensor()
+{
+    Sensor sensorPosture;
+    sensorPosture.SetSensorId(SENSOR_TYPE_ID_POSTURE);
+    sensorPosture.SetSensorTypeId(SENSOR_TYPE_ID_POSTURE);
+    sensorPosture.SetFirmwareVersion(VERSION_NAME);
+    sensorPosture.SetHardwareVersion(VERSION_NAME);
+    sensorPosture.SetMaxRange(MAX_RANGE);
+    sensorPosture.SetSensorName("sensor_posture");
+    sensorPosture.SetVendorName("default_posture");
+    sensorPosture.SetResolution(RESOLITION);
+    sensorPosture.SetPower(POWER);
+    sensorPosture.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
+    sensorPosture.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
+    return sensorPosture;
 }
 
 int32_t SensorHdiConnection::GetSensorList(std::vector<Sensor> &sensorList)
@@ -154,49 +210,13 @@ int32_t SensorHdiConnection::GetSensorList(std::vector<Sensor> &sensorList)
     for (const auto &sensorId : mockSet_) {
         switch (sensorId) {
             case SENSOR_TYPE_ID_COLOR:
-                Sensor sensorColor;
-                sensorColor.SetSensorId(SENSOR_TYPE_ID_COLOR);
-                sensorColor.SetSensorTypeId(SENSOR_TYPE_ID_COLOR);
-                sensorColor.SetFirmwareVersion(VERSION_NAME);
-                sensorColor.SetHardwareVersion(VERSION_NAME);
-                sensorColor.SetMaxRange(MAX_RANGE);
-                sensorColor.SetSensorName("sensor_color");
-                sensorColor.SetVendorName("default_color");
-                sensorColor.SetResolution(RESOLITION);
-                sensorColor.SetPower(POWER);
-                sensorColor.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
-                sensorColor.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
-                sensorList.push_back(sensorColor);
+                sensorList.push_back(GenerateColorSensor());
                 break;
             case SENSOR_TYPE_ID_SAR:
-                Sensor sensorSar;
-                sensorSar.SetSensorId(SENSOR_TYPE_ID_SAR);
-                sensorSar.SetSensorTypeId(SENSOR_TYPE_ID_SAR);
-                sensorSar.SetFirmwareVersion(VERSION_NAME);
-                sensorSar.SetHardwareVersion(VERSION_NAME);
-                sensorSar.SetMaxRange(MAX_RANGE);
-                sensorSar.SetSensorName("sensor_sar");
-                sensorSar.SetVendorName("default_sar");
-                sensorSar.SetResolution(RESOLITION);
-                sensorSar.SetPower(POWER);
-                sensorSar.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
-                sensorSar.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
-                sensorList.push_back(sensorSar);
+                sensorList.push_back(GenerateSarSensor());
                 break;
             case SENSOR_TYPE_ID_POSTURE:
-                Sensor sensorPosture;
-                sensorPosture.SetSensorId(SENSOR_TYPE_ID_POSTURE);
-                sensorPosture.SetSensorTypeId(SENSOR_TYPE_ID_POSTURE);
-                sensorPosture.SetFirmwareVersion(VERSION_NAME);
-                sensorPosture.SetHardwareVersion(VERSION_NAME);
-                sensorPosture.SetMaxRange(MAX_RANGE);
-                sensorPosture.SetSensorName("sensor_posture");
-                sensorPosture.SetVendorName("default_posture");
-                sensorPosture.SetResolution(RESOLITION);
-                sensorPosture.SetPower(POWER);
-                sensorPosture.SetMinSamplePeriodNs(MIN_SAMPLE_PERIOD_NS);
-                sensorPosture.SetMaxSamplePeriodNs(MAX_SAMPLE_PERIOD_NS);
-                sensorList.push_back(sensorPosture);
+                sensorList.push_back(GeneratePostureSensor());
                 break;
             default:
                 break;
@@ -223,7 +243,7 @@ int32_t SensorHdiConnection::EnableSensor(int32_t sensorId)
     CHKPR(iSensorHdiConnection_, ENABLE_SENSOR_ERR);
     ret = iSensorHdiConnection_->EnableSensor(sensorId);
     FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         SEN_HILOGI("Enable sensor failed, sensorId:%{public}d", sensorId);
         return ENABLE_SENSOR_ERR;
     }
@@ -248,7 +268,7 @@ int32_t SensorHdiConnection::DisableSensor(int32_t sensorId)
     CHKPR(iSensorHdiConnection_, DISABLE_SENSOR_ERR);
     ret = iSensorHdiConnection_->DisableSensor(sensorId);
     FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         SEN_HILOGI("Disable sensor failed, sensorId:%{public}d", sensorId);
         return DISABLE_SENSOR_ERR;
     }
@@ -273,7 +293,7 @@ int32_t SensorHdiConnection::SetBatch(int32_t sensorId, int64_t samplingInterval
     CHKPR(iSensorHdiConnection_, SET_SENSOR_CONFIG_ERR);
     ret = iSensorHdiConnection_->SetBatch(sensorId, samplingInterval, reportInterval);
     FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         SEN_HILOGI("Set batch failed, sensorId:%{public}d", sensorId);
         return SET_SENSOR_CONFIG_ERR;
     }
@@ -283,10 +303,22 @@ int32_t SensorHdiConnection::SetBatch(int32_t sensorId, int64_t samplingInterval
 int32_t SensorHdiConnection::SetMode(int32_t sensorId, int32_t mode)
 {
     StartTrace(HITRACE_TAG_SENSORS, "SetMode");
+    int32_t ret = SET_SENSOR_MODE_ERR;
+    if (CheckOneInMockSet(sensorId)) {
+        // 当前sensor在注入打桩的set中，走打桩
+        CHKPR(iSensorCompatibleHdiConnection_, SET_SENSOR_MODE_ERR);
+        ret = iSensorCompatibleHdiConnection_->SetMode(sensorId, mode);
+        FinishTrace(HITRACE_TAG_SENSORS);
+        if (ret != ERR_OK) {
+            SEN_HILOGI("Set mode failed, sensorId:%{public}d", sensorId);
+            return SET_SENSOR_MODE_ERR;
+        }
+        return ret;
+    }
     CHKPR(iSensorHdiConnection_, SET_SENSOR_MODE_ERR);
-    int32_t ret = iSensorHdiConnection_->SetMode(sensorId, mode);
+    ret = iSensorHdiConnection_->SetMode(sensorId, mode);
     FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         SEN_HILOGI("Set mode failed, sensorId:%{public}d", sensorId);
         return SET_SENSOR_MODE_ERR;
     }

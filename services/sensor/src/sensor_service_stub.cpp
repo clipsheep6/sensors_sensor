@@ -64,6 +64,10 @@ SensorServiceStub::SensorServiceStub()
         &SensorServiceStub::DisableActiveInfoCBInner;
     baseFuncs_[static_cast<uint32_t>(SensorInterfaceCode::RESET_SENSORS)] =
         &SensorServiceStub::ResetSensorsInner;
+    baseFuncs_[static_cast<uint32_t>(SensorInterfaceCode::INJECT_MOCK_SENSOR)] =
+        &SensorServiceStub::InjectMockSensorInner;
+    baseFuncs_[static_cast<uint32_t>(SensorInterfaceCode::UNINJECT_MOCK_SENSOR)] =
+        &SensorServiceStub::UninjectMockSensorInner;
 }
 
 SensorServiceStub::~SensorServiceStub()
@@ -322,7 +326,10 @@ ErrCode SensorServiceStub::InjectMockSensorInner(MessageParcel &data, MessagePar
 
 ErrCode SensorServiceStub::UninjectMockSensorInner(MessageParcel &data, MessageParcel &reply)
 {
-
+    (void)reply;
+    int32_t sensorId;
+    READINT32(data, sensorId, READ_PARCEL_ERR);
+    return UninjectMockSensor(sensorId);
 }
 }  // namespace Sensors
 }  // namespace OHOS
