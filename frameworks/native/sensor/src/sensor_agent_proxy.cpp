@@ -313,13 +313,15 @@ int32_t SensorAgentProxy::GetAllSensors(SensorInfo **sensorInfo, int32_t *count)
     CHKPR(sensorInfo, OHOS::Sensors::ERROR);
     CHKPR(count, OHOS::Sensors::ERROR);
     std::lock_guard<std::mutex> listLock(sensorInfoMutex_);
-    if (sensorInfos_ == nullptr) {
-        int32_t ret = ConvertSensorInfos();
-        if (ret != SUCCESS) {
-            SEN_HILOGE("Convert sensor lists failed");
-            ClearSensorInfos();
-            return ERROR;
-        }
+    if (sensorInfos_ != nullptr) {
+        free(sensorInfos_);
+        sensorInfos_ = nullptr;
+    }
+    int32_t ret = ConvertSensorInfos();
+    if (ret != SUCCESS) {
+        SEN_HILOGE("Convert sensor lists failed");
+        ClearSensorInfos();
+        return ERROR;
     }
     *sensorInfo = sensorInfos_;
     *count = sensorInfoCount_;
@@ -436,6 +438,10 @@ int32_t SensorAgentProxy::ResetSensors() const
 int32_t SensorAgentProxy::InjectMockSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
+    if (sensorId < 0) {
+        SEN_HILOGE("SensorId is invalid, sensorId:%{public}d", sensorId);
+        return PARAMETER_ERROR;
+    }
     int32_t ret = SenClient.InjectMockSensor(sensorId);
     if (ret != ERR_OK) {
         SEN_HILOGE("inject sensors failed, ret:%{public}d", ret);
@@ -446,6 +452,10 @@ int32_t SensorAgentProxy::InjectMockSensor(int32_t sensorId)
 int32_t SensorAgentProxy::UninjectMockSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
+    if (sensorId < 0) {
+        SEN_HILOGE("SensorId is invalid, sensorId:%{public}d", sensorId);
+        return PARAMETER_ERROR;
+    }
     int32_t ret = SenClient.UninjectMockSensor(sensorId);
     if (ret != ERR_OK) {
         SEN_HILOGE("uninject sensors failed, ret:%{public}d", ret);
