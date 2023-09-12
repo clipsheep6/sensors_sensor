@@ -31,9 +31,9 @@ config("sensor_private_config") {
 
 config("sensor_public_config") {
   include_dirs = [
-    "include" ,
+    "include",
     "$SUBSYSTEM_DIR/interfaces/kits/c",
-    ]
+  ]
 }
 
 ohos_shared_library("sensor_interface_native") {
