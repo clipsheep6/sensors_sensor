@@ -26,7 +26,6 @@
  * @file sensor_capi_base.h
  *
  * @brief 定义常用传感器属性。
- * @library 需要链接生成libsensor_capi_ndk.so。
  * @syscap SystemCapability.Sensors.Sensor
  *
  * @since 11
