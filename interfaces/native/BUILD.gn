@@ -24,12 +24,16 @@ config("sensor_private_config") {
   include_dirs = [
     "$SUBSYSTEM_DIR/frameworks/native/sensor/include",
     "$SUBSYSTEM_DIR/interfaces/native/include",
+    "$SUBSYSTEM_DIR/interfaces/kits/c",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 }
 
 config("sensor_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include" ,
+    "$SUBSYSTEM_DIR/interfaces/kits/c",
+    ]
 }
 
 ohos_shared_library("sensor_interface_native") {
@@ -38,6 +42,7 @@ ohos_shared_library("sensor_interface_native") {
     "src/geomagnetic_field.cpp",
     "src/sensor_agent.cpp",
     "src/sensor_algorithm.cpp",
+    "src/sensor_capi.cpp",
   ]
 
   configs = [ ":sensor_private_config" ]
