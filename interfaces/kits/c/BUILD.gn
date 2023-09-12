@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/ohos/ndk/ndk.gni")
 import("./../../../sensor.gni")
 ohos_ndk_headers("sensor_capi_header") {
   dest_dir = "$ndk_headers_out_dir/sensor_capi"
@@ -23,7 +24,7 @@ ohos_ndk_headers("sensor_capi_header") {
 
 ohos_ndk_library("libsensor_capi_ndk") {
   ndk_description_file = "./libsensor_capi.ndk.json"
-  output_name = "sensor_capi_ndk"
+  output_name = "libsensor_capi_ndk"
   output_extension = "so"
 
   system_capability = "SystemCapability.Sensors.Sensor"
