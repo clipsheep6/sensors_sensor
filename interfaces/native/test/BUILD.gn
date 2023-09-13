@@ -49,9 +49,8 @@ ohos_unittest("SensorAgentTest") {
 ohos_unittest("SensorCapiTest") {
   module_out_path = "sensors/sensor/interfaces"
 
-  sources = [
-    "$SUBSYSTEM_DIR/interfaces/native/test/unittest/sensor_capi_test.cpp",
-  ]
+  sources =
+      [ "$SUBSYSTEM_DIR/interfaces/native/test/unittest/sensor_capi_test.cpp" ]
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/native/include",
