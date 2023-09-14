@@ -58,6 +58,16 @@
             ],
             "header_base": "//base/sensors/sensor/interfaces/native/include"
           }
+        },
+        {
+          "name": "//base/sensors/sensor/interfaces/native:sensor_ndk",
+          "header": {
+          "header_files": [
+            "sensor_capi_base.h",
+            "sensor_capi.h"
+          ],
+          "header_base": "//base/sensors/sensor/interfaces/kits/c"
+          }
         }
       ],
       "test": [

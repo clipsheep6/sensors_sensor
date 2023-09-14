@@ -17,6 +17,7 @@ import("./../../../sensor.gni")
 ohos_ndk_headers("sensor_capi_header") {
   dest_dir = "$ndk_headers_out_dir/sensor_capi"
   sources = [
+    "$SUBSYSTEM_DIR/interfaces/native",
     "./sensor_capi.h",
     "./sensor_capi_base.h",
   ]
@@ -24,12 +25,12 @@ ohos_ndk_headers("sensor_capi_header") {
 
 ohos_ndk_library("libsensor_capi_ndk") {
   ndk_description_file = "./libsensor_capi.ndk.json"
-  output_name = "libsensor_capi_ndk"
+  output_name = "sensor_capi_ndk"
   output_extension = "so"
-
+  min_compact_version = "10"
   system_capability = "SystemCapability.Sensors.Sensor"
   system_capability_headers = [
-    "sensor/sensor_capi_base.h",
-    "sensor/sensor_capi.h",
+    "$ndk_headers_out_dir/sensor/sensor_capi_base.h",
+    "$ndk_headers_out_dir/sensor/sensor_capi.h",
   ]
 }
