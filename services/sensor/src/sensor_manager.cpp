@@ -35,6 +35,21 @@ constexpr uint32_t PROXIMITY_SENSOR_ID = 50331904;
 constexpr float PROXIMITY_FAR = 5.0;
 }  // namespace
 
+SensorManager::~SensorManager()
+{
+    CALL_LOG_ENTER;
+#ifdef HDF_DRIVERS_INTERFACE_SENSOR
+    sensorDataProcesser_->StopThread();
+    if (dataThread_.joinable()) {
+        {
+            std::unique_lock<std::mutex> lk(ISensorHdiConnection::dataMutex_);
+            ISensorHdiConnection::dataCondition_.notify_one();
+        }
+        dataThread_.join();
+    }
+#endif // HDF_DRIVERS_INTERFACE_SENSOR
+}
+
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
 void SensorManager::InitSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap,
                                   sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback)

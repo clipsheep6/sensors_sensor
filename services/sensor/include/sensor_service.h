@@ -50,6 +50,7 @@ public:
     void OnDump() override;
     void OnStart() override;
     void OnStop() override;
+    void OnStartFuzz();
     int Dump(int fd, const std::vector<std::u16string> &args) override;
     ErrCode EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs) override;
     ErrCode DisableSensor(int32_t sensorId) override;
@@ -97,7 +98,7 @@ private:
     std::vector<Sensor> sensors_;
     std::unordered_map<int32_t, Sensor> sensorMap_;
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
-    bool InitInterface();
+    bool InitInterface(bool status);
     bool InitDataCallback();
     bool InitSensorList();
     SensorHdiConnection &sensorHdiConnection_ = SensorHdiConnection::GetInstance();

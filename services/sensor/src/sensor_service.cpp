@@ -66,7 +66,7 @@ void SensorService::OnStart()
         CHKPV(clientDeathObserver_);
     }
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
-    if (!InitInterface()) {
+    if (!InitInterface(true)) {
         SEN_HILOGE("Init interface error");
         return;
     }
@@ -96,10 +96,48 @@ void SensorService::OnStart()
     state_ = SensorServiceState::STATE_RUNNING;
 }
 
-#ifdef HDF_DRIVERS_INTERFACE_SENSOR
-bool SensorService::InitInterface()
+void SensorService::OnStartFuzz()
 {
-    auto ret = sensorHdiConnection_.ConnectHdi();
+    CALL_LOG_ENTER;
+    if (state_ == SensorServiceState::STATE_RUNNING) {
+        SEN_HILOGD("SensorService has already started");
+        return;
+    }
+    if (clientDeathObserver_ == nullptr) {
+        clientDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<SensorService *>(this));
+        CHKPV(clientDeathObserver_);
+    }
+#ifdef HDF_DRIVERS_INTERFACE_SENSOR
+    if (!InitInterface(false)) {
+        SEN_HILOGE("Init interface error");
+        return;
+    }
+    if (!InitDataCallback()) {
+        SEN_HILOGE("Init data callback error");
+        return;
+    }
+    if (!InitSensorList()) {
+        SEN_HILOGE("Init sensor list error");
+        return;
+    }
+    sensorDataProcesser_ = new (std::nothrow) SensorDataProcesser(sensorMap_);
+    CHKPV(sensorDataProcesser_);
+#endif // HDF_DRIVERS_INTERFACE_SENSOR
+    if (!InitSensorPolicy()) {
+        SEN_HILOGE("Init sensor policy error");
+    }
+#ifdef HDF_DRIVERS_INTERFACE_SENSOR
+    sensorManager_.InitSensorMap(sensorMap_, sensorDataProcesser_, reportDataCallback_);
+#else
+    sensorManager_.InitSensorMap(sensorMap_);
+#endif // HDF_DRIVERS_INTERFACE_SENSOR
+    state_ = SensorServiceState::STATE_RUNNING;
+}
+
+#ifdef HDF_DRIVERS_INTERFACE_SENSOR
+bool SensorService::InitInterface(bool status)
+{
+    int32_t ret = status ? sensorHdiConnection_.ConnectHdi() : sensorHdiConnection_.ConnectCompatible();
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi failed");
         return false;

@@ -32,6 +32,7 @@ using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataProcesser" };
 }  // namespace
+std::atomic_bool SensorDataProcesser::isStop_ = false;
 
 SensorDataProcesser::SensorDataProcesser(const std::unordered_map<int32_t, Sensor> &sensorMap)
 {
@@ -43,6 +44,11 @@ SensorDataProcesser::~SensorDataProcesser()
 {
     dataCountMap_.clear();
     sensorMap_.clear();
+}
+
+void SensorDataProcesser::StopThread()
+{
+    isStop_ = true;
 }
 
 void SensorDataProcesser::SendNoneFifoCacheData(std::unordered_map<int32_t, SensorData> &cacheBuf,
@@ -295,6 +301,10 @@ int32_t SensorDataProcesser::DataThread(sptr<SensorDataProcesser> dataProcesser,
         if (dataProcesser->ProcessEvents(dataCallback) == INVALID_POINTER) {
             SEN_HILOGE("Callback cannot be null");
             return INVALID_POINTER;
+        }
+        if (dataProcesser->isStop_) {
+            SEN_HILOGI("Thread stop");
+            return THREAD_STOP;
         }
     } while (1);
 }

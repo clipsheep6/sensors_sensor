@@ -34,6 +34,7 @@ namespace Sensors {
 using namespace Security::AccessToken;
 class SensorManager : public Singleton<SensorManager> {
 public:
+    ~SensorManager();
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
     void InitSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap, sptr<SensorDataProcesser> dataProcesser,
                        sptr<ReportDataCallback> dataCallback);
