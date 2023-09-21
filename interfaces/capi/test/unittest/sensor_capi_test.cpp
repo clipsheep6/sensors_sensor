@@ -35,8 +35,8 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, OHOS::Sensors::SENSOR_LOG_DOMAIN, "SensorCapiTest" };
-// Sensor_SubscribeId SENSOR_ID = 1;
-// Sensor_SubscribeId INVALID_VALUE = -1;
+Sensor_SensorTypeId SENSOR_ID = ACCELEROMETER;
+Sensor_SensorTypeId INVALID_VALUE = INVALID;
 
 PermissionDef g_infoManagerTestPermDef = {
     .permissionName = "ohos.permission.ACCELEROMETER",
@@ -148,60 +148,56 @@ HWTEST_F(SensorCapiTest, OH_Sensor_GetAllSensorsTest_003, TestSize.Level1)
 HWTEST_F(SensorCapiTest, OH_Sensor_SubscribeSensorTest_001, TestSize.Level1)
 {
     SEN_HILOGI("OH_Sensor_GetAllSensors_001 in");
-    Sensor_SubscribeUser user;
+    Sensor_SensorUser user;
     user.callback = nullptr;
-    Sensor_SubscribeId subscribeId;
     struct Sensor_SubscribeAttribute attribute;
-    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(subscribeId, attribute, &user));
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(SENSOR_ID, attribute, &user));
     ASSERT_NE(ret, SENSOR_SUCCESS);
 }
 
-// HWTEST_F(SensorCapiTest, OH_Sensor_SubscribeSensorTest_002, TestSize.Level1)
-// {
-//     SEN_HILOGI("OH_Sensor_SubscribeSensor_002 in");
-//     Sensor_SubscribeUser user;
-//     user.callback = SensorDataCallbackImpl;
-//     struct Sensor_SubscribeAttribute attribute;
-//     Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(INVALID_VALUE, attribute, &user));
-//     ASSERT_NE(ret, SENSOR_SUCCESS);
-// }
+HWTEST_F(SensorCapiTest, OH_Sensor_SubscribeSensorTest_002, TestSize.Level1)
+{
+    SEN_HILOGI("OH_Sensor_SubscribeSensor_002 in");
+    Sensor_SensorUser user;
+    user.callback = SensorDataCallbackImpl;
+    struct Sensor_SubscribeAttribute attribute;
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(INVALID_VALUE, attribute, &user));
+    ASSERT_NE(ret, SENSOR_SUCCESS);
+}
 
 HWTEST_F(SensorCapiTest, OH_Sensor_SubscribeSensorTest_003, TestSize.Level1)
 {
     SEN_HILOGI("OH_Sensor_SubscribeSensor_003 in");
     struct Sensor_SubscribeAttribute attribute;
-    Sensor_SubscribeId subscribeId;
-    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(subscribeId, attribute, nullptr));
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(SENSOR_ID, attribute, nullptr));
     ASSERT_NE(ret, SENSOR_SUCCESS);
 }
 
 HWTEST_F(SensorCapiTest, OH_Sensor_UnsubscribeSensorTest_001, TestSize.Level1)
 {
     SEN_HILOGI("OH_Sensor_UnsubscribeSensorTest_001 in");
-    Sensor_SubscribeUser user;
+    Sensor_SensorUser user;
     user.callback = nullptr;
     struct Sensor_SubscribeAttribute attribute;
-    Sensor_SubscribeId subscribeId;
-    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(subscribeId, attribute, &user));
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_SubscribeSensor(SENSOR_ID, attribute, &user));
     ASSERT_NE(ret, SENSOR_SUCCESS);
-    ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(subscribeId, &user));
+    ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(SENSOR_ID, &user));
     ASSERT_NE(ret, SENSOR_SUCCESS);
 }
 
-// HWTEST_F(SensorCapiTest, OH_Sensor_UnsubscribeSensorTest_002, TestSize.Level1)
-// {
-//     SEN_HILOGI("OH_Sensor_UnsubscribeSensorTest_002 in");
-//     Sensor_SubscribeUser user;
-//     user.callback = SensorDataCallbackImpl;
-//     Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(INVALID_VALUE, &user));
-//     ASSERT_NE(ret, SENSOR_SUCCESS);
-// }
+HWTEST_F(SensorCapiTest, OH_Sensor_UnsubscribeSensorTest_002, TestSize.Level1)
+{
+    SEN_HILOGI("OH_Sensor_UnsubscribeSensorTest_002 in");
+    Sensor_SensorUser user;
+    user.callback = SensorDataCallbackImpl;
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(INVALID_VALUE, &user));
+    ASSERT_NE(ret, SENSOR_SUCCESS);
+}
 
 HWTEST_F(SensorCapiTest, OH_Sensor_UnsubscribeSensorTest_003, TestSize.Level1)
 {
     SEN_HILOGI("OH_Sensor_UnsubscribeSensor_003 in");
-    Sensor_SubscribeId subscribeId;
-    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(subscribeId, nullptr));
+    Sensor_Result ret = static_cast<Sensor_Result>(OH_Sensor_UnsubscribeSensor(SENSOR_ID, nullptr));
     ASSERT_NE(ret, SENSOR_SUCCESS);
 }
 }  // namespace Sensors

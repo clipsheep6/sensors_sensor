@@ -32,7 +32,7 @@ Sensor_Result OH_Sensor_GetAllSensors(Sensor_SensorInfo **sensorInfo, int32_t *c
     return ret;
 }
 
-bool CheckSensorSubscribeId(Sensor_SubscribeId subscribeId)
+bool CheckSensorSubscribeId(int32_t sensorTypeId)
 {
     int32_t count = -1;
     Sensor_SensorInfo *sensorInfo = nullptr;
@@ -42,15 +42,15 @@ bool CheckSensorSubscribeId(Sensor_SubscribeId subscribeId)
     }
     for (int32_t i = 0; i < count; i++)
     {
-        if ((sensorInfo + i)->sensorTypeId == subscribeId.sensorTypeId) {
+        if ((sensorInfo + i)->sensorTypeId == sensorTypeId) {
             return true;
         }
     }
     return false;
 }
 
-Sensor_Result OH_Sensor_SubscribeSensor(Sensor_SubscribeId subscribeId, Sensor_SubscribeAttribute attribute,
-    const Sensor_SubscribeUser *user)
+Sensor_Result OH_Sensor_SubscribeSensor(Sensor_SensorTypeId sensorTypeId, Sensor_SubscribeAttribute attribute,
+    const Sensor_SensorUser *user)
 {
     SEN_HILOGD("cff2 OH_Sensor_SubscribeSensor in");
     if (!CheckSensorSubscribeId(subscribeId) || attribute.samplingInterval < 0 || attribute.reportInterval < 0) {
@@ -66,7 +66,7 @@ Sensor_Result OH_Sensor_SubscribeSensor(Sensor_SubscribeId subscribeId, Sensor_S
     return ret;
 }
 
-Sensor_Result OH_Sensor_UnsubscribeSensor(Sensor_SubscribeId subscribeId, const Sensor_SubscribeUser *user)
+Sensor_Result OH_Sensor_UnsubscribeSensor(Sensor_SensorTypeId sensorTypeId, const Sensor_SensorUser *user)
 {
     SEN_HILOGD("cff4 OH_Sensor_UnsubscribeSensor in");
     if (!CheckSensorSubscribeId(subscribeId)) {
