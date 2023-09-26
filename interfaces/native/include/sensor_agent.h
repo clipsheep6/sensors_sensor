@@ -189,6 +189,10 @@ int32_t Unregister(SensorActiveInfoCB callback);
  */
 int32_t ResetSensors();
 
+int32_t InjectMockSensor(int32_t sensorTypeId); // 注入打桩sensor
+
+int32_t UninjectMockSensor(int32_t sensorTypeId); // 删除打桩sensor
+
 #ifdef __cplusplus
 #if __cplusplus
 }

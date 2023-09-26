@@ -170,3 +170,23 @@ int32_t ResetSensors()
     }
     return ret;
 }
+
+int32_t InjectMockSensor(int32_t sensorTypeId)
+{
+    int32_t ret = SENSOR_AGENT_IMPL->InjectMockSensor(sensorTypeId);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("InjectMockSensor failed");
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}
+
+int32_t UninjectMockSensor(int32_t sensorTypeId)
+{
+    int32_t ret = SENSOR_AGENT_IMPL->UninjectMockSensor(sensorTypeId);
+    if (ret != OHOS::ERR_OK) {
+        SEN_HILOGE("UninjectMockSensor failed");
+        return NormalizeErrCode(ret);
+    }
+    return ret;
+}

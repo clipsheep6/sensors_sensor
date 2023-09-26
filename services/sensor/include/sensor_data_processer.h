@@ -37,6 +37,7 @@ class SensorDataProcesser : public RefBase {
 public:
     explicit SensorDataProcesser(const std::unordered_map<int32_t, Sensor> &sensorMap);
     virtual ~SensorDataProcesser();
+    void UpdateSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap);
     int32_t ProcessEvents(sptr<ReportDataCallback> dataCallback);
     int32_t SendEvents(sptr<SensorBasicDataChannel> &channel, SensorData &data);
     static int DataThread(sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback);
@@ -59,7 +60,7 @@ private:
     FlushInfoRecord &flushInfo_ = FlushInfoRecord::GetInstance();
     std::mutex dataCountMutex_;
     std::unordered_map<int32_t, std::vector<sptr<FifoCacheData>>> dataCountMap_;
-    std::mutex sensorMutex_;
+    std::mutex sensorMapMutex_;
     std::unordered_map<int32_t, Sensor> sensorMap_;
 };
 }  // namespace Sensors

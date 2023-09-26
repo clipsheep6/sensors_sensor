@@ -48,6 +48,7 @@ public:
     bool IsOtherClientUsingSensor(int32_t sensorId, int32_t clientPid);
     ErrCode AfterDisableSensor(int32_t sensorId);
     void GetPackageName(AccessTokenID tokenId, std::string &packageName);
+    void UpdateSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap);
 
 private:
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
@@ -57,8 +58,8 @@ private:
     sptr<ReportDataCallback> reportDataCallback_;
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
     ClientInfo &clientInfo_ = ClientInfo::GetInstance();
-    std::unordered_map<int32_t, Sensor> sensorMap_;
     std::mutex sensorMapMutex_;
+    std::unordered_map<int32_t, Sensor> sensorMap_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

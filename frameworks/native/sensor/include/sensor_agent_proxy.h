@@ -49,6 +49,8 @@ public:
     int32_t Unregister(SensorActiveInfoCB callback);
     void HandleSensorData(SensorEvent *events, int32_t num, void *data);
     int32_t ResetSensors() const;
+    int32_t InjectMockSensor(int32_t sensorId);
+    int32_t UninjectMockSensor(int32_t sensorId);
 
 private:
     int32_t CreateSensorDataChannel();

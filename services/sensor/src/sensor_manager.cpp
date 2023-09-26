@@ -40,7 +40,7 @@ void SensorManager::InitSensorMap(const std::unordered_map<int32_t, Sensor> &sen
                                   sptr<SensorDataProcesser> dataProcesser, sptr<ReportDataCallback> dataCallback)
 {
     std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
-    sensorMap_.insert(sensorMap.begin(), sensorMap.end());
+    sensorMap_ = sensorMap;
     sensorDataProcesser_ = dataProcesser;
     reportDataCallback_ = dataCallback;
     SEN_HILOGD("Begin sensorMap_.size:%{public}zu", sensorMap_.size());
@@ -211,6 +211,14 @@ void SensorManager::GetPackageName(AccessTokenID tokenId, std::string &packageNa
             break;
         }
     }
+}
+
+void SensorManager::UpdateSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap)
+{
+    std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
+    sensorMap_.clear();
+    sensorMap_ = sensorMap;
+    SEN_HILOGD("Update sensorMap_.size:%{public}zu", sensorMap_.size());
 }
 }  // namespace Sensors
 }  // namespace OHOS

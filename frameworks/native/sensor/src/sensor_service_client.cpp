@@ -476,5 +476,45 @@ int32_t SensorServiceClient::CreateSocketChannel()
     isConnected_ = true;
     return ERR_OK;
 }
+
+int32_t SensorServiceClient::InjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "InjectMockSensor");
+    ret = sensorServer_->InjectMockSensor(sensorId);
+    if (ret == ERR_OK) {
+        // 注入sensor成功，更新sensorList
+        sensorList_.clear();
+        sensorList_ = sensorServer_->GetSensorList();
+    }
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
+int32_t SensorServiceClient::UninjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(sensorServer_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "UninjectMockSensor");
+    ret = sensorServer_->UninjectMockSensor(sensorId);
+    if (ret == ERR_OK) {
+        // 删除sensor成功，更新sensorList
+        sensorList_.clear();
+        sensorList_ = sensorServer_->GetSensorList();
+    }
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

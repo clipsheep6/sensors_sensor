@@ -526,6 +526,70 @@ ErrCode SensorService::ResetSensors()
     return POWER_POLICY.ResetSensors();
 }
 
+ErrCode SensorService::InjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = sensorHdiConnection_.InjectMockSensor(sensorId);
+    if (ret != ERR_OK) {
+        // 注入sensor失败
+        return ret;
+    }
+    // 注入sensor成功
+    
+    //1.更新 SensorService::sensors_ 和 SensorService::sensorMap_
+    std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
+    sensors_.clear();
+    ret = sensorHdiConnection_.GetSensorList(sensors_);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("GetSensorList is failed");
+        return ret;
+    }
+    std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
+    sensorMap_.clear();
+    for (const auto &it : sensors_) {
+        sensorMap_.insert(std::make_pair(it.GetSensorId(), it));
+    }
+
+    //2.更新 SensorDataProcesser::sensorMap_
+    sensorDataProcesser_->UpdateSensorMap(sensorMap_);
+
+    //3.更新 SensorManager::sensorMap_
+    sensorManager_.UpdateSensorMap(sensorMap_);
+    return ERR_OK;
+}
+
+ErrCode SensorService::UninjectMockSensor(int32_t sensorId)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = sensorHdiConnection_.UninjectMockSensor(sensorId);
+    if (ret != ERR_OK) {
+        // 删除sensor失败
+        return ret;
+    }
+    // 删除sensor成功
+
+    //1.更新 SensorService::sensors_ 和 SensorService::sensorMap_
+    std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
+    sensors_.clear();
+    ret = sensorHdiConnection_.GetSensorList(sensors_);
+    if (ret != ERR_OK) {
+        SEN_HILOGE("GetSensorList is failed");
+        return ret;
+    }
+    std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
+    sensorMap_.clear();
+    for (const auto &it : sensors_) {
+        sensorMap_.insert(std::make_pair(it.GetSensorId(), it));
+    }
+
+    //2.更新 SensorDataProcesser::sensorMap_
+    sensorDataProcesser_->UpdateSensorMap(sensorMap_);
+
+    //3.更新 SensorManager::sensorMap_
+    sensorManager_.UpdateSensorMap(sensorMap_);
+    return ERR_OK;
+}
+
 void SensorService::ReportActiveInfo(int32_t sensorId, int32_t pid)
 {
     CALL_LOG_ENTER;

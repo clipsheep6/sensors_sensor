@@ -49,6 +49,8 @@ public:
     virtual ErrCode EnableActiveInfoCB() = 0;
     virtual ErrCode DisableActiveInfoCB() = 0;
     virtual ErrCode ResetSensors() = 0;
+    virtual ErrCode InjectMockSensor(int32_t sensorId) = 0;
+    virtual ErrCode UninjectMockSensor(int32_t sensorId) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

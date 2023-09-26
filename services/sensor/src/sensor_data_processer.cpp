@@ -35,14 +35,23 @@ constexpr HiLogLabel LABEL = { LOG_CORE, SENSOR_LOG_DOMAIN, "SensorDataProcesser
 
 SensorDataProcesser::SensorDataProcesser(const std::unordered_map<int32_t, Sensor> &sensorMap)
 {
-    sensorMap_.insert(sensorMap.begin(), sensorMap.end());
-    SEN_HILOGD("sensorMap_.size:%{public}d", int32_t { sensorMap_.size() });
+    std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
+    sensorMap_ = sensorMap;
+    SEN_HILOGD("Begin sensorMap_.size:%{public}zu", sensorMap_.size());
 }
 
 SensorDataProcesser::~SensorDataProcesser()
 {
     dataCountMap_.clear();
     sensorMap_.clear();
+}
+
+void SensorDataProcesser::UpdateSensorMap(const std::unordered_map<int32_t, Sensor> &sensorMap)
+{
+    std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
+    sensorMap_.clear();
+    sensorMap_ = sensorMap;
+    SEN_HILOGD("Update sensorMap_.size:%{public}zu", sensorMap_.size());
 }
 
 void SensorDataProcesser::SendNoneFifoCacheData(std::unordered_map<int32_t, SensorData> &cacheBuf,
@@ -177,7 +186,7 @@ bool SensorDataProcesser::ReportNotContinuousData(std::unordered_map<int32_t, Se
                                                   sptr<SensorBasicDataChannel> &channel, SensorData &data)
 {
     int32_t sensorId = data.sensorTypeId;
-    std::lock_guard<std::mutex> sensorLock(sensorMutex_);
+    std::lock_guard<std::mutex> sensorLock(sensorMapMutex_);
     auto sensor = sensorMap_.find(sensorId);
     if (sensor == sensorMap_.end()) {
         SEN_HILOGE("Data's sensorId is not supported");

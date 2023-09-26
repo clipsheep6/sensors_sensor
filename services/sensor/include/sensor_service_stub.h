@@ -47,6 +47,8 @@ private:
     ErrCode EnableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply);
     ErrCode DisableActiveInfoCBInner(MessageParcel &data, MessageParcel &reply);
     ErrCode ResetSensorsInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode InjectMockSensorInner(MessageParcel &data, MessageParcel &reply);
+    ErrCode UninjectMockSensorInner(MessageParcel &data, MessageParcel &reply);
     std::unordered_map<uint32_t, SensorBaseFunc> baseFuncs_;
 };
 }  // namespace Sensors

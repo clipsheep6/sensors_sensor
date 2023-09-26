@@ -33,6 +33,8 @@ enum class SensorInterfaceCode {
     ENABLE_ACTIVE_INFO_CB,
     DISABLE_ACTIVE_INFO_CB,
     RESET_SENSORS,
+    INJECT_MOCK_SENSOR,
+    UNINJECT_MOCK_SENSOR,
 };
 }  // namespace Sensors
 }  // namespace OHOS

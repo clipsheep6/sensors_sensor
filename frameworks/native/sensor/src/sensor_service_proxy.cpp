@@ -364,5 +364,49 @@ ErrCode SensorServiceProxy::ResetSensors()
     }
     return static_cast<ErrCode>(ret);
 }
+
+ErrCode SensorServiceProxy::InjectMockSensor(int32_t sensorId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Parcel write descriptor failed");
+        return WRITE_PARCEL_ERR;
+    }
+    WRITEINT32(data, sensorId, WRITE_PARCEL_ERR);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(SensorInterfaceCode::INJECT_MOCK_SENSOR),
+        data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "InjectMockSensor", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
+
+ErrCode SensorServiceProxy::UninjectMockSensor(int32_t sensorId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SensorServiceProxy::GetDescriptor())) {
+        SEN_HILOGE("Parcel write descriptor failed");
+        return WRITE_PARCEL_ERR;
+    }
+    WRITEINT32(data, sensorId, WRITE_PARCEL_ERR);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(SensorInterfaceCode::UNINJECT_MOCK_SENSOR),
+        data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::SENSOR, "SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "UninjectMockSensor", "ERROR_CODE", ret);
+        SEN_HILOGE("Failed, ret:%{public}d", ret);
+    }
+    return static_cast<ErrCode>(ret);
+}
 }  // namespace Sensors
 }  // namespace OHOS
