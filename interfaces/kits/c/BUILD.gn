@@ -26,7 +26,6 @@ ohos_ndk_headers("sensor_capi_header") {
 ohos_ndk_library("libsensor_capi_ndk") {
   ndk_description_file = "./libsensor_capi.ndk.json"
   output_name = "sensor_capi_ndk"
-  output_extension = "so"
   min_compact_version = "10"
   system_capability = "SystemCapability.Sensors.Sensor"
   system_capability_headers = [
