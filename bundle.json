@@ -40,6 +40,7 @@
         "fwk_group": [
           "//base/sensors/sensor/interfaces/plugin:sensor_js_target",
           "//base/sensors/sensor/interfaces/native:sensor_ndk_target",
+          "//base/sensors/sensor/interfaces/capi:sensor_capi_ndk_target",
           "//base/sensors/sensor/frameworks/native/sensor:sensor_native_target",
           "//base/sensors/sensor/utils:sensor_utils_target"
         ],
@@ -58,13 +59,24 @@
             ],
             "header_base": "//base/sensors/sensor/interfaces/native/include"
           }
+        },
+        {
+          "name": "//base/sensors/sensor/interfaces/capi:sensor_capi_ndk_target",
+          "header": {
+          "header_files": [
+            "sensor_capi_base.h",
+            "sensor_capi.h"
+          ],
+          "header_base": "//base/sensors/sensor/interfaces/kits/c"
+          }
         }
       ],
       "test": [
-          "//base/sensors/sensor/interfaces/plugin/test/unittest:unittest",
-          "//base/sensors/sensor/interfaces/native/test/fuzztest:fuzztest",
-          "//base/sensors/sensor/interfaces/native/test:unittest",
-          "//base/sensors/sensor/services/sensor/test/fuzztest:fuzztest"
+        "//base/sensors/sensor/interfaces/plugin/test/unittest:unittest",
+        "//base/sensors/sensor/interfaces/native/test/fuzztest:fuzztest",
+        "//base/sensors/sensor/interfaces/capi/test/unittest:unittest",
+        "//base/sensors/sensor/interfaces/native/test:unittest",
+        "//base/sensors/sensor/services/sensor/test/fuzztest:fuzztest"
       ]
     }
   }
