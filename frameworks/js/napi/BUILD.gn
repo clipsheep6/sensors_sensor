@@ -27,11 +27,6 @@ ohos_shared_library("libsensor") {
     "APP_LOG_TAG = \"sensorJs\"",
     "LOG_DOMAIN = 0xD002700",
   ]
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "src/sensor_js.cpp",
     "src/sensor_napi_error.cpp",
