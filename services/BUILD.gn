@@ -34,7 +34,7 @@ ohos_shared_library("libsensor_service") {
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/ipc/include",
   ]
-  
+
   defines = sensor_default_defines
 
   deps = [
