@@ -36,7 +36,7 @@ ohos_shared_library("libsensor_native") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   defines = sensor_default_defines
