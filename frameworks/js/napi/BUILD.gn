@@ -30,7 +30,7 @@ ohos_shared_library("libsensor") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
   sources = [
     "src/sensor_js.cpp",

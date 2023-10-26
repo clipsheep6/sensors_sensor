@@ -34,7 +34,7 @@ ohos_shared_library("libsensor_utils") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   external_deps = [
