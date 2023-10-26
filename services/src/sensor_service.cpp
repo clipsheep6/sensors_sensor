@@ -84,7 +84,7 @@ void SensorService::OnStart()
     if (!InitSensorPolicy()) {
         SEN_HILOGE("Init sensor policy error");
     }
-    if (!SystemAbility::Publish(SensorDelayedSpSingleton<SensorService>::GetInstance())) {
+    if (!SystemAbility::Publish(this)) {
         SEN_HILOGE("Publish SensorService error");
         return;
     }
