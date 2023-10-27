@@ -51,8 +51,8 @@ int32_t HdiConnection::ConnectHdi()
         g_sensorInterface = ISensorInterface::Get();
         if (g_sensorInterface != nullptr) {
             SEN_HILOGI("Connect v1_1 hdi success");
-            eventCallback_ = new (std::nothrow) SensorEventCallback();
-            CHKPR(eventCallback_, ERR_NO_INIT);
+            g_eventCallback = new (std::nothrow) SensorEventCallback();
+            CHKPR(g_eventCallback, ERR_NO_INIT);
             RegisterHdiDeathRecipient();
             return ERR_OK;
         }
@@ -185,7 +185,7 @@ int32_t HdiConnection::DestroyHdiConnection()
         SEN_HILOGE("Unregister is failed");
         return ret;
     }
-    eventCallback_ = nullptr;
+    g_eventCallback = nullptr;
     UnregisterHdiDeathRecipient();
     return ERR_OK;
 }
@@ -212,26 +212,26 @@ void HdiConnection::UpdateSensorBasicInfo(int32_t sensorId, int64_t samplingPeri
     SensorBasicInfo sensorBasicInfo;
     sensorBasicInfo.SetSamplingPeriodNs(samplingPeriodNs);
     sensorBasicInfo.SetMaxReportDelayNs(maxReportDelayNs);
-    sensorBasicInfoMap_[sensorId] = sensorBasicInfo;
+    g_sensorBasicInfoMap[sensorId] = sensorBasicInfo;
 }
 
 void HdiConnection::SetSensorBasicInfoState(int32_t sensorId, bool state)
 {
     std::lock_guard<std::mutex> sensorInfoLock(g_sensorBasicInfoMutex);
-    auto it = sensorBasicInfoMap_.find(sensorId);
-    if (it == sensorBasicInfoMap_.end()) {
+    auto it = g_sensorBasicInfoMap.find(sensorId);
+    if (it == g_sensorBasicInfoMap.end()) {
         SEN_HILOGW("Should set batch first");
         return;
     }
-    sensorBasicInfoMap_[sensorId].SetSensorState(state);
+    g_sensorBasicInfoMap[sensorId].SetSensorState(state);
 }
 
 void HdiConnection::DeleteSensorBasicInfoState(int32_t sensorId)
 {
     std::lock_guard<std::mutex> sensorInfoLock(g_sensorBasicInfoMutex);
-    auto it = sensorBasicInfoMap_.find(sensorId);
-    if (it != sensorBasicInfoMap_.end()) {
-        sensorBasicInfoMap_.erase(sensorId);
+    auto it = g_sensorBasicInfoMap.find(sensorId);
+    if (it != g_sensorBasicInfoMap.end()) {
+        g_sensorBasicInfoMap.erase(sensorId);
     }
 }
 
@@ -261,7 +261,7 @@ void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
     CHKPV(hdiService);
     CHKPV(hdiDeathObserver_);
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
-    eventCallback_ = nullptr;
+    g_eventCallback = nullptr;
     Reconnect();
 }
 
@@ -285,7 +285,7 @@ void HdiConnection::Reconnect()
         return;
     }
     std::lock_guard<std::mutex> sensorInfoLock(g_sensorBasicInfoMutex);
-    for (const auto &sensorInfo: sensorBasicInfoMap_) {
+    for (const auto &sensorInfo: g_sensorBasicInfoMap) {
         int32_t sensorTypeId = sensorInfo.first;
         SensorBasicInfo info = sensorInfo.second;
         if (info.GetSensorState() != true) {
