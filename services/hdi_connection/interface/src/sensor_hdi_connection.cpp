@@ -14,7 +14,9 @@
  */
 #include "sensor_hdi_connection.h"
 
+#ifdef BUILD_VARIANT_ENG
 #include "compatible_connection.h"
+#endif
 #include "hdi_connection.h"
 #include "hitrace_meter.h"
 #include "sensor_errors.h"
@@ -43,13 +45,16 @@ int32_t SensorHdiConnection::ConnectHdi()
     int32_t ret = ConnectHdiService();
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi service failed, try to connect compatible connection, ret:%{public}d", ret);
-        iSensorHdiConnection_ = std::make_unique<CompatibleConnection>();
-        ret = ConnectHdiService();
-        if (ret != ERR_OK) {
-            SEN_HILOGE("Connect compatible connection failed, ret:%{public}d", ret);
-            return ret;
+            #ifdef BUILD_VARIANT_ENG
+            iSensorHdiConnection_ = std::make_unique<CompatibleConnection>();
+            ret = ConnectHdiService();
+            if (ret != ERR_OK) {
+                SEN_HILOGE("Connect compatible connection failed, ret:%{public}d", ret);
+                return ret;
+            }
+            hdiConnectionStatus_ = false;
+            #endif
         }
-        hdiConnectionStatus_ = false;
     } else {
         hdiConnectionStatus_ = true;
     }
@@ -83,6 +88,7 @@ int32_t SensorHdiConnection::ConnectHdiService()
     return ERR_OK;
 }
 
+#ifdef BUILD_VARIANT_ENG
 int32_t SensorHdiConnection::ConnectCompatibleHdi()
 {
     if (iSensorCompatibleHdiConnection_ == nullptr) {
@@ -95,6 +101,7 @@ int32_t SensorHdiConnection::ConnectCompatibleHdi()
     }
     return ERR_OK;
 }
+#endif
 
 bool SensorHdiConnection::FindAllInSensorSet(const std::unordered_set<int32_t> &sensors)
 {

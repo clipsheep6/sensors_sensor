@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef BUILD_VARIANT_ENG
 #include "compatible_connection.h"
+#endif
 
 #include <cstring>
 
