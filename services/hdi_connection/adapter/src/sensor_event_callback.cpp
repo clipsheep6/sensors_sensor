@@ -53,9 +53,11 @@ int32_t SensorEventCallback::OnDataEvent(const HdfSensorEvents &event)
     for (int32_t i = 0; i < dataSize; i++) {
         sensorData.data[i] = event.data[i];
     }
+#ifdef BUILD_VARIANT_ENG 
     std::unique_lock<std::mutex> lk(ISensorHdiConnection::dataMutex_);
     (void)(reportDataCallback_->*(reportDataCb_))(&sensorData, reportDataCallback_);
     ISensorHdiConnection::dataCondition_.notify_one();
+#endif
     return ERR_OK;
 }
 }  // namespace Sensors

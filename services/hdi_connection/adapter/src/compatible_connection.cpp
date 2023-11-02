@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef BUILD_VARIANT_ENG
 #include "compatible_connection.h"
+#endif
 
 #include <cstring>
 
@@ -138,7 +140,9 @@ void CompatibleConnection::ReportSensorDataCallback(SensorEvent *event)
     }
     CHKPV(reportDataCallback_);
     CHKPV(reportDataCb_);
+#ifdef BUILD_VARIANT_ENG 
     std::unique_lock<std::mutex> lk(ISensorHdiConnection::dataMutex_);
+#endif
     (void)(reportDataCallback_->*reportDataCb_)(&sensorData, reportDataCallback_);
     ISensorHdiConnection::dataCondition_.notify_one();
 }
