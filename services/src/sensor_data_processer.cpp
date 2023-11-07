@@ -254,8 +254,10 @@ void SensorDataProcesser::EventFilter(CircularEventBuf &eventsBuf)
 int32_t SensorDataProcesser::ProcessEvents(sptr<ReportDataCallback> dataCallback)
 {
     CHKPR(dataCallback, INVALID_POINTER);
+#ifdef BUILD_VARIANT_ENG 
     std::unique_lock<std::mutex> lk(ISensorHdiConnection::dataMutex_);
     ISensorHdiConnection::dataCondition_.wait(lk);
+#endif
     auto &eventsBuf = dataCallback->GetEventData();
     if (eventsBuf.eventNum <= 0) {
         SEN_HILOGE("Data cannot be empty");
