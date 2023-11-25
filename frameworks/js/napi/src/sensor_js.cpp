@@ -342,6 +342,16 @@ static napi_value On(napi_env env, napi_callback_info info)
         napi_value value = GetNamedProperty(env, args[2], "interval");
         if (IsMatchType(env, value, napi_number)) {
             GetNativeInt64(env, value, interval);
+            SubscribeSensor(sensorTypeId, interval, DataCallbackImpl);
+        } else if (IsMatchType(env, value, napi_string)) {
+            std::string mode;
+            GetStringValue(env, value, mode);
+            auto iter = g_samplingPeriod.find(mode);
+            if (iter != g_samplingPeriod.end()) {
+                interval = iter->second;
+            }
+            SEN_HILOGD("%{public}s", mode.c_str());
+            SubscribeSensor(sensorTypeId, interval, DataCallbackImpl);
         }
     }
     SEN_HILOGD("Interval is %{public}" PRId64, interval);
