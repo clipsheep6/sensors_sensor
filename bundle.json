@@ -39,6 +39,7 @@
         "base_group": [],
         "fwk_group": [
           "//base/sensors/sensor/frameworks/js/napi:sensor_js_target",
+          "//base/sensors/sensor/frameworks/capi:sensor_capi_target",
           "//base/sensors/sensor/frameworks/native:sensor_target",
           "//base/sensors/sensor/utils:sensor_utils_target"
         ],
@@ -57,11 +58,22 @@
             ],
             "header_base": "//base/sensors/sensor/interfaces/inner_api"
           }
+        },
+        {
+          "name": "//base/sensors/sensor/frameworks/capi:sensor_capi_target",
+          "header": {
+          "header_files": [
+            "sensor_capi_base.h",
+            "sensor_capi.h"
+          ],
+          "header_base": "//base/sensors/sensor/frameworks/kits/c"
+          }
         }
       ],
       "test": [
           "//base/sensors/sensor/test/unittest/interfaces/js:unittest",
           "//base/sensors/sensor/test/fuzztest/interfaces:fuzztest",
+          "//base/sensors/sensor/test/unittest/interfaces/capi:unittest",
           "//base/sensors/sensor/test/unittest/interfaces/inner_api:unittest",
           "//base/sensors/sensor/test/fuzztest/services:fuzztest"
       ]
