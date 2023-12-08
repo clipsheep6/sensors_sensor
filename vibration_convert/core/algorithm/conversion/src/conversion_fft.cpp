@@ -15,8 +15,8 @@
 
 #include "conversion_fft.h"
 
+#include "sensor_errors.h"
 #include "sensor_log.h"
-#include "sensors_errors.h"
 #include "utils.h"
 
 namespace OHOS {

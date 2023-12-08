@@ -29,6 +29,7 @@
 #include "sensor_napi_error.h"
 #include "sensor_napi_utils.h"
 #include "sensor_system_js.h"
+#include "vibrator_convert_js.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -1265,8 +1266,24 @@ static napi_value CreateEnumSensorAccuracy(napi_env env, napi_value exports)
     return exports;
 }
 
+static napi_value CreateVibratorConvertClass(napi_env env, napi_value exports)
+{
+    napi_property_descriptor clzDes[] = {
+    DECLARE_NAPI_FUNCTION("getAudioAttribute", VibratorConvert::GetAudioAttribute),
+    DECLARE_NAPI_FUNCTION("audioToHaptic", VibratorConvert::ConvertAudioToHaptic),
+    DECLARE_NAPI_FUNCTION("getAudioData", VibratorConvert::GetAudioData),
+    };
+    napi_value cons { nullptr };
+    CHKCP((napi_define_class(env, "VibratorConvert", NAPI_AUTO_LENGTH, VibratorConvert::ConvertAudioToHapticConstructor,
+    nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons) == napi_ok), "napi_define_class fail");
+    CHKCP((napi_set_named_property(env, exports, "VibratorConvert", cons) == napi_ok), "napi_set_named_property fail");
+    return exports;
+}
+
 static napi_value Init(napi_env env, napi_value exports)
 {
+    napi_value instance = VibratorConvert::CreateInstance(env);
+    CHKPP(instance);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("once", Once),
@@ -1319,6 +1336,7 @@ static napi_value Init(napi_env env, napi_value exports)
     };
     CHKNRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc),
         "napi_define_properties");
+    CHKCP(CreateVibratorConvertClass(env, exports), "Create vibrator convert class fail");
     CHKCP(CreateEnumSensorType(env, exports), "Create enum sensor type fail");
     CHKCP(CreateEnumSensorId(env, exports), "Create enum sensor id fail");
     CHKCP(CreateEnumSensorAccuracy(env, exports), "Create enum sensor accuracy fail");

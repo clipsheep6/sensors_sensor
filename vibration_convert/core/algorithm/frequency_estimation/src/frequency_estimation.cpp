@@ -19,8 +19,8 @@
 #include <iterator>
 #include <numeric>
 
+#include "sensor_errors.h"
 #include "sensor_log.h"
-#include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {

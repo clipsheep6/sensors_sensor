@@ -14,6 +14,10 @@
 import("//build/ohos.gni")
 import("./../../sensor.gni")
 
+config("libsensor_utils_public_config") {
+  include_dirs = [ "include" ]
+}
+
 ohos_shared_library("libsensor_utils") {
   sources = [
     "src/active_info.cpp",
@@ -37,6 +41,8 @@ ohos_shared_library("libsensor_utils") {
     "$SUBSYSTEM_DIR/frameworks/native/include",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
+
+  public_configs = [ ":libsensor_utils_public_config" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

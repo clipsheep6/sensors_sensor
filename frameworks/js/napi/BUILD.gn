@@ -22,12 +22,16 @@ ohos_shared_library("libsensor") {
     "$SUBSYSTEM_DIR/utils/common/include",
     "//third_party/libuv/include",
     "//third_party/node/src",
+    "$SUBSYSTEM_DIR/vibration_convert/core/native/include",
+    "$SUBSYSTEM_DIR/vibration_convert/interfaces/js/include",
   ]
   defines = [
     "APP_LOG_TAG = \"sensorJs\"",
     "LOG_DOMAIN = 0xD002700",
   ]
   sources = [
+    "$SUBSYSTEM_DIR/vibration_convert/interfaces/js/src/vibrator_convert_js.cpp",
+    "$SUBSYSTEM_DIR/vibration_convert/interfaces/js/src/vibrator_convert_napi_utils.cpp",
     "src/sensor_js.cpp",
     "src/sensor_napi_error.cpp",
     "src/sensor_napi_utils.cpp",
@@ -39,7 +43,11 @@ ohos_shared_library("libsensor") {
     cfi_cross_dso = true
     debug = false
   }
-  deps = [ "$SUBSYSTEM_DIR/frameworks/native:sensor_interface_native" ]
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/native:sensor_interface_native",
+    "${SUBSYSTEM_DIR}/utils/common:libsensor_utils",
+    "${SUBSYSTEM_DIR}/vibration_convert/core:vibrationconvert_native",
+  ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
