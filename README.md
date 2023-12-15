@@ -179,3 +179,4 @@ Pan-sensor subsystem
 
 [sensors\_miscdevice](https://gitee.com/openharmony/sensors_miscdevice)
 
+  
