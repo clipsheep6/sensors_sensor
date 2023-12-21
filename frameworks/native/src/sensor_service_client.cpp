@@ -100,6 +100,7 @@ int32_t SensorServiceClient::InitServiceClient()
 
 bool SensorServiceClient::IsValid(int32_t sensorId)
 {
+    SEN_HILOGI("SensorServiceClient::IsValid already started, sensorId:%{public}d", sensorId);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         SEN_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -431,6 +432,7 @@ void SensorServiceClient::ReceiveMessage(const char *buf, size_t size)
 
 void SensorServiceClient::HandleNetPacke(NetPacket &pkt)
 {
+    SEN_HILOGE("SensorServiceClient::HandleNetPacke already started");
     auto id = pkt.GetMsgId();
     if (id != MessageId::ACTIVE_INFO) {
         SEN_HILOGE("NetPacke message id is not ACTIVE_INFO");
