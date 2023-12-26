@@ -51,12 +51,12 @@ SensorService::~SensorService() {}
 
 void SensorService::OnDump()
 {
-    SEN_HILOGI("OnDump");
+    SEN_HILOGI("SensorService::OnDump already started");
 }
 
 void SensorService::OnStart()
 {
-    CALL_LOG_ENTER;
+    SEN_HILOGI("SensorService::OnStart already started");
     if (state_ == SensorServiceState::STATE_RUNNING) {
         SEN_HILOGW("SensorService has already started");
         return;
@@ -92,6 +92,7 @@ void SensorService::OnStart()
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
 bool SensorService::InitInterface()
 {
+    SEN_HILOGI("SensorService::InitInterface already started");
     auto ret = sensorHdiConnection_.ConnectHdi();
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi failed");
@@ -102,6 +103,7 @@ bool SensorService::InitInterface()
 
 bool SensorService::InitDataCallback()
 {
+    SEN_HILOGI("SensorService::InitDataCallback already started");    
     reportDataCallback_ = new (std::nothrow) ReportDataCallback();
     CHKPF(reportDataCallback_);
     ReportDataCb cb = &ReportDataCallback::ReportEventCallback;
@@ -115,6 +117,7 @@ bool SensorService::InitDataCallback()
 
 bool SensorService::InitSensorList()
 {
+    SEN_HILOGI("SensorService::InitSensorList already started");     
     std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
     int32_t ret = sensorHdiConnection_.GetSensorList(sensors_);
     if (ret != 0) {
@@ -135,12 +138,13 @@ bool SensorService::InitSensorList()
 
 bool SensorService::InitSensorPolicy()
 {
+    SEN_HILOGI("SensorService::InitSensorPolicy already started");    
     return true;
 }
 
 void SensorService::OnStop()
 {
-    CALL_LOG_ENTER;
+    SEN_HILOGI("SensorService::OnStop already started");
     if (state_ == SensorServiceState::STATE_STOPPED) {
         SEN_HILOGW("Already stopped");
         return;
@@ -156,7 +160,7 @@ void SensorService::OnStop()
 }
 
 void SensorService::ReportSensorSysEvent(int32_t sensorId, bool enable, int32_t pid)
-{
+{     
     std::string packageName("");
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
@@ -173,6 +177,7 @@ void SensorService::ReportSensorSysEvent(int32_t sensorId, bool enable, int32_t 
 
 void SensorService::ReportOnChangeData(int32_t sensorId)
 {
+    SEN_HILOGI("SensorService::ReportOnChangeDat already started, sensorId:%{public}d", sensorId);
     std::lock_guard<std::mutex> sensorMapLock(sensorMapMutex_);
     auto it = sensorMap_.find(sensorId);
     if (it == sensorMap_.end()) {
@@ -199,7 +204,7 @@ void SensorService::ReportOnChangeData(int32_t sensorId)
 }
 
 ErrCode SensorService::SaveSubscriber(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
-{
+{    
     if (!sensorManager_.SaveSubscriber(sensorId, GetCallingPid(), samplingPeriodNs, maxReportDelayNs)) {
         SEN_HILOGE("SaveSubscriber failed");
         return UPDATE_SENSOR_INFO_ERR;
@@ -230,7 +235,7 @@ bool SensorService::CheckSensorId(int32_t sensorId)
 
 ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
 {
-    CALL_LOG_ENTER;
+    SEN_HILOGI("SensorService::EnableSensor already started");
     if ((!CheckSensorId(sensorId)) ||
         ((samplingPeriodNs != 0L) && ((maxReportDelayNs / samplingPeriodNs) > MAX_EVENT_COUNT))) {
         SEN_HILOGE("sensorId is invalid or maxReportDelayNs exceeded the maximum value");
@@ -316,6 +321,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId)
 
 std::vector<Sensor> SensorService::GetSensorList()
 {
+    SEN_HILOGI("SensorService::GetSensorList already started");    
     std::lock_guard<std::mutex> sensorLock(sensorsMutex_);
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
     int32_t ret = sensorHdiConnection_.GetSensorList(sensors_);
