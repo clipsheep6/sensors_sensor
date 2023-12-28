@@ -231,7 +231,7 @@ bool SensorService::CheckSensorId(int32_t sensorId)
 ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
 {
     SEN_HILOGI("sensorId:%{public}d, samplingPeriodNs:%{public}lld, maxReportDelayNs:%{public}lld",
-    sensorId, samplingPeriodNs, maxReportDelayNs);
+        sensorId, samplingPeriodNs, maxReportDelayNs);
     if ((!CheckSensorId(sensorId)) ||
         ((samplingPeriodNs != 0L) && ((maxReportDelayNs / samplingPeriodNs) > MAX_EVENT_COUNT))) {
         SEN_HILOGE("sensorId is invalid or maxReportDelayNs exceeded the maximum value");
