@@ -229,8 +229,9 @@ bool SensorService::CheckSensorId(int32_t sensorId)
 }
 
 ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
-{  
-    SEN_HILOGI("sensorId:%{public}d, samplingPeriodNs:%{public}ld, maxReportDelayNs:%{public}ld", sensorId, samplingPeriodNs, maxReportDelayNs);
+{
+    SEN_HILOGI("sensorId:%{public}d, samplingPeriodNs:%{public}ld, maxReportDelayNs:%{public}ld",
+    sensorId, samplingPeriodNs, maxReportDelayNs);
     if ((!CheckSensorId(sensorId)) ||
         ((samplingPeriodNs != 0L) && ((maxReportDelayNs / samplingPeriodNs) > MAX_EVENT_COUNT))) {
         SEN_HILOGE("sensorId is invalid or maxReportDelayNs exceeded the maximum value");
@@ -283,7 +284,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
 {
     std::string packageName("");
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
-    sensorManager_.GetPackageName(tokenId, packageName);    
+    sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("sensorId:%{public}d, packageName:%{public}s", sensorId, packageName.c_str());
     if (!CheckSensorId(sensorId)) {
         SEN_HILOGE("sensorId is invalid");
@@ -454,7 +455,7 @@ ErrCode SensorService::SuspendSensors(int32_t pid)
 {
     std::string packageName("");
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
-    sensorManager_.GetPackageName(tokenId, packageName);    
+    sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
     if (pid < 0) {
         SEN_HILOGE("Pid is invalid");
@@ -467,7 +468,7 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
 {
     std::string packageName("");
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
-    sensorManager_.GetPackageName(tokenId, packageName);    
+    sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
     if (pid < 0) {
         SEN_HILOGE("Pid is invalid");
@@ -480,7 +481,7 @@ ErrCode SensorService::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &a
 {
     std::string packageName("");
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
-    sensorManager_.GetPackageName(tokenId, packageName);    
+    sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
     if (pid < 0) {
         SEN_HILOGE("Pid is invalid");
