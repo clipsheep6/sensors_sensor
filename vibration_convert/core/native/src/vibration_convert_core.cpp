@@ -17,8 +17,8 @@
 #include <numeric>
 
 #include "generate_vibration_json_file.h"
+#include "sensor_errors.h"
 #include "sensor_log.h"
-#include "sensors_errors.h"
 #include "vibration_convert_core.h"
 
 namespace OHOS {

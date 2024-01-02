@@ -1,0 +1,59 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/sensors/sensor/sensor.gni")
+import("//build/ohos.gni")
+
+##############################################
+ohos_shared_library("vibrationconvert_native") {
+  sources = [
+    "algorithm/conversion/src/conversion_fft.cpp",
+    "algorithm/conversion/src/conversion_filter.cpp",
+    "algorithm/conversion/src/conversion_mfcc.cpp",
+    "algorithm/conversion/src/fft.cpp",
+    "algorithm/frequency_estimation/src/frequency_estimation.cpp",
+    "algorithm/intensity_processor/src/intensity_processor.cpp",
+    "algorithm/onset/src/onset.cpp",
+    "algorithm/peak_finder/src/peak_finder.cpp",
+    "native/src/audio_parsing.cpp",
+    "native/src/generate_vibration_json_file.cpp",
+    "native/src/vibration_convert_core.cpp",
+    "utils/src/audio_utils.cpp",
+    "utils/src/utils.cpp",
+  ]
+
+  include_dirs = [
+    "native/include",
+    "algorithm/conversion/include",
+    "algorithm/frequency_estimation/include",
+    "algorithm/intensity_processor/include",
+    "algorithm/onset/include",
+    "algorithm/peak_finder/include",
+    "utils/include",
+    "//third_party/jsoncpp/include",
+    "$SUBSYSTEM_DIR/vibration_convert/interfaces/native/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
+    "$SUBSYSTEM_DIR/utils/include",
+  ]
+  deps = [
+    "$SUBSYSTEM_DIR/utils/common:libsensor_utils",
+    "//third_party/jsoncpp:jsoncpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+  part_name = "sensor"
+  subsystem_name = "sensors"
+}

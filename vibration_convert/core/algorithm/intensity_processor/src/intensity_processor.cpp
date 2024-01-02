@@ -16,8 +16,8 @@
 #include "intensity_processor.h"
 
 #include "audio_utils.h"
+#include "sensor_errors.h"
 #include "sensor_log.h"
-#include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {

@@ -32,7 +32,9 @@
         "samgr",
         "eventhandler"
       ],
-      "third_party": []
+      "third_party": [
+        "jsoncpp"
+      ]
     },
     "build": {
       "group_type": {

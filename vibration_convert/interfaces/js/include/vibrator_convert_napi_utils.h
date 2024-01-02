@@ -26,7 +26,7 @@
 #include "napi/native_node_api.h"
 #include "refbase.h"
 
-#include "sensors_errors.h"
+#include "sensor_errors.h"
 #include "vibration_convert_type.h"
 
 namespace OHOS {
