@@ -157,7 +157,7 @@ void SensorService::OnStop()
 
 void SensorService::ReportSensorSysEvent(int32_t sensorId, bool enable, int32_t pid)
 {
-    std::string packageName("");
+    std::string packageName;
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
     const int logLevel = 4;
@@ -282,7 +282,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
 
 ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
 {
-    std::string packageName("");
+    std::string packageName;
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("sensorId:%{public}d, packageName:%{public}s", sensorId, packageName.c_str());
@@ -314,7 +314,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
 
 ErrCode SensorService::DisableSensor(int32_t sensorId)
 {
-    SEN_HILOGE("DisableSensor already started, sensorId:%{public}d", sensorId);
+    CALL_LOG_ENTER;
     return DisableSensor(sensorId, GetCallingPid());
 }
 
@@ -453,7 +453,7 @@ int32_t SensorService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 
 ErrCode SensorService::SuspendSensors(int32_t pid)
 {
-    std::string packageName("");
+    std::string packageName;
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
@@ -466,7 +466,7 @@ ErrCode SensorService::SuspendSensors(int32_t pid)
 
 ErrCode SensorService::ResumeSensors(int32_t pid)
 {
-    std::string packageName("");
+    std::string packageName;
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
@@ -479,7 +479,7 @@ ErrCode SensorService::ResumeSensors(int32_t pid)
 
 ErrCode SensorService::GetActiveInfoList(int32_t pid, std::vector<ActiveInfo> &activeInfoList)
 {
-    std::string packageName("");
+    std::string packageName;
     AccessTokenID tokenId = clientInfo_.GetTokenIdByPid(pid);
     sensorManager_.GetPackageName(tokenId, packageName);
     SEN_HILOGI("packageName:%{public}s", packageName.c_str());
