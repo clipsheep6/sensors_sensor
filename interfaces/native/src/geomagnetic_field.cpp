@@ -94,12 +94,12 @@ constexpr float DELTA_GAUSS_COEFFICIENT_H[13][13] = {
 constexpr int32_t GAUSSIAN_COEFFICIENT_DIMENSION = 13;
 std::mutex mutex_;
 
-float northComponent;
-float eastComponent;
-float downComponent;
-float geocentricLatitude;
-float geocentricLongitude;
-float geocentricRadius;
+float g_northComponent;
+float g_eastComponent;
+float g_downComponent;
+float g_geocentricLatitude;
+float g_geocentricLongitude;
+float g_geocentricRadius;
 
 std::vector<std::vector<float>> schmidtQuasiNormalFactors;
 std::vector<std::vector<float>> polynomials(GAUSSIAN_COEFFICIENT_DIMENSION);
