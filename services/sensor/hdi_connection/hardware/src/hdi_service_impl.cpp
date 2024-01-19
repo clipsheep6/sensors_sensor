@@ -34,7 +34,7 @@ std::vector<int32_t> supportSensors = {0};
 float g_testData[] = {9.8F};
 SensorEvents testEvent = {
     .sensorId = 0,
-    .data = static_cast<uint8_t *>(g_testData),
+    .data = reinterpret_cast<uint8_t *>(g_testData),
     .dataLen = 4
 };
 }
