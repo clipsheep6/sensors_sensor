@@ -3118,7 +3118,7 @@ describe("SensorJsTest", function () {
         }
     })
 
-    var getGeomagneticDipResult = [ 0.8760581016540527, 0.862170, -Infinity, 44330]
+    var getGeomagneticDipResult = [0.8760581016540527, 0.862170, -953042337792, 44330]
 
     /*
     * @tc.name: Sensor_GetGeomagneticDip_001
