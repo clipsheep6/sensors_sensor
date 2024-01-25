@@ -191,7 +191,8 @@ void GeomagneticField::GetLongitudeTrigonometric()
 void GeomagneticField::GetRelativeRadiusPower()
 {
     relativeRadiusPower[0] = 1.0f;
-    relativeRadiusPower[1] = EARTH_REFERENCE_RADIUS / g_geocentricRadius;
+    relativeRadiusPower[1] = OHOS::Sensors::IsEqual(g_geocentricRadius, 0.0f) ? std::numeric_limits<float>::max() :
+        EARTH_REFERENCE_RADIUS / g_geocentricRadius;
     for (int32_t index = 2; index < static_cast<int32_t>(relativeRadiusPower.size()); ++index) {
         relativeRadiusPower[index] = relativeRadiusPower[index - 1] * relativeRadiusPower[1];
     }
