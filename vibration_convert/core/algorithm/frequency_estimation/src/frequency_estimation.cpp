@@ -44,8 +44,9 @@ double FrequencyEstimation::Mean(const std::vector<double> &data)
     return (sumValue / data.size());
 }
 
-void FrequencyEstimation::FreqPostProcess(const std::vector<double> &frequencyHz, const std::vector<bool> &voiceSegmentFlag,
-    const std::vector<int32_t> &rmseIntensityNorm, std::vector<int32_t> &freqNorm)
+void FrequencyEstimation::FreqPostProcess(const std::vector<double> &frequencyHz,
+    const std::vector<bool> &voiceSegmentFlag, const std::vector<int32_t> &rmseIntensityNorm,
+    std::vector<int32_t> &freqNorm)
 {
     // Processing of effective values for filling in mute positions.
     std::vector<double> hzTrims;
@@ -70,7 +71,8 @@ void FrequencyEstimation::FreqPostProcess(const std::vector<double> &frequencyHz
     }
 }
 
-std::vector<double> FrequencyEstimation::GetZeroCrossingRate(const std::vector<double> &data, int32_t frmLength, int32_t hopLength)
+std::vector<double> FrequencyEstimation::GetZeroCrossingRate(const std::vector<double> &data, int32_t frmLength,
+    int32_t hopLength)
 {
     if (data.empty() || frmLength <= hopLength) {
         SEN_HILOGE("data is empty or frmLength is less than hopLength");

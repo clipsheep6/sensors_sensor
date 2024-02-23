@@ -190,7 +190,7 @@ void SensorDump::DumpHelp(int32_t fd)
     dprintf(fd, "      -l, --list: dump the sensor list\n");
     dprintf(fd, "      -c, --channel: dump the sensor data channel info\n");
     dprintf(fd, "      -o, --open: dump the opening sensors\n");
-#ifdef BUILD_VARIANT_ENG 
+#ifdef BUILD_VARIANT_ENG
     dprintf(fd, "      -d, --data: dump the last 10 packages sensor data\n");
 #endif // BUILD_VARIANT_ENG
 }
@@ -251,7 +251,7 @@ bool SensorDump::DumpOpeningSensor(int32_t fd, const std::vector<Sensor> &sensor
     return true;
 }
 
-#ifdef BUILD_VARIANT_ENG 
+#ifdef BUILD_VARIANT_ENG
 bool SensorDump::DumpSensorData(int32_t fd, ClientInfo &clientInfo)
 {
     dprintf(fd, "Last 10 packages sensor data:\n");

@@ -300,11 +300,11 @@ private:
     float averageFrequencyIncrement_ { 0.0F }; // the root-of-two multiplier between averaging bin frequencies
     /** An array of averages - the energy across the pitch spectrum */
     std::shared_ptr<float> averages_ { nullptr };        // the actual averages
-    std::shared_ptr<float> peaks_ { nullptr };           // peaks of the averages, aka "maxAverages" in other implementations
+    std::shared_ptr<float> peaks_ { nullptr };      // peaks of the averages, aka "maxAverages" in other implementations
     std::shared_ptr<int32_t> peakHoldTimes_ { nullptr }; // how long to hold THIS peak meter?  decay if == 0
     int32_t peakHoldTime_ { 0 };   // how long do we hold peaks? (in fft frames)
     float peakDecayRate_ { 0.0F };    // how quickly the peaks decay:  0f=instantly .. 1f=not at all
-    std::shared_ptr<int32_t> spe2avg_ { nullptr };       // the mapping between spectrum[] indices and averages[] indices
+    std::shared_ptr<int32_t> spe2avg_ { nullptr };      // the mapping between spectrum[] indices and averages[] indices
     // the fft's log equalizer() is no longer of any use (it would be nonsense to log scale
     // the spectrum values into log-sized average bins) so here's a quick-and-dirty linear
     // equalizer instead:

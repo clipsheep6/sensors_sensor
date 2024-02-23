@@ -22,6 +22,8 @@
 #include <numeric>
 #include <vector>
 
+#include "sensor_log.h"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
@@ -47,7 +49,7 @@ constexpr double F_THREE = 3.0;
 constexpr double SAMPLE_IN_MS = 1000.0;
 constexpr double INTERSITY_BOUNDARY_POINT = 0.25;
 constexpr double INTERSITY_NUMBER_BOUNDARY_POINT = 0.75;
-}  // namespace
+} // namespace
 
 enum WindowType {
     WND_TYPE_BARTLETT = 1,
@@ -55,10 +57,10 @@ enum WindowType {
     WND_TYPE_HANNING = 3,
 };
 
-enum FilterMethod{
-	LOW_RESONANT_FILTER = 1,
-	HIGH_RESONANT_FILTER = 2,
-	BAND_PASS_FILTER = 3,
+enum FilterMethod {
+    LOW_RESONANT_FILTER = 1,
+    HIGH_RESONANT_FILTER = 2,
+    BAND_PASS_FILTER = 3,
 };
 
 bool IsPowerOfTwo(uint32_t x);
@@ -185,6 +187,10 @@ inline bool IsEqual(const T& left, const T& right)
 template<typename T>
 decltype(auto) MakeSharedArray(size_t size)
 {
+    if (size == 0) {
+        SEN_HILOGE("size is zero");
+        return nullptr;
+    }
     return std::shared_ptr<T>(new T[size], std::default_delete<T[]>());
 }
 

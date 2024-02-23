@@ -62,8 +62,8 @@ struct ContinuousEvent {
     int32_t intensity { 0 };
     int32_t frequency { 0 };
 
-    ContinuousEvent(double time, double duration, int32_t intensity, int32_t frequency) : time(time), duration(duration),
-        intensity(intensity), frequency(frequency) {}
+    ContinuousEvent(double time, double duration, int32_t intensity, int32_t frequency) : time(time),
+        duration(duration), intensity(intensity), frequency(frequency) {}
 };
 
 struct TransientEvent {
@@ -146,7 +146,8 @@ private:
     void TranslateAnchorPoint(int32_t amplitudePeakPos, int32_t &amplitudePeakIdx, double &amplitudePeakTime);
     int32_t DetectRmsIntensity(const std::vector<double> &datas, double rmsILowerDelta,
         std::vector<IntensityData> &intensityDatas);
-    std::vector<int32_t> DetectFrequency(const std::vector<double> &datas, const std::vector<int32_t> &rmseIntensityNorms);
+    std::vector<int32_t> DetectFrequency(const std::vector<double> &datas,
+        const std::vector<int32_t> &rmseIntensityNorms);
     std::vector<double> StartTimeNormalize(int32_t rmseLen);
 
 private:
@@ -181,7 +182,8 @@ private:
     void StoreHapticEvent();
     void StoreEventSequence();
     void StoreEventBlock();
-    void CombinateContinuousEvents(const std::vector<ContinuousEvent> &continuousEvents, int32_t startIdx, int32_t endIdx);
+    void CombinateContinuousEvents(const std::vector<ContinuousEvent> &continuousEvents, int32_t startIdx,
+        int32_t endIdx);
     /**
      * Using transient events instead of onse
      */

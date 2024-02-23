@@ -180,11 +180,13 @@ int32_t AudioParsing::ConvertAudioToHaptic(const AudioSetting &audioSetting, std
 {
     CALL_LOG_ENTER;
     if (audioData_.audioDatas.size() < MIN_SAMPLE_COUNT) {
-        SEN_HILOGE("audioDatas less then MIN_SAMPLE_COUNT, audioDatas.size():%{public}zu", audioData_.audioDatas.size());
+        SEN_HILOGE("audioDatas less then MIN_SAMPLE_COUNT, audioDatas.size():%{public}zu",
+            audioData_.audioDatas.size());
         return Sensors::ERROR;
     }
     VibrationConvertCore vibrationConvertCore;
-    if (vibrationConvertCore.ConvertAudioToHaptic(audioSetting, audioData_.audioDatas, hapticEvents) != Sensors::SUCCESS) {
+    if (vibrationConvertCore.ConvertAudioToHaptic(audioSetting, audioData_.audioDatas, hapticEvents) !=
+        Sensors::SUCCESS) {
         SEN_HILOGE("ConvertAudioToHaptic failed");
         return Sensors::ERROR;
     }

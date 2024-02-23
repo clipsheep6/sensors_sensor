@@ -118,7 +118,7 @@ VibratorConvert *VibratorConvert::GetInstance(napi_env env)
         return nullptr;
     }
     return instance;
-} 
+}
 
 bool VibratorConvert::ParseParameter(napi_env env, napi_value &value, RawFileDescriptor &fileDescriptor)
 {
@@ -244,7 +244,7 @@ napi_value VibratorConvert::GetAudioData(napi_env env, napi_callback_info info)
             "napi_create_reference failed");
         EmitHapticAsyncCallbackWork(asyncCallbackInfo);
         return nullptr;
-    } 
+    }
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise failed");
