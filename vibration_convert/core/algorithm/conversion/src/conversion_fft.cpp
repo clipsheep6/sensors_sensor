@@ -34,7 +34,7 @@ int32_t ConversionFFT::Init(const FFTInputPara &fftPara)
     if ((fftPara.sampleRate <= 0) ||
         (fftPara.fftSize <= 0 || !(IsPowerOfTwo(static_cast<uint32_t>(fftPara.fftSize)))) ||
         (fftPara.hopSize <= 0 || !(IsPowerOfTwo(static_cast<uint32_t>(fftPara.hopSize))))) {
-        SEN_HILOGE("sampleRate:%{public}d,fftSize:%{public}d,hopSize:%{public}d",fftPara.sampleRate,
+        SEN_HILOGE("sampleRate:%{public}d,fftSize:%{public}d,hopSize:%{public}d", fftPara.sampleRate,
             fftPara.fftSize, fftPara.hopSize);
         return Sensors::PARAMETER_ERROR;
     }

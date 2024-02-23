@@ -76,6 +76,10 @@ Sensor_Result OH_Sensor_GetInfos(Sensor_Info **sensors, uint32_t *count)
 
 Sensor_Info **OH_Sensor_CreateInfos(uint32_t count)
 {
+    if (count == 0) {
+        SEN_HILOGD("count is zero");
+        return nullptr;
+    }
     auto sensors = new Sensor_Info *[count];
     for (uint32_t i = 0; i < count; ++i) {
         sensors[i] = new Sensor_Info();

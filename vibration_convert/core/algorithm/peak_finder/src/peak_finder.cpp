@@ -79,7 +79,7 @@ std::vector<bool> PeakFinder::GetVoiceFlag(const std::vector<double> &data, cons
     }
     lowerAmp = *max_element(peakAmp.begin(), peakAmp.end()) * INTERSITY_BOUNDARY_POINT;
     if (peakAmp.size() > 2) {
-        lowerAmp = peakAmp[static_cast<int32_t>(peakAmp.size() * INTERSITY_NUMBER_BOUNDARY_POINT )];
+        lowerAmp = peakAmp[static_cast<int32_t>(peakAmp.size() * INTERSITY_NUMBER_BOUNDARY_POINT)];
     }
     std::vector<double> triangularEnvelope(data.size(), 0.0);
     for (size_t i = 0; i < data.size(); i++) {
@@ -129,7 +129,7 @@ std::vector<bool> PeakFinder::SplitVoiceSlienceRange(int32_t dataSize, const std
             vioceFlag[boundary] = true;
         }
     }
-    for (int32_t i = 0; i < dataSize; ) {
+    for (int32_t i = 0; i < dataSize;) {
         if (vioceFlag[i]) {
             int32_t j = i / hopLength_;
             segmentFlag[j] = true;
@@ -436,7 +436,7 @@ std::vector<int32_t> PeakFinder::DetectPeak(const std::vector<double> &envelope,
     }
     std::vector<double> gradientEnvelope;
     for (size_t i = 0; i < (envelope.size() - 1); i++) {
-         gradientEnvelope.push_back(envelope[i+1] - envelope[i]);
+        gradientEnvelope.push_back(envelope[i+1] - envelope[i]);
     }
     if (gradientEnvelope.empty()) {
         SEN_HILOGE("gradientEnvelope is empty");
@@ -455,7 +455,7 @@ std::vector<int32_t> PeakFinder::DetectPeak(const std::vector<double> &envelope,
     }
     if (peakThreshold < EPS_MIN) {
         for (size_t j = 0; j < (gradientEnvelope.size() - 1); j++) {
-            if((gradientEnvelope[j] > 0) && (gradientEnvelope[j+1] < 0)) {
+            if ((gradientEnvelope[j] > 0) && (gradientEnvelope[j+1] < 0)) {
                 peaks.push_back(j+1);
             }
         }
@@ -557,7 +557,7 @@ int32_t PeakFinder::GetPeakEnvelope(const std::vector<double> &data, int32_t sam
         peakDetection.ampPeakTimes.push_back(peakDetection.ampPeakIdxs[i] * coef);
     }
     return Sensors::SUCCESS;
- }
+}
 
 // Estimating the downward trend of isolated short events.
 // A descent height of less than 0.03 at 100 points indicates a slow descent.
@@ -656,8 +656,8 @@ void PeakFinder::SplitLongShortEnvelope(int32_t dataSize, const std::vector<int3
 // Calculate the starting and ending envelopes of isolated pure short events, searching from peak to both sides
 // Do not merge common envelope peaks
 // Missing trackback function similar to note when co enveloping
-int32_t PeakFinder::GetIsolatedEnvelope(const std::vector<double> &data, const std::vector<int32_t> &peaks, double lowerAmp,
-    IsolatedEnvelopeInfo &isolatedEnvelopeInfo)
+int32_t PeakFinder::GetIsolatedEnvelope(const std::vector<double> &data, const std::vector<int32_t> &peaks,
+    double lowerAmp, IsolatedEnvelopeInfo &isolatedEnvelopeInfo)
 {
     std::vector<double> triangularEnvelope(data.size(), 0.0);
     for (size_t i = 0; i < data.size(); i++) {

@@ -52,7 +52,7 @@ int32_t SensorHdiConnection::ConnectHdi()
     int32_t ret = ConnectHdiService();
     if (ret != ERR_OK) {
         SEN_HILOGE("Connect hdi service failed, try to connect compatible connection, ret:%{public}d", ret);
-#ifdef BUILD_VARIANT_ENG 
+#ifdef BUILD_VARIANT_ENG
         iSensorHdiConnection_ = std::make_unique<CompatibleConnection>();
         ret = ConnectHdiService();
         if (ret != ERR_OK) {

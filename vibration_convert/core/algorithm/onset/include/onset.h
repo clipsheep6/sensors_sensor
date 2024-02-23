@@ -35,7 +35,8 @@ struct OnsetInfo {
     std::vector<double> envelopes;
     std::vector<int32_t> idxs;
     std::vector<double> times;
-    void Clear() {
+    void Clear()
+    {
         backTrackFlag = false;
         envelopes.clear();
         idxs.clear();

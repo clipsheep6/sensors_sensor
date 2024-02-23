@@ -180,7 +180,7 @@ int32_t Onset::CheckOnset(const std::vector<double> &data, int32_t nFft, int32_t
     if ((data.size() < ONSET_HOP_LEN) || (nFft == 0) || (hopLength == 0)) {
         SEN_HILOGE("Invalid parameter, data:%{public}zu, nFft:%{public}d, hopLength:%{public}d",
             data.size(), nFft, hopLength);
-        return Sensors::PARAMETER_ERROR;;
+        return Sensors::PARAMETER_ERROR;
     }
     std::vector<float> magnitudes;
     int32_t sfftFrmCount;
