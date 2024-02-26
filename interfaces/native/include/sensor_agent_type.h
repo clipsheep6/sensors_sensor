@@ -228,8 +228,8 @@ typedef struct AccelUncalibratedData {
 } AccelUncalibratedData;
 
 /**
- * @brief Defines the uncalibrated gyroscope sensor data structure. Measures the uncalibrated rotational angular velocity of the
- * device on three physical axes (x, y, and z) in rad/s.
+ * @brief Defines the uncalibrated gyroscope sensor data structure. Measures the uncalibrated rotational angular
+ * velocity of the device on three physical axes (x, y, and z) in rad/s.
  */
 typedef struct GyroUncalibratedData {
     float x;
@@ -241,17 +241,18 @@ typedef struct GyroUncalibratedData {
 } GyroUncalibratedData;
 
 /**
- * @brief Defines the significant Motion sensor data structure. Measures whether there is substantial motion in the device on
- * the three physical axes (x, y, and z); a value of 1 indicates the presence of large motion; and a value of 0 indicates that
- * there is no large movement.
+ * @brief Defines the significant Motion sensor data structure. Measures whether there is substantial motion in the
+ * device on the three physical axes (x, y, and z); a value of 1 indicates the presence of large motion; and a value of
+ * 0 indicates that there is no large movement.
  */
 typedef struct SignificantMotionData {
     float scalar;
 } SignificantMotionData;
 
 /**
- * @brief Defines the pedometer detection sensor data structure. Detects the user's step counting action; if the value is 1, it
- * means that the user has generated the action of counting walking; if the value is 0, it means that the user has not moved.
+ * @brief Defines the pedometer detection sensor data structure. Detects the user's step counting action; if the value
+ * is 1, it means that the user has generated the action of counting walking; if the value is 0, it means that the user
+ * has not moved.
  */
 typedef struct PedometerDetectData {
     float scalar;
@@ -298,8 +299,8 @@ typedef struct MagneticFieldData {
 } MagneticFieldData;
 
 /**
- * @brief Defines the uncalibrated magnetic field sensor data structure. Measure the uncalibrated ambient geomagnetic field in three
- * physical axes (x, y, z) in μT.
+ * @brief Defines the uncalibrated magnetic field sensor data structure. Measure the uncalibrated ambient geomagnetic
+ * field in three physical axes (x, y, z) in μT.
  */
 typedef struct MagneticFieldUncalibratedData {
     float x;
@@ -346,8 +347,8 @@ typedef struct RotationVectorData {
 } RotationVectorData;
 
 /**
- * @brief Defines the game rotation vector sensor data structure. Measuring device game rotation vector, composite sensor:
- * synthesized by acceleration sensor, gyroscope sensor.
+ * @brief Defines the game rotation vector sensor data structure. Measuring device game rotation vector, composite
+ * sensor:synthesized by acceleration sensor, gyroscope sensor.
  */
 typedef struct GameRotationVectorData {
     float x;
@@ -357,8 +358,8 @@ typedef struct GameRotationVectorData {
 } GameRotationVectorData;
 
 /**
- * @brief Defines the geomagnetic rotation vector sensor data structure. Measuring device geomagnetic rotation vector, composite
- *  sensor: synthesized by acceleration sensor and magnetic field sensor.
+ * @brief Defines the geomagnetic rotation vector sensor data structure. Measuring device geomagnetic rotation vector,
+ * composite sensor: synthesized by acceleration sensor and magnetic field sensor.
  */
 typedef struct GeomagneticRotaVectorData {
     float x;
@@ -368,8 +369,8 @@ typedef struct GeomagneticRotaVectorData {
 } GeomagneticRotaVectorData;
 
 /**
- * @brief Defines the proximity light sensor data structure. Measures the proximity or distance of visible objects relative to
- * the device display, where 0 indicates proximity and 1 indicates distance.
+ * @brief Defines the proximity light sensor data structure. Measures the proximity or distance of visible objects
+ * relative to the device display, where 0 indicates proximity and 1 indicates distance.
  */
 typedef struct ProximityData {
     float distance;
