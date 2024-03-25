@@ -40,6 +40,7 @@
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/List.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/ohosTest/js/test/ExampleJsunit.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/SensorJsunit.test.js" desc="js文件，不参与打包不影响兼容性"/>
+                <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/SensorJsunitSync.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/ohosTest/js/test/List.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/default/pages/index/index.js" desc="js文件，不参与打包不影响兼容性"/>
             </filefilter>
@@ -53,6 +54,7 @@
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/List.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/ohosTest/js/test/ExampleJsunit.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/SensorJsunit.test.js" desc="js文件，不参与打包不影响兼容性"/>
+                <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/test/SensorJsunitSync.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/ohosTest/js/test/List.test.js" desc="js文件，不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="interfaces/plugin/test/sensor_js_test_hap/entry/src/main/js/default/pages/index/index.js" desc="js文件，不参与打包不影响兼容性"/>
             </filefilter>
