@@ -14,7 +14,7 @@
  */
 #ifndef SENSOR_JS_H
 #define SENSOR_JS_H
-#include "sensor_napi_utils.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 

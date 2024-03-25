@@ -990,38 +990,26 @@ static napi_value GetSensorList(napi_env env, napi_callback_info info)
 static napi_value GetSensorListSync(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
-    size_t argc = 1;
-    napi_value args[1] = { 0 };
-    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
-        return nullptr;
-    }
     SensorInfo *sensorInfos = nullptr;
     int32_t count = 0;
     int32_t ret = GetAllSensors(&sensorInfos, &count);
-    if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Get sensor list fail");
-        ThrowErr(env, PARAMETER_ERROR, "Failed to get sensor list synchronously");
+    if (ret != ERR_OK) {
+        ThrowErr(env, ret, "Failed to get sensor list synchronously");
         return nullptr;
     }
-    vector<SensorInfo> infos;
-    for (int32_t i = 0; i < count; ++i) {
-        if (sensorInfos[i].sensorTypeId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+    napi_value resultArray = nullptr ;
+    napi_status status = napi_create_array(env, &resultArray);
+    if (status != napi_ok) {
+        SEN_HILOGE("Failed to create result array");
+        return nullptr;
+    }
+    for (int32_t j = 0; j < count; ++j) {
+        if (sensorInfos[j].sensorTypeId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
             SEN_HILOGD("This sensor is secondary ambient light");
             continue;
         }
-        infos.push_back(*(sensorInfos + i));
-    }
-    napi_value resultArray;
-    status = napi_create_array(env, &resultArray);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "Failed to create result array");
-        return nullptr;
-    }
-    for (uint32_t j = 0; j < infos.size(); ++j) {
         napi_value value = nullptr;
-        CHKNCP(env, ConvertToSensorInfo(env, infos[j], value), "Convert sensor info fail");
+        CHKNCP(env, ConvertToSensorInfo(env, sensorInfos[j], value), "Convert sensor info fail");
         CHKNCP(env, (napi_set_element(env, resultArray, j, value) == napi_ok), "napi_set_element fail");
     }
     return resultArray;
@@ -1081,7 +1069,7 @@ napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
     size_t argc = 1;
     napi_value args[1] = { 0 };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (status != napi_ok || argc < 1) {
+    if (status != napi_ok) {
         ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
         return nullptr;
     }
@@ -1094,7 +1082,7 @@ napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
     int32_t count = 0;
     int32_t ret = GetAllSensors(&sensorInfos, &count);
     if (ret != OHOS::ERR_OK) {
-        SEN_HILOGE("Get sensor list fail");
+        ThrowErr(env, PARAMETER_ERROR, "Get sensor list fail");
         return nullptr;
     }
     for (int32_t i = 0; i < count; ++i) {
@@ -1107,6 +1095,7 @@ napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
             return result;
         }
     }
+    ThrowErr(env, DEVICE_NOT_EXIST,"Sensor type not found");
     return nullptr;   
 }
 
