@@ -46,6 +46,8 @@ extern "C" {
 #endif
 #endif
 
+namespace OHOS {
+namespace Sensors {
 /**
  * @brief Obtains information about all sensors in the system.
  *
@@ -188,7 +190,8 @@ int32_t Unregister(SensorActiveInfoCB callback);
  * @since 10
  */
 int32_t ResetSensors();
-
+} // namespace Sensors
+} // namespace OHOS
 #ifdef __cplusplus
 #if __cplusplus
 }

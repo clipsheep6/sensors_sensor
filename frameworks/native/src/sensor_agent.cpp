@@ -20,6 +20,9 @@
 
 #undef LOG_TAG
 #define LOG_TAG "SensorNativeAPI"
+
+namespace OHOS {
+namespace Sensors {
 using OHOS::Sensors::SensorAgentProxy;
 using OHOS::Sensors::SERVICE_EXCEPTION;
 using OHOS::Sensors::PARAMETER_ERROR;
@@ -170,3 +173,5 @@ int32_t ResetSensors()
     }
     return ret;
 }
+} // namespace Sensors
+} // namespace OHOS

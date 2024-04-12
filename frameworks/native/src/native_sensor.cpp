@@ -36,7 +36,7 @@ Sensor_Result OH_Sensor_GetInfos(Sensor_Info **sensors, uint32_t *count)
     }
     SensorInfo *sensorInfo = nullptr;
     int32_t sensorCount = -1;
-    int32_t ret = GetAllSensors(&sensorInfo, &sensorCount);
+    int32_t ret = OHOS::Sensors::GetAllSensors(&sensorInfo, &sensorCount);
     if (ret != SENSOR_SUCCESS || sensorCount < 0) {
         SEN_HILOGE("GetAllSensors fail");
         return SENSOR_SERVICE_EXCEPTION;
@@ -185,18 +185,18 @@ Sensor_Result OH_Sensor_Subscribe(const Sensor_SubscriptionId *id,
     }
     const SensorUser *sensorUser = reinterpret_cast<const SensorUser *>(user);
     int32_t sensorType = id->sensorType;
-    int32_t ret = SubscribeSensor(sensorType, sensorUser);
+    int32_t ret = OHOS::Sensors::SubscribeSensor(sensorType, sensorUser);
     if (ret != SENSOR_SUCCESS) {
         SEN_HILOGE("SubscribeSensor failed, %{public}d", ret);
         return SENSOR_SERVICE_EXCEPTION;
     }
     int64_t samplingInterval = attribute->samplingInterval;
-    ret = SetBatch(sensorType, sensorUser, samplingInterval, samplingInterval);
+    ret = OHOS::Sensors::SetBatch(sensorType, sensorUser, samplingInterval, samplingInterval);
     if (ret != SENSOR_SUCCESS) {
         SEN_HILOGE("SetBatch failed, %{public}d", ret);
         return SENSOR_SERVICE_EXCEPTION;
     }
-    return static_cast<Sensor_Result>(ActivateSensor(sensorType, sensorUser));
+    return static_cast<Sensor_Result>(OHOS::Sensors::ActivateSensor(sensorType, sensorUser));
 }
 
 Sensor_Result OH_Sensor_Unsubscribe(const Sensor_SubscriptionId *id,
@@ -208,12 +208,12 @@ Sensor_Result OH_Sensor_Unsubscribe(const Sensor_SubscriptionId *id,
     }
     const SensorUser *sensorUser = reinterpret_cast<const SensorUser *>(user);
     int32_t sensorType = id->sensorType;
-    int32_t ret = DeactivateSensor(sensorType, sensorUser);
+    int32_t ret = OHOS::Sensors::DeactivateSensor(sensorType, sensorUser);
     if (ret != SENSOR_SUCCESS) {
         SEN_HILOGE("SetBatch failed, %{public}d", ret);
         return SENSOR_SERVICE_EXCEPTION;
     }
-    return static_cast<Sensor_Result>(UnsubscribeSensor(sensorType, sensorUser));
+    return static_cast<Sensor_Result>(OHOS::Sensors::UnsubscribeSensor(sensorType, sensorUser));
 }
 
 int32_t OH_SensorEvent_GetType(Sensor_Event* sensorEvent, Sensor_Type *sensorType)
