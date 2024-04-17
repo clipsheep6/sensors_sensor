@@ -51,6 +51,7 @@ bool ConvertToRotationMatrix(const napi_env &env, sptr<AsyncCallbackInfo> asyncC
 bool ConvertToSensorData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
 bool CreateNapiArray(const napi_env &env, float *data, int32_t dataLength, napi_value &result);
 bool ConvertToSensorInfos(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
+bool ConvertToSensorInfo(const napi_env &env, SensorInfo sensorInfo, napi_value &result);
 bool ConvertToSingleSensor(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
 bool ConvertToBodyData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2]);
 bool CreateFailMessage(CallbackDataType type, int32_t code, string message,
@@ -65,6 +66,14 @@ void ReleaseCallback(sptr<AsyncCallbackInfo> asyncCallbackInfo);
         if (!(cond)) { \
             SEN_HILOGE("(%{public}s)", #message); \
             return false; \
+        } \
+    } while (0)
+
+#define CHKNCP(env, cond, message) \
+    do { \
+        if (!(cond)) { \
+            SEN_HILOGE("(%{public}s)", #message); \
+            return nullptr; \
         } \
     } while (0)
 

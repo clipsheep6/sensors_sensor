@@ -987,6 +987,34 @@ static napi_value GetSensorList(napi_env env, napi_callback_info info)
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
+static napi_value GetSensorListSync(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    SensorInfo *sensorInfos = nullptr;
+    int32_t count = 0;
+    int32_t ret = GetAllSensors(&sensorInfos, &count);
+    if (ret != ERR_OK) {
+        ThrowErr(env, ret, "Failed to get sensor list synchronously");
+        return nullptr;
+    }
+    napi_value resultArray = nullptr ;
+    napi_status status = napi_create_array(env, &resultArray);
+    if (status != napi_ok) {
+        SEN_HILOGE("Failed to create result array");
+        return nullptr;
+    }
+    for (int32_t j = 0; j < count; ++j) {
+        if (sensorInfos[j].sensorTypeId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+            SEN_HILOGD("This sensor is secondary ambient light");
+            continue;
+        }
+        napi_value value = nullptr;
+        CHKNCP(env, ConvertToSensorInfo(env, sensorInfos[j], value), "Convert sensor info fail");
+        CHKNCP(env, (napi_set_element(env, resultArray, j, value) == napi_ok), "napi_set_element fail");
+    }
+    return resultArray;
+}
+
 static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -1033,6 +1061,42 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
+}
+
+napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 1;
+    napi_value args[1] = { 0 };
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        return nullptr;
+    }
+    int32_t sensorTypeId = INVALID_SENSOR_ID;
+    if (!GetNativeInt32(env, args[0], sensorTypeId)) {
+        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get number fail");
+        return nullptr;
+    }
+    SensorInfo *sensorInfos = nullptr;
+    int32_t count = 0;
+    int32_t ret = GetAllSensors(&sensorInfos, &count);
+    if (ret != OHOS::ERR_OK) {
+        ThrowErr(env, PARAMETER_ERROR, "Get sensor list fail");
+        return nullptr;
+    }
+    for (int32_t i = 0; i < count; ++i) {
+        if (sensorInfos[i].sensorTypeId == sensorTypeId) {
+            napi_value result = nullptr;
+            if (!ConvertToSensorInfo(env, sensorInfos[i], result)) {
+                SEN_HILOGE("ConvertToSensorInfo fail");
+                return nullptr;
+            }
+            return result;
+        }
+    }
+    ThrowErr(env, DEVICE_NOT_EXIST,"Sensor type not found");
+    return nullptr;   
 }
 
 napi_value Subscribe(napi_env env, napi_callback_info info, int32_t sensorTypeId, CallbackDataType type)
@@ -1286,7 +1350,9 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("createRotationMatrix", CreateRotationMatrix),
         DECLARE_NAPI_FUNCTION("getRotationMatrix", CreateRotationMatrix),
         DECLARE_NAPI_FUNCTION("getSensorList", GetSensorList),
+        DECLARE_NAPI_FUNCTION("getSensorListSync", GetSensorListSync),
         DECLARE_NAPI_FUNCTION("getSingleSensor", GetSingleSensor),
+        DECLARE_NAPI_FUNCTION("getSingleSensorSync", GetSingleSensorSync),
         DECLARE_NAPI_FUNCTION("subscribeAccelerometer", SubscribeAccelerometer),
         DECLARE_NAPI_FUNCTION("unsubscribeAccelerometer", UnsubscribeAccelerometer),
         DECLARE_NAPI_FUNCTION("subscribeCompass", SubscribeCompass),
