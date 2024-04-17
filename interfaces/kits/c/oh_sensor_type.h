@@ -82,6 +82,11 @@ typedef enum Sensor_Type {
      */
     SENSOR_TYPE_PROXIMITY = 12,
     /**
+     * Senondary ambient light sensor.
+     * @since 11
+     */
+    SENSOR_TYPE_AMBIENT_LIGHT1 = 16,
+    /**
      * Orientation sensor.
      * @since 11
      */
