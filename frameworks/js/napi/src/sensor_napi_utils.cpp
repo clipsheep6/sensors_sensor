@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Sensors {
 namespace {
     constexpr int32_t STRING_LENGTH_MAX = 64;
+    constexpr int32_t OPTIONAL_PARAMETER_INVALID = -1;
 } // namespace
 bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs)
 {
@@ -160,7 +161,7 @@ std::map<int32_t, vector<string>> g_sensorAttributeList = {
     { 0, { "x" } },
     { SENSOR_TYPE_ID_ACCELEROMETER, { "x", "y", "z" } },
     { SENSOR_TYPE_ID_GYROSCOPE, { "x", "y", "z" } },
-    { SENSOR_TYPE_ID_AMBIENT_LIGHT, { "intensity" } },
+    { SENSOR_TYPE_ID_AMBIENT_LIGHT, { "intensity", "colorTemp", "irLuminance" } },
     { SENSOR_TYPE_ID_MAGNETIC_FIELD, { "x", "y", "z" } },
     { SENSOR_TYPE_ID_BAROMETER, { "pressure" } },
     { SENSOR_TYPE_ID_HALL, { "status" } },
@@ -328,6 +329,11 @@ bool ConvertToSensorData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallb
     napi_value message = nullptr;
     auto sensorAttributes = g_sensorAttributeList[sensorTypeId];
     for (uint32_t i = 0; i < size; ++i) {
+        if (sensorTypeId == SENSOR_TYPE_ID_AMBIENT_LIGHT && i > 0) {
+            if (asyncCallbackInfo->data.sensorData.data[i] == OPTIONAL_PARAMETER_INVALID) {
+                CHKNRF(env, napi_get_undefined(env, &message), "napi_get_undefined");
+            }
+        }
         CHKNRF(env, napi_create_double(env, asyncCallbackInfo->data.sensorData.data[i], &message),
             "napi_create_double");
         CHKNRF(env, napi_set_named_property(env, result[1], sensorAttributes[i].c_str(), message),

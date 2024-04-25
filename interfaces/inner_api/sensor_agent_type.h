@@ -80,6 +80,7 @@ typedef enum SensorTypeId {
     SENSOR_TYPE_ID_SAR = 15,                   /**< Sar sensor */
     SENSOR_TYPE_ID_AMBIENT_LIGHT1 = 16,        /**< Secondary ambient light sensor */
     SENSOR_TYPE_ID_HALL_EXT = 17,              /**< Extended hall effect sensor */
+    SENSOR_TYPE_ID_PROXIMITY1 = 18,            /**< Secondary proximity sensor */
     SENSOR_TYPE_ID_PHYSICAL_MAX = 0xFF,        /**< Maximum type ID of a physical sensor */
     SENSOR_TYPE_ID_ORIENTATION = 256,          /**< Orientation sensor */
     SENSOR_TYPE_ID_GRAVITY = 257,              /**< Gravity sensor */
@@ -87,20 +88,21 @@ typedef enum SensorTypeId {
     SENSOR_TYPE_ID_ROTATION_VECTOR = 259,      /**< Rotation vector sensor */
     SENSOR_TYPE_ID_AMBIENT_TEMPERATURE = 260,  /**< Ambient temperature sensor */
     SENSOR_TYPE_ID_MAGNETIC_FIELD_UNCALIBRATED = 261,  /**< Uncalibrated magnetic field sensor */
-    SENSOR_TYPE_ID_GAME_ROTATION_VECTOR = 262,    /**< Game rotation vector sensor */
-    SENSOR_TYPE_ID_GYROSCOPE_UNCALIBRATED = 263,  /**< Uncalibrated gyroscope sensor */
-    SENSOR_TYPE_ID_SIGNIFICANT_MOTION = 264,    /**< Significant motion sensor */
-    SENSOR_TYPE_ID_PEDOMETER_DETECTION = 265,   /**< Pedometer detection sensor */
-    SENSOR_TYPE_ID_PEDOMETER = 266,             /**< Pedometer sensor */
-    SENSOR_TYPE_ID_POSTURE = 267,               /**< Posture sensor */
-    SENSOR_TYPE_ID_HEADPOSTURE = 268,           /**< Head posture sensor */
+    SENSOR_TYPE_ID_GAME_ROTATION_VECTOR = 262,         /**< Game rotation vector sensor */
+    SENSOR_TYPE_ID_GYROSCOPE_UNCALIBRATED = 263,       /**< Uncalibrated gyroscope sensor */
+    SENSOR_TYPE_ID_SIGNIFICANT_MOTION = 264,   /**< Significant motion sensor */
+    SENSOR_TYPE_ID_PEDOMETER_DETECTION = 265,  /**< Pedometer detection sensor */
+    SENSOR_TYPE_ID_PEDOMETER = 266,            /**< Pedometer sensor */
+    SENSOR_TYPE_ID_POSTURE = 267,              /**< Posture sensor */
+    SENSOR_TYPE_ID_HEADPOSTURE = 268,          /**< Head posture sensor */
     SENSOR_TYPE_ID_DROP_DETECTION = 269,       /**< Drop detection sensor */
     SENSOR_TYPE_ID_GEOMAGNETIC_ROTATION_VECTOR = 277,  /**< Geomagnetic rotation vector sensor */
-    SENSOR_TYPE_ID_HEART_RATE = 278,            /**< Heart rate sensor */
-    SENSOR_TYPE_ID_DEVICE_ORIENTATION = 279,    /**< Device orientation sensor */
-    SENSOR_TYPE_ID_WEAR_DETECTION = 280,        /**< Wear detection sensor */
+    SENSOR_TYPE_ID_HEART_RATE = 278,           /**< Heart rate sensor */
+    SENSOR_TYPE_ID_DEVICE_ORIENTATION = 279,   /**< Device orientation sensor */
+    SENSOR_TYPE_ID_WEAR_DETECTION = 280,       /**< Wear detection sensor */
     SENSOR_TYPE_ID_ACCELEROMETER_UNCALIBRATED = 281,   /**< Uncalibrated acceleration sensor */
-    SENSOR_TYPE_ID_MAX = 30,      /**< Maximum number of sensor type IDs*/
+    SENSOR_TYPE_ID_RPC = 282,                  /**< Radio Power Control */
+    SENSOR_TYPE_ID_MAX = 30,                   /**< Maximum number of sensor type IDs*/
 } SensorTypeId;
 
 /**
@@ -417,6 +419,8 @@ typedef struct ProximityData {
  */
 typedef struct AmbientLightData {
     float intensity = 0.0;
+    float colorTemperature = 0.0;
+    float infraredLuminance = 0.0;
 } AmbientLightData;
 
 /**
