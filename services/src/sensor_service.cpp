@@ -203,7 +203,8 @@ void SensorService::ReportOnChangeData(int32_t sensorId)
 
 ErrCode SensorService::SaveSubscriber(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
 {
-    if (!sensorManager_.SaveSubscriber(sensorId, IPCSkeleton::GetCallingRealPid(), samplingPeriodNs, maxReportDelayNs)) {
+    if (!sensorManager_.SaveSubscriber(sensorId,
+        IPCSkeleton::GetCallingRealPid(), samplingPeriodNs, maxReportDelayNs)) {
         SEN_HILOGE("SaveSubscriber failed");
         return UPDATE_SENSOR_INFO_ERR;
     }
