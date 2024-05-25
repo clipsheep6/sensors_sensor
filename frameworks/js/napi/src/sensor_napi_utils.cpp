@@ -303,7 +303,8 @@ bool ConvertToFailData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbac
     CALL_LOG_ENTER;
     CHKPF(asyncCallbackInfo);
     int32_t code = asyncCallbackInfo->error.code;
-    auto msg = GetNapiError(code);
+    std::string codeMsg = asyncCallbackInfo->error.message;
+    auto msg = GetNapiError(code, codeMsg);
     if (!msg) {
         SEN_HILOGE("ErrCode:%{public}d is invalid", code);
         return false;

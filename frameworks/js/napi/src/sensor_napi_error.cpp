@@ -17,6 +17,7 @@
 
 #include <optional>
 
+#include "securec.h"
 #undef LOG_TAG
 #define LOG_TAG "SensorJsAPI"
 
@@ -34,7 +35,7 @@ napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const
     return businessError;
 }
 
-std::optional<std::string> GetNapiError(int32_t errorCode)
+std::optional<std::string> GetNapiError(int32_t errorCode, const std::string &codeMsg)
 {
     auto iter = ERROR_MESSAGES.find(errorCode);
     if (iter != ERROR_MESSAGES.end()) {
@@ -43,12 +44,13 @@ std::optional<std::string> GetNapiError(int32_t errorCode)
     return std::nullopt;
 }
 
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
+void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg, const std::string &correctMsg)
 {
-    SEN_HILOGE("Message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
-    auto msg = GetNapiError(errCode);
+    SEN_HILOGE("printMsg:%{public}s, correctMsg:%{public}s, code:%{public}d", printMsg.c_str(), correctMsg.c_str(), errCode);
+    std::string codeMsg;
+    auto msg = GetNapiError(errCode, codeMsg);
     if (!msg) {
-        SEN_HILOGE("ErrCode:%{public}d is invalid", errCode);
+        SEN_HILOGE("ErrCode:%{public}d is invalid, codeMsg:%{public}s", errCode, codeMsg.c_str());
         return;
     }
     napi_handle_scope scope = nullptr;
