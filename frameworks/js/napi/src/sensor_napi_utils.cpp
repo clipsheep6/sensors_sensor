@@ -309,7 +309,7 @@ bool ConvertToFailData(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbac
         SEN_HILOGE("ErrCode:%{public}d is invalid", code);
         return false;
     }
-    result[0] = CreateBusinessError(env, code, msg.value());
+    result[0] = CreateBusinessError(env, code, codeMsg);
     return (result[0] != nullptr);
 }
 
