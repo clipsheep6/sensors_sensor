@@ -53,8 +53,8 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
     if (GetNapiError(errCode, codeMsg)) {
         char buf[300];
         if (sprintf_s(buf, sizeof(buf), codeMsg.c_str(), printMsg.c_str(), correctMsg.c_str()) > 0 ) {
+            SEN_HILOGE("Message buf:%{public}s", buf);
             CreateBusinessError(env, errCode, buf);
-            SEN_HILOGE("cff Message:%{public}s", buf);
         } else {
             SEN_HILOGE("Failed to convert string type to char type");
         }
