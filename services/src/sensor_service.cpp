@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include "hisysevent.h"
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
@@ -210,7 +211,7 @@ void SensorService::ReportOnChangeData(int32_t sensorId)
         SEN_HILOGE("There is no data to be reported");
         return;
     }
-    sptr<SensorBasicDataChannel> channel = clientInfo_.GetSensorChannelByPid(GetCallingPid());
+    sptr<SensorBasicDataChannel> channel = clientInfo_.GetSensorChannelByPid(IPCSkeleton::GetCallingRealPid());
     CHKPV(channel);
     auto sendRet = channel->SendData(&sensorData, sizeof(sensorData));
     if (sendRet != ERR_OK) {
@@ -221,17 +222,18 @@ void SensorService::ReportOnChangeData(int32_t sensorId)
 
 ErrCode SensorService::SaveSubscriber(int32_t sensorId, int64_t samplingPeriodNs, int64_t maxReportDelayNs)
 {
-    if (!sensorManager_.SaveSubscriber(sensorId, GetCallingPid(), samplingPeriodNs, maxReportDelayNs)) {
+    if (!sensorManager_.SaveSubscriber(sensorId,
+        IPCSkeleton::GetCallingRealPid(), samplingPeriodNs, maxReportDelayNs)) {
         SEN_HILOGE("SaveSubscriber failed");
         return UPDATE_SENSOR_INFO_ERR;
     }
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
     sensorManager_.StartDataReportThread();
-    SensorBasicInfo sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, GetCallingPid());
+    SensorBasicInfo sensorInfo = clientInfo_.GetCurPidSensorInfo(sensorId, IPCSkeleton::GetCallingRealPid());
     if (!sensorManager_.SetBestSensorParams(sensorId,
         sensorInfo.GetSamplingPeriodNs(), sensorInfo.GetMaxReportDelayNs())) {
         SEN_HILOGE("SetBestSensorParams failed");
-        clientInfo_.RemoveSubscriber(sensorId, GetCallingPid());
+        clientInfo_.RemoveSubscriber(sensorId, IPCSkeleton::GetCallingRealPid());
         return SET_SENSOR_CONFIG_ERR;
     }
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
@@ -257,7 +259,7 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
         SEN_HILOGE("sensorId is invalid or maxReportDelayNs exceeded the maximum value");
         return ERR_NO_INIT;
     }
-    int32_t pid = GetCallingPid();
+    int32_t pid = IPCSkeleton::GetCallingRealPid();
     std::lock_guard<std::mutex> serviceLock(serviceLock_);
     if (clientInfo_.GetSensorState(sensorId)) {
         SEN_HILOGW("Sensor has been enabled already");
@@ -279,14 +281,14 @@ ErrCode SensorService::EnableSensor(int32_t sensorId, int64_t samplingPeriodNs, 
     auto ret = SaveSubscriber(sensorId, samplingPeriodNs, maxReportDelayNs);
     if (ret != ERR_OK) {
         SEN_HILOGE("SaveSubscriber failed");
-        clientInfo_.RemoveSubscriber(sensorId, GetCallingPid());
+        clientInfo_.RemoveSubscriber(sensorId, IPCSkeleton::GetCallingRealPid());
         return ret;
     }
 #ifdef HDF_DRIVERS_INTERFACE_SENSOR
     ret = sensorHdiConnection_.EnableSensor(sensorId);
     if (ret != ERR_OK) {
         SEN_HILOGE("EnableSensor failed");
-        clientInfo_.RemoveSubscriber(sensorId, GetCallingPid());
+        clientInfo_.RemoveSubscriber(sensorId, IPCSkeleton::GetCallingRealPid());
         return ENABLE_SENSOR_ERR;
     }
 #endif // HDF_DRIVERS_INTERFACE_SENSOR
@@ -332,7 +334,7 @@ ErrCode SensorService::DisableSensor(int32_t sensorId, int32_t pid)
 ErrCode SensorService::DisableSensor(int32_t sensorId)
 {
     CALL_LOG_ENTER;
-    return DisableSensor(sensorId, GetCallingPid());
+    return DisableSensor(sensorId, IPCSkeleton::GetCallingRealPid());
 }
 
 std::vector<Sensor> SensorService::GetSensorList()
@@ -356,7 +358,7 @@ ErrCode SensorService::TransferDataChannel(const sptr<SensorBasicDataChannel> &s
                                            const sptr<IRemoteObject> &sensorClient)
 {
     CHKPR(sensorBasicDataChannel, ERR_NO_INIT);
-    auto pid = GetCallingPid();
+    auto pid = IPCSkeleton::GetCallingRealPid();
     auto uid = GetCallingUid();
     auto callerToken = GetCallingTokenID();
     if (!clientInfo_.UpdateAppThreadInfo(pid, uid, callerToken)) {
@@ -375,7 +377,7 @@ ErrCode SensorService::TransferDataChannel(const sptr<SensorBasicDataChannel> &s
 ErrCode SensorService::DestroySensorChannel(sptr<IRemoteObject> sensorClient)
 {
     CALL_LOG_ENTER;
-    const int32_t clientPid = GetCallingPid();
+    const int32_t clientPid = IPCSkeleton::GetCallingRealPid();
     if (clientPid < 0) {
         SEN_HILOGE("clientPid is invalid, clientPid:%{public}d", clientPid);
         return CLIENT_PID_INVALID_ERR;
@@ -506,14 +508,14 @@ ErrCode SensorService::CreateSocketChannel(sptr<IRemoteObject> sensorClient, int
     CALL_LOG_ENTER;
     CHKPR(sensorClient, INVALID_POINTER);
     int32_t serverFd = -1;
-    int32_t ret = AddSocketPairInfo(GetCallingUid(), GetCallingPid(),
+    int32_t ret = AddSocketPairInfo(GetCallingUid(), IPCSkeleton::GetCallingRealPid(),
         AccessTokenKit::GetTokenTypeFlag(GetCallingTokenID()),
         serverFd, std::ref(clientFd));
     if (ret != ERR_OK) {
         SEN_HILOGE("Add socket pair info failed, ret:%{public}d", ret);
         return ret;
     }
-    RegisterClientDeathRecipient(sensorClient, GetCallingPid());
+    RegisterClientDeathRecipient(sensorClient, IPCSkeleton::GetCallingRealPid());
     return ERR_OK;
 }
 
@@ -521,7 +523,7 @@ ErrCode SensorService::DestroySocketChannel(sptr<IRemoteObject> sensorClient)
 {
     CALL_LOG_ENTER;
     CHKPR(sensorClient, INVALID_POINTER);
-    DelSession(GetCallingPid());
+    DelSession(IPCSkeleton::GetCallingRealPid());
     UnregisterClientDeathRecipient(sensorClient);
     return ERR_OK;
 }
@@ -530,14 +532,14 @@ ErrCode SensorService::EnableActiveInfoCB()
 {
     CALL_LOG_ENTER;
     isReportActiveInfo_ = true;
-    return clientInfo_.AddActiveInfoCBPid(GetCallingPid());
+    return clientInfo_.AddActiveInfoCBPid(IPCSkeleton::GetCallingRealPid());
 }
 
 ErrCode SensorService::DisableActiveInfoCB()
 {
     CALL_LOG_ENTER;
     isReportActiveInfo_ = false;
-    return clientInfo_.DelActiveInfoCBPid(GetCallingPid());
+    return clientInfo_.DelActiveInfoCBPid(IPCSkeleton::GetCallingRealPid());
 }
 
 ErrCode SensorService::ResetSensors()
