@@ -42,13 +42,37 @@ napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const
 
 bool GetNapiError(int32_t errorCode, std::string &codeMsg)
 {
-    auto iter = ERROR_MESSAGES.find(errorCode);
-    if (iter == ERROR_MESSAGES.end()) {
+    auto iter = ERROR_CODE_MESSAGES.find(errorCode);
+    if (iter == ERROR_CODE_MESSAGES.end()) {
         SEN_HILOGE("errorCode %{public}d not found", errorCode);
         return false;
     }
     codeMsg = iter->second;
     return true;
+}
+
+std::optional<std::string> GetNapiError(int32_t errorCode)
+{
+    auto iter = ERROR_MESSAGES.find(errorCode);
+    if (iter != ERROR_MESSAGES.end()) {
+        return iter->second;
+    }
+    return std::nullopt;
+}
+
+void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
+{
+    SEN_HILOGE("Message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
+    auto msg = GetNapiError(errCode);
+    if (!msg) {
+        SEN_HILOGE("ErrCode:%{public}d is invalid", errCode);
+        return;
+    }
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    napi_value error = CreateBusinessError(env, errCode, msg.value());
+    napi_throw(env, error);
+    napi_close_handle_scope(env, scope);
 }
 
 void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg, const std::string &correctMsg)

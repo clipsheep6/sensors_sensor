@@ -268,11 +268,8 @@ static napi_value Once(napi_env env, napi_callback_info info)
     if (!CheckSubscribe(sensorTypeId)) {
         SEN_HILOGD("No subscription to change sensor data, registration is required");
         int32_t ret = SubscribeSensor(sensorTypeId, REPORTING_INTERVAL, DataCallbackImpl);
-        if (ret == PARAMETER_ERROR) {
-            ThrowErr(env, ret, "parameter verification failed", "enter the correct parameters");
-            return nullptr;
-        } else if (ret != ERR_OK) {
-            ThrowErr(env, ret, "SubscribeSensor fail", "Must be positive");
+        if (ret != ERR_OK) {
+            ThrowErr(env, ret, "SubscribeSensor fail");
             return nullptr;
         }
     }
@@ -376,14 +373,8 @@ static napi_value On(napi_env env, napi_callback_info info)
     }
     SEN_HILOGD("Interval is %{public}" PRId64, interval);
     int32_t ret = SubscribeSensor(sensorTypeId, interval, DataCallbackImpl);
-    if (ret == PARAMETER_ERROR) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret == SERVICE_EXCEPTION) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret != ERR_OK) {
-        ThrowErr(env, ret, "SubscribeSensor fail", "positive");
+    if (ret != ERR_OK) {
+        ThrowErr(env, ret, "SubscribeSensor fail");
         return nullptr;
     }
     UpdateCallbackInfos(env, sensorTypeId, args[1]);
@@ -524,7 +515,7 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     }
     napi_value napiLatitude = GetNamedProperty(env, args[0], "latitude");
     if (napiLatitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiLatitude is null", "positive");
+        ThrowErr(env, PARAMETER_ERROR, "napiLatitude is null", "napi_value");
         return nullptr;
     }
     double latitude = 0;
@@ -534,7 +525,7 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     }
     napi_value napiLongitude = GetNamedProperty(env, args[0], "longitude");
     if (napiLongitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napiLongitude is positive");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_value");
         return nullptr;
     }
     double longitude = 0;
@@ -544,7 +535,7 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     }
     napi_value napiAltitude = GetNamedProperty(env, args[0], "altitude");
     if (napiAltitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiAltitude is null", "napiAltitude is positive");
+        ThrowErr(env, PARAMETER_ERROR, "napiAltitude is null", "napi_value");
         return nullptr;
     }
     double altitude = 0;
@@ -637,11 +628,8 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     std::vector<float> outRotationVector(length);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.TransformCoordinateSystem(inRotationVector, axisX, axisY, outRotationVector);
-    if (ret == PARAMETER_ERROR) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Transform coordinate system fail", "Must be positive");
+    if (ret != OHOS::ERR_OK) {
+        ThrowErr(env, ret, "Transform coordinate system fail");
         return nullptr;
     } else {
         for (size_t i = 0; i < length; ++i) {
@@ -691,7 +679,7 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetAngleModify(curRotationVector, preRotationVector, angleChange);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get angle modify fail", "Must be positive");
+        ThrowErr(env, ret, "Get angle modify fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = ROTATION_VECTOR_LENGTH;
@@ -731,11 +719,8 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
     std::vector<float> rotationAngle(ROTATION_VECTOR_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetDirection(rotationMatrix, rotationAngle);
-    if (ret == PARAMETER_ERROR) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get direction fail", "Must be positive");
+    if (ret != OHOS::ERR_OK) {
+        ThrowErr(env, ret, "Get direction fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = ROTATION_VECTOR_LENGTH;
@@ -775,11 +760,8 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     std::vector<float> quaternion(QUATERNION_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateQuaternion(rotationVector, quaternion);
-    if (ret == PARAMETER_ERROR) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get createQuaternion fail", "Must be positive");
+    if (ret != OHOS::ERR_OK) {
+        ThrowErr(env, ret, "Get createQuaternion fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = QUATERNION_LENGTH;
@@ -825,7 +807,7 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetAltitude(seaPressure, currentPressure, &altitude);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get altitude fail", "Must be positive");
+        ThrowErr(env, ret, "Get altitude fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.reserve[0] = altitude;
@@ -862,11 +844,8 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     float geomagneticDip = 0;
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.GetGeomagneticDip(inclinationMatrix, &geomagneticDip);
-    if (ret == PARAMETER_ERROR) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
-        return nullptr;
-    } else if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get geomagnetic dip fail", "Must be positive");
+    if (ret != OHOS::ERR_OK) {
+        ThrowErr(env, ret, "Get geomagnetic dip fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.reserve[0] = geomagneticDip;
@@ -902,7 +881,7 @@ static napi_value CreateRotationAndInclination(const napi_env &env, napi_value a
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateRotationAndInclination(gravity, geomagnetic, rotation, inclination);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Create rotation and inclination matrix fail", "Must be positive");
+        ThrowErr(env, ret, "Create rotation and inclination matrix fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = THREE_DIMENSIONAL_MATRIX_LENGTH;
@@ -938,7 +917,7 @@ static napi_value GetRotationMatrix(const napi_env &env, napi_value args[], size
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateRotationMatrix(rotationVector, rotationMatrix);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
+        ThrowErr(env, ret, "Create rotation matrix fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = THREE_DIMENSIONAL_MATRIX_LENGTH;
@@ -1027,7 +1006,7 @@ static napi_value GetSensorListSync(napi_env env, napi_callback_info info)
     int32_t count = 0;
     int32_t ret = GetAllSensors(&sensorInfos, &count);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "parameter verification failed", "positive");
+        ThrowErr(env, ret, "Get sensor list fail");
         return result;
     }
     vector<SensorInfo> sensorInfoVec;
@@ -1095,7 +1074,7 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
             }
         }
         if (asyncCallbackInfo->sensorInfos.empty()) {
-            ThrowErr(env, SENSOR_NO_SUPPORT, "parameter verification failed", "The sensor is supported by the device");
+            ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is supported by the device");
             return nullptr;
         }
     }
@@ -1127,7 +1106,7 @@ static napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
     int32_t count = 0;
     int32_t ret = GetAllSensors(&sensorInfos, &count);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "Get sensor list fail", "Must be positive");
+        ThrowErr(env, ret, "Get sensor list fail");
         return result;
     }
     vector<SensorInfo> sensorInfoVec;
@@ -1143,7 +1122,7 @@ static napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
         }
     }
     if (sensorInfoVec.empty()) {
-        ThrowErr(env, SENSOR_NO_SUPPORT, "parameter verification failed", "The sensor is supported by the device");
+        ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is supported by the device");
         return result;
     }
     if (!ConvertToSensorInfo(env, sensorInfoVec[0], result)) {
