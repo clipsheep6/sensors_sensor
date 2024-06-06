@@ -82,8 +82,12 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
     if (GetNapiError(errCode, codeMsg)) {
         char buf[SENSOR_BUFF];
         if (sprintf_s(buf, sizeof(buf), codeMsg.c_str(), printMsg.c_str(), correctMsg.c_str()) > 0 ) {
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            napi_value error =CreateBusinessError(env, errCode, buf);
             SEN_HILOGE("Message buf:%{public}s", buf);
-            CreateBusinessError(env, errCode, buf);
+            napi_throw(env, error);
+            napi_close_handle_scope(env, scope);
         } else {
             SEN_HILOGE("Failed to convert string type to char type");
         }
