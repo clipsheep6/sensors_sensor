@@ -120,23 +120,23 @@ typedef enum Sensor_Type {
  */
 typedef enum Sensor_Result {
     /**
-     * The operation is successful.
+     * @error The operation is successful.
      * @since 11
      */
     SENSOR_SUCCESS = 0,
     /**
-     * Permission verification failed.
+     * @error Permission verification failed.
      * @since 11
      */
     SENSOR_PERMISSION_DENIED = 201,
     /**
-     * Parameter check failed. For example, a mandatory parameter is not passed in,
+     * @error Parameter check failed. For example, a mandatory parameter is not passed in,
      * or the parameter type passed in is incorrect.
      * @since 11
      */
     SENSOR_PARAMETER_ERROR = 401,
     /**
-     * The sensor service is abnormal.
+     * @error The sensor service is abnormal.
      * @since 11
      */
     SENSOR_SERVICE_EXCEPTION = 14500101,
