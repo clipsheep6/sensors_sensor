@@ -17,11 +17,17 @@
 
 #include <optional>
 
+#include "securec.h"
+
 #undef LOG_TAG
 #define LOG_TAG "SensorJsAPI"
 
 namespace OHOS {
 namespace Sensors {
+namespace {
+constexpr int32_t SENSOR_BUFF = 300;
+}  // namespace
+
 napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const std::string &errMessage)
 {
     napi_value businessError = nullptr;
@@ -32,6 +38,17 @@ napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const
     napi_create_error(env, nullptr, msg, &businessError);
     napi_set_named_property(env, businessError, "code", code);
     return businessError;
+}
+
+bool GetNapiError(int32_t errorCode, std::string &codeMsg)
+{
+    auto iter = ACCURATE_MESSAGES.find(errorCode);
+    if (iter == ACCURATE_MESSAGES.end()) {
+        SEN_HILOGE("errorCode %{public}d not found", errorCode);
+        return false;
+    }
+    codeMsg = iter->second;
+    return true;
 }
 
 std::optional<std::string> GetNapiError(int32_t errorCode)
@@ -56,6 +73,25 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
     napi_value error = CreateBusinessError(env, errCode, msg.value());
     napi_throw(env, error);
     napi_close_handle_scope(env, scope);
+}
+
+void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg, const std::string &correctMsg)
+{
+    SEN_HILOGE("printMsg:%{public}s, correctMsg:%{public}s, code:%{public}d", printMsg.c_str(), correctMsg.c_str(), errCode);
+    std::string codeMsg;
+    if (GetNapiError(errCode, codeMsg)) {
+        char buf[SENSOR_BUFF];
+        if (sprintf_s(buf, sizeof(buf), codeMsg.c_str(), printMsg.c_str(), correctMsg.c_str()) > 0 ) {
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            napi_value error =CreateBusinessError(env, errCode, buf);
+            SEN_HILOGE("Message buf:%{public}s", buf);
+            napi_throw(env, error);
+            napi_close_handle_scope(env, scope);
+        } else {
+            SEN_HILOGE("Failed to convert string type to char type");
+        }
+    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

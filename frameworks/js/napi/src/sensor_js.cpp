@@ -237,7 +237,7 @@ static void UpdateOnceCallback(napi_env env, int32_t sensorTypeId, napi_value ca
     CHKPV(asyncCallbackInfo);
     napi_status status = napi_create_reference(env, callback, 1, &asyncCallbackInfo->callback[0]);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "create reference");
         return;
     }
     std::vector<sptr<AsyncCallbackInfo>> callbackInfos = g_onceCallbackInfos[sensorTypeId];
@@ -253,16 +253,16 @@ static napi_value Once(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if ((!IsMatchType(env, args[0], napi_number)) || (!IsMatchType(env, args[1], napi_function))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_function");
         return nullptr;
     }
     int32_t sensorTypeId = INVALID_SENSOR_ID;
     if (!GetNativeInt32(env, args[0], sensorTypeId)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get number fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "sensorTypeId");
         return nullptr;
     }
     if (!CheckSubscribe(sensorTypeId)) {
@@ -309,7 +309,7 @@ static void UpdateCallbackInfos(napi_env env, int32_t sensorTypeId, napi_value c
     CHKPV(asyncCallbackInfo);
     napi_status status = napi_create_reference(env, callback, 1, &asyncCallbackInfo->callback[0]);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "create reference");
         return;
     }
     std::vector<sptr<AsyncCallbackInfo>> callbackInfos = g_onCallbackInfos[sensorTypeId];
@@ -353,16 +353,16 @@ static napi_value On(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if ((!IsMatchType(env, args[0], napi_number)) || (!IsMatchType(env, args[1], napi_function))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "args[0] is napi_number and args[1] is napi_function");
         return nullptr;
     }
     int32_t sensorTypeId = INVALID_SENSOR_ID;
     if (!GetNativeInt32(env, args[0], sensorTypeId)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get number fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "sensorTypeId");
         return nullptr;
     }
     int64_t interval = REPORTING_INTERVAL;
@@ -443,12 +443,12 @@ static napi_value Off(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     int32_t sensorTypeId = INVALID_SENSOR_ID;
     if ((!IsMatchType(env, args[0], napi_number)) || (!GetNativeInt32(env, args[0], sensorTypeId))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type or get number fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_number or sensorTypeId");
         return nullptr;
     }
     int32_t subscribeSize = -1;
@@ -459,7 +459,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
     } else if (IsMatchType(env, args[1], napi_function)) {
         subscribeSize = RemoveCallback(env, sensorTypeId, args[1]);
     } else {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, args[1] should is napi_function");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_function");
         return nullptr;
     }
     if (CheckSystemSubscribe(sensorTypeId) || (subscribeSize > 0)) {
@@ -467,8 +467,10 @@ static napi_value Off(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int32_t ret = UnsubscribeSensor(sensorTypeId);
-    if (ret == PARAMETER_ERROR || ret == PERMISSION_DENIED) {
-        ThrowErr(env, ret, "UnsubscribeSensor fail");
+    if (ret == PARAMETER_ERROR) {
+        ThrowErr(env, ret, "parameter verification failed", "UnsubscribeSensor success");
+    } else if (ret == PERMISSION_DENIED) {
+        ThrowErr(env, ret, "unsubscribe sensor", "permission");
     }
     return nullptr;
 }
@@ -504,46 +506,46 @@ static napi_value GetGeomagneticField(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if ((!IsMatchType(env, args[0], napi_object)) || (!IsMatchType(env, args[1], napi_number))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_object or napi_number");
         return nullptr;
     }
     napi_value napiLatitude = GetNamedProperty(env, args[0], "latitude");
     if (napiLatitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiLatitude is null");
+        ThrowErr(env, PARAMETER_ERROR, "napiLatitude is null", "napi_value");
         return nullptr;
     }
     double latitude = 0;
     if (!GetNativeDouble(env, napiLatitude, latitude)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get latitude fail");
+        ThrowErr(env, PARAMETER_ERROR, "get latitude fail", "double");
         return nullptr;
     }
     napi_value napiLongitude = GetNamedProperty(env, args[0], "longitude");
     if (napiLongitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiLongitude is null");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_value");
         return nullptr;
     }
     double longitude = 0;
     if (!GetNativeDouble(env, napiLongitude, longitude)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get longitude fail");
+        ThrowErr(env, PARAMETER_ERROR, "get longitude fail", "double");
         return nullptr;
     }
     napi_value napiAltitude = GetNamedProperty(env, args[0], "altitude");
     if (napiAltitude == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiAltitude is null");
+        ThrowErr(env, PARAMETER_ERROR, "napiAltitude is null", "napi_value");
         return nullptr;
     }
     double altitude = 0;
     if (!GetNativeDouble(env, napiAltitude, altitude)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get altitude fail");
+        ThrowErr(env, PARAMETER_ERROR, "get altitude fail", "double");
         return nullptr;
     }
     int64_t timeMillis = 0;
     if (!GetNativeInt64(env, args[1], timeMillis)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get timeMillis fail");
+        ThrowErr(env, PARAMETER_ERROR, "get timeMillis fail", "int64_t");
         return nullptr;
     }
     GeomagneticField geomagneticField(latitude, longitude, altitude, timeMillis);
@@ -583,41 +585,41 @@ static napi_value TransformCoordinateSystem(napi_env env, napi_callback_info inf
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if ((!IsMatchArrayType(env, args[0])) || (!IsMatchType(env, args[1], napi_object))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "array or napi_object");
         return nullptr;
     }
     std::vector<float> inRotationVector;
     if (!GetFloatArray(env, args[0], inRotationVector)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get inRotationVector fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "get inRotationVector success");
         return nullptr;
     }
     size_t length = inRotationVector.size();
     if ((length != DATA_LENGTH) && (length != THREE_DIMENSIONAL_MATRIX_LENGTH)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong inRotationVector length");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct inRotationVector length");
         return nullptr;
     }
     napi_value napiAxisX = GetAxisX(env, args[1]);
     if (napiAxisX == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiAxisX is null");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_value");
         return nullptr;
     }
     int32_t axisX = 0;
     if (!GetNativeInt32(env, napiAxisX, axisX)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get axisY fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "int32_t");
         return nullptr;
     }
     napi_value napiAxisY = GetAxisY(env, args[1]);
     if (napiAxisY == nullptr) {
-        ThrowErr(env, PARAMETER_ERROR, "napiAxisY is null");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_value");
         return nullptr;
     }
     int32_t axisY = 0;
     if (!GetNativeInt32(env, napiAxisY, axisY)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get axisY fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "int32_t");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -649,15 +651,15 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[0])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[1])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -665,12 +667,12 @@ static napi_value GetAngleModify(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     std::vector<float> curRotationVector;
     if (!GetFloatArray(env, args[0], curRotationVector)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get curRotationVector fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> preRotationVector;
     if (!GetFloatArray(env, args[1], preRotationVector)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get preRotationVector fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> angleChange(ROTATION_VECTOR_LENGTH);
@@ -699,11 +701,11 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[0])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -711,7 +713,7 @@ static napi_value GetDirection(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     std::vector<float> rotationMatrix;
     if (!GetFloatArray(env, args[0], rotationMatrix)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get rotationMatrix fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> rotationAngle(ROTATION_VECTOR_LENGTH);
@@ -740,11 +742,11 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info failed or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[0])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -752,14 +754,14 @@ static napi_value CreateQuaternion(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     std::vector<float> rotationVector;
     if (!GetFloatArray(env, args[0], rotationVector)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get rotationVector failed");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> quaternion(QUATERNION_LENGTH);
     SensorAlgorithm sensorAlgorithm;
     int32_t ret = sensorAlgorithm.CreateQuaternion(rotationVector, quaternion);
     if (ret != OHOS::ERR_OK) {
-        ThrowErr(env, ret, "CreateQuaternion fail");
+        ThrowErr(env, ret, "Get createQuaternion fail");
         return nullptr;
     } else {
         asyncCallbackInfo->data.reserveData.length = QUATERNION_LENGTH;
@@ -781,11 +783,11 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 3");
         return nullptr;
     }
     if ((!IsMatchType(env, args[0], napi_number)) || (!IsMatchType(env, args[1], napi_number))) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_number");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -793,12 +795,12 @@ static napi_value GetAltitude(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     float seaPressure = 0;
     if (!GetNativeFloat(env, args[0], seaPressure)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get seaPressure fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float");
         return nullptr;
     }
     float currentPressure = 0;
     if (!GetNativeFloat(env, args[1], currentPressure)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get currentPressure fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float");
         return nullptr;
     }
     float altitude = 0;
@@ -824,11 +826,11 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[0])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -836,7 +838,7 @@ static napi_value GetGeomagneticDip(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     std::vector<float> inclinationMatrix;
     if (!GetFloatArray(env, args[0], inclinationMatrix)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get inclinationMatrix fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     float geomagneticDip = 0;
@@ -858,17 +860,17 @@ static napi_value CreateRotationAndInclination(const napi_env &env, napi_value a
 {
     CALL_LOG_ENTER;
     if (argc < 2) {
-        ThrowErr(env, PARAMETER_ERROR, "The number of parameters is not valid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 2");
         return nullptr;
     }
     std::vector<float> gravity;
     if (!GetFloatArray(env, args[0], gravity)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get gravity fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> geomagnetic;
     if (!GetFloatArray(env, args[1], geomagnetic)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get geomagnetic fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     std::vector<float> rotation(THREE_DIMENSIONAL_MATRIX_LENGTH);
@@ -900,12 +902,12 @@ static napi_value GetRotationMatrix(const napi_env &env, napi_value args[], size
 {
     CALL_LOG_ENTER;
     if (argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "The number of parameters is not valid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     std::vector<float> rotationVector;
     if (!GetFloatArray(env, args[0], rotationVector)) {
-        ThrowErr(env, PARAMETER_ERROR, "Get rotationVector fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "float array");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -937,11 +939,11 @@ static napi_value CreateRotationMatrix(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     if (!IsMatchArrayType(env, args[0])) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be array");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return nullptr;
     }
     if (argc >= 2 && IsMatchArrayType(env, args[1])) {
@@ -959,7 +961,7 @@ static napi_value GetSensorList(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "enter the correct parameters");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -997,7 +999,7 @@ static napi_value GetSensorListSync(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "enter the correct parameters");
         return result;
     }
     SensorInfo *sensorInfos = nullptr;
@@ -1017,17 +1019,17 @@ static napi_value GetSensorListSync(napi_env env, napi_callback_info info)
         sensorInfoVec.push_back(*(sensorInfos + i));
     }
     if (napi_create_array(env, &result) != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_create_array fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_create_array success");
         return result;
     }
     for (uint32_t i = 0; i < sensorInfoVec.size(); ++i) {
         napi_value value = nullptr;
         if (!ConvertToSensorInfo(env, sensorInfoVec[i], value)) {
-            ThrowErr(env, PARAMETER_ERROR, "Convert sensor info fail");
+            ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "Convert sensor info success");
             return result;
         }
         if (napi_set_element(env, result, i, value) != napi_ok) {
-            ThrowErr(env, PARAMETER_ERROR, "napi_set_element fail");
+            ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_set_element success");
         }
     }
     return result;
@@ -1041,12 +1043,12 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     int32_t sensorTypeId = INVALID_SENSOR_ID;
     if (!GetNativeInt32(env, args[0], sensorTypeId)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get number fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "sensorTypeId");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo =
@@ -1072,7 +1074,7 @@ static napi_value GetSingleSensor(napi_env env, napi_callback_info info)
             }
         }
         if (asyncCallbackInfo->sensorInfos.empty()) {
-            ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is not supported by the device");
+            ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is supported by the device");
             return nullptr;
         }
     }
@@ -1092,12 +1094,12 @@ static napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc == 0) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return result;
     }
     int32_t sensorTypeId = INVALID_SENSOR_ID;
     if (!GetNativeInt32(env, args[0], sensorTypeId)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, get number fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "correct argument type");
         return result;
     }
     SensorInfo *sensorInfos = nullptr;
@@ -1120,11 +1122,11 @@ static napi_value GetSingleSensorSync(napi_env env, napi_callback_info info)
         }
     }
     if (sensorInfoVec.empty()) {
-        ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is not supported by the device");
+        ThrowErr(env, SENSOR_NO_SUPPORT, "The sensor is supported by the device");
         return result;
     }
     if (!ConvertToSensorInfo(env, sensorInfoVec[0], result)) {
-        ThrowErr(env, PARAMETER_ERROR, "Convert sensor info fail");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "Convert sensor info success");
     }
     return result;
 }
@@ -1137,11 +1139,11 @@ napi_value Subscribe(napi_env env, napi_callback_info info, int32_t sensorTypeId
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     if (!IsMatchType(env, args[0], napi_object)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be object");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_object");
         return nullptr;
     }
     string interval = "normal";
@@ -1209,7 +1211,7 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info, int32_t sensorType
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
+        ThrowErr(env, PARAMETER_ERROR, "Parameter verification failed", "napi_get_cb_info success");
         return nullptr;
     }
     if (!RemoveSubscribeCallback(env, sensorTypeId) || CheckSubscribe(sensorTypeId)) {
@@ -1231,11 +1233,11 @@ napi_value GetBodyState(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisVar, nullptr);
     if (status != napi_ok || argc < 1) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "greater than 1");
         return nullptr;
     }
     if (!IsMatchType(env, args[0], napi_object)) {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, should be object");
+        ThrowErr(env, PARAMETER_ERROR, "parameter verification failed", "napi_object");
         return nullptr;
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env, GET_BODY_STATE);
