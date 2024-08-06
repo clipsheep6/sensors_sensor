@@ -25,6 +25,7 @@
 #include "securec.h"
 
 #include "geomagnetic_field.h"
+#include "print_sensor_data.h"
 #include "sensor_algorithm.h"
 #include "sensor_napi_error.h"
 #include "sensor_napi_utils.h"
@@ -137,6 +138,7 @@ static void EmitOnCallback(SensorEvent *event)
             continue;
         }
         EmitUvEventLoop(onCallbackInfo);
+        PrintSensorData::GetInstance().ControlSensorJsPrint(event);
     }
 }
 

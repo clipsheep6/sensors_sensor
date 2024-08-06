@@ -17,6 +17,7 @@
 
 #include <cstring>
 
+#include "print_sensor_data.h"
 #include "securec.h"
 #include "sensor_errors.h"
 #include "sensor_service_client.h"
@@ -75,6 +76,7 @@ void SensorAgentProxy::HandleSensorData(SensorEvent *events, int32_t num, void *
             RecordSensorCallback fun = user->callback;
             CHKPV(fun);
             fun(&eventStream);
+            PrintSensorData::GetInstance().ControlSensorClientPrint(eventStream);
         }
     }
 }
